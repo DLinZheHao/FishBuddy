@@ -60,7 +60,7 @@ class APIService {
         return endpoint
     }
     
-    // MARK:- API Request 網路請求設定
+    // MARK: - API Request 網路請求設定
     /// requestClosure
     private let requestClosure = { (endpoint: Endpoint, done: MoyaProvider.RequestResultClosure) in
         do {
@@ -73,6 +73,27 @@ class APIService {
         }
     }
 
+    // MARK: - API 請求 Log
+    private func getPluginTypes() -> [PluginType] {
+        if #available(iOS 14.0, *) {
+            let networkLogger = APILoggerPlugin(
+                configuration: .init(
+                    formatter: .init(responseData: jsonResponseDataFormatter),
+                    logOptions: .verbose
+                )
+            )
+            return [networkLogger]
+        } else {
+            let networkLogger = NetworkLoggerPlugin(
+                configuration: .init(
+                    formatter: .init(responseData: jsonResponseDataFormatter),
+                    logOptions: .verbose
+                )
+            )
+            return [networkLogger]
+        }
+    }
+    
     /// 外部使用唯一運行辦法 （預設）
     public static func shareManager() -> APIService {
         // TODO: 可以在這裡新增屬性
@@ -92,7 +113,8 @@ class APIService {
     func requestDataCombine(target: TargetType) -> AnyPublisher<Any?, MoyaError> {
         let target = MultiTarget(target)
         let provider = MoyaProvider<MultiTarget>(endpointClosure: endpointClosure,
-                                                 requestClosure: requestClosure)
+                                                 requestClosure: requestClosure,
+                                                 plugins: getPluginTypes())
         
         let result = Future<Any?, MoyaError> { promise in
             let cancellable = provider.request(target) { result in
@@ -129,3 +151,17 @@ class APIService {
 }
 
 
+extension APIService {
+    /// ResponseDataFormatter
+    /// - Parameter data: data description
+    /// - Returns:
+    private func jsonResponseDataFormatter(_ data: Data) -> String {
+        do {
+            let dataAsJSON = try JSONSerialization.jsonObject(with: data)
+            let prettyData = try JSONSerialization.data(withJSONObject: dataAsJSON, options: .prettyPrinted)
+            return String(data: prettyData, encoding: .utf8) ?? String(data: data, encoding: .utf8) ?? ""
+        } catch {
+            return String(data: data, encoding: .utf8) ?? ""
+        }
+    }
+}

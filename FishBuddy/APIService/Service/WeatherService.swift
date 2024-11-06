@@ -28,6 +28,8 @@ enum WeatherAPIService {
         var method: Moya.Method { return .get }
         var path: String { return "F-C0032-001" }
         var task: Task {
+            var params = params
+            params["Authorization"] = APIService.shareManager().weatherKey
             return .requestParameters(parameters: params, encoding: URLEncoding.default)
         }
         

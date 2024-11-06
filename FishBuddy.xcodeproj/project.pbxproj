@@ -18,6 +18,10 @@
 		054C84602CD9C0AF005595EF /* UIControlPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C845F2CD9C0AF005595EF /* UIControlPublisher.swift */; };
 		054C84622CD9C0E3005595EF /* PublisherExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84612CD9C0E3005595EF /* PublisherExtension.swift */; };
 		054C84652CD9C144005595EF /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84642CD9C144005595EF /* WeatherService.swift */; };
+		054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C846B2CDB0548005595EF /* CodableExtension.swift */; };
+		054C846E2CDB06AA005595EF /* WeatherAllModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C846D2CDB06AA005595EF /* WeatherAllModel.swift */; };
+		05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E672DF2CDB0C78006CF3BF /* APILoggerPlugin.swift */; };
+		05E672E42CDB0CB3006CF3BF /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */; };
 		34CB838C47F0B8332479937F /* Pods_FishBuddy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 403AA25D1C561EBE052111F9 /* Pods_FishBuddy.framework */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +39,10 @@
 		054C845F2CD9C0AF005595EF /* UIControlPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIControlPublisher.swift; sourceTree = "<group>"; };
 		054C84612CD9C0E3005595EF /* PublisherExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublisherExtension.swift; sourceTree = "<group>"; };
 		054C84642CD9C144005595EF /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
+		054C846B2CDB0548005595EF /* CodableExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableExtension.swift; sourceTree = "<group>"; };
+		054C846D2CDB06AA005595EF /* WeatherAllModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAllModel.swift; sourceTree = "<group>"; };
+		05E672DF2CDB0C78006CF3BF /* APILoggerPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APILoggerPlugin.swift; sourceTree = "<group>"; };
+		05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
 		403AA25D1C561EBE052111F9 /* Pods_FishBuddy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FishBuddy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		93D4B919CA5B1C4E00C568C4 /* Pods-FishBuddy.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FishBuddy.debug.xcconfig"; path = "Target Support Files/Pods-FishBuddy/Pods-FishBuddy.debug.xcconfig"; sourceTree = "<group>"; };
 		9E8680C797A3C5BAD69C85F4 /* Pods-FishBuddy.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FishBuddy.release.xcconfig"; path = "Target Support Files/Pods-FishBuddy/Pods-FishBuddy.release.xcconfig"; sourceTree = "<group>"; };
@@ -73,6 +81,7 @@
 		054C84412CD9B994005595EF /* FishBuddy */ = {
 			isa = PBXGroup;
 			children = (
+				054C84662CDB04D5005595EF /* Weather */,
 				054C845B2CD9C030005595EF /* Common */,
 				054C84562CD9BD37005595EF /* APIService */,
 				054C84422CD9B994005595EF /* AppDelegate.swift */,
@@ -92,6 +101,7 @@
 				054C84632CD9C132005595EF /* Service */,
 				054C84572CD9BD76005595EF /* APIService.swift */,
 				054C84592CD9BDE5005595EF /* APIConfig.swift */,
+				05E672DF2CDB0C78006CF3BF /* APILoggerPlugin.swift */,
 			);
 			path = APIService;
 			sourceTree = "<group>";
@@ -99,6 +109,8 @@
 		054C845B2CD9C030005595EF /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				05E672E12CDB0C93006CF3BF /* DebugLogger */,
+				054C846A2CDB0531005595EF /* Codable */,
 				054C845E2CD9C082005595EF /* Combine */,
 			);
 			path = Common;
@@ -119,6 +131,54 @@
 				054C84642CD9C144005595EF /* WeatherService.swift */,
 			);
 			path = Service;
+			sourceTree = "<group>";
+		};
+		054C84662CDB04D5005595EF /* Weather */ = {
+			isa = PBXGroup;
+			children = (
+				054C84692CDB04F0005595EF /* Model */,
+				054C84682CDB04EA005595EF /* ViewModel */,
+				054C84672CDB04E3005595EF /* View */,
+			);
+			path = Weather;
+			sourceTree = "<group>";
+		};
+		054C84672CDB04E3005595EF /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		054C84682CDB04EA005595EF /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		054C84692CDB04F0005595EF /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				054C846D2CDB06AA005595EF /* WeatherAllModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		054C846A2CDB0531005595EF /* Codable */ = {
+			isa = PBXGroup;
+			children = (
+				054C846B2CDB0548005595EF /* CodableExtension.swift */,
+			);
+			path = Codable;
+			sourceTree = "<group>";
+		};
+		05E672E12CDB0C93006CF3BF /* DebugLogger */ = {
+			isa = PBXGroup;
+			children = (
+				05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */,
+			);
+			path = DebugLogger;
 			sourceTree = "<group>";
 		};
 		A618D7BF026182D6CF0FD035 /* Frameworks */ = {
@@ -253,10 +313,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				054C846E2CDB06AA005595EF /* WeatherAllModel.swift in Sources */,
+				05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */,
 				054C84652CD9C144005595EF /* WeatherService.swift in Sources */,
 				054C84472CD9B994005595EF /* ViewController.swift in Sources */,
+				054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */,
 				054C84432CD9B994005595EF /* AppDelegate.swift in Sources */,
 				054C84602CD9C0AF005595EF /* UIControlPublisher.swift in Sources */,
+				05E672E42CDB0CB3006CF3BF /* DebugLogger.swift in Sources */,
 				054C84582CD9BD76005595EF /* APIService.swift in Sources */,
 				054C84452CD9B994005595EF /* SceneDelegate.swift in Sources */,
 				054C845A2CD9BDE5005595EF /* APIConfig.swift in Sources */,
@@ -414,6 +478,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z4U4RWP3LA;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FishBuddy/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -421,6 +486,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -443,6 +509,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z4U4RWP3LA;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FishBuddy/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -450,6 +517,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
