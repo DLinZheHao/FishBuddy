@@ -1,16 +1,17 @@
 //
-//  ViewController.swift
+//  WeatherLobbyViewController.swift
 //  FishBuddy
 //
-//  Created by 林哲豪 on 2024/11/5.
+//  Created by 林哲豪 on 2024/11/15.
 //
 
 import UIKit
 import Combine
 
-class ViewController: UIViewController {
+class WeatherLobbyViewController: UIViewController {
 
-    var cancellables = Set<AnyCancellable>()
+    // viewModel
+    var vm = WeatherLobbyVM()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,7 +41,7 @@ class ViewController: UIViewController {
             }, receiveValue: { (model: WeatherAllModel) in
                 print("成功")
             })
-            .store(in: &cancellables)
+            .store(in: &vm.cancellables)
     }
-}
 
+}
