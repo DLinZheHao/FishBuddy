@@ -75,8 +75,11 @@ public enum APIMediaType: Int {
 }
 
 class APIBaseURLConfig {
+    /// 本地 domain
+    static var domainAPI = "http://192.168.0.224:3000"
+    
     /// 氣象署天氣服務
     static var weatherBaseURL: URL {
-        return URL(string: "https://opendata.cwa.gov.tw/api/v1/rest/datastore/")!
+        return URL(string: domainAPI + "/forecast")!
     }
 }

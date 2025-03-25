@@ -11,5 +11,5 @@ import Combine
 class WeatherLobbyVM {
     // 綁訂事件
     var cancellables = Set<AnyCancellable>()
-    
+
 }

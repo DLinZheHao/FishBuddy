@@ -27,8 +27,15 @@
 		05589EF22CE6F0A7003881AA /* UIStoryboardExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05589EF12CE6F0A7003881AA /* UIStoryboardExtension.swift */; };
 		05589EF42CE6F2D2003881AA /* UIViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05589EF32CE6F2D2003881AA /* UIViewControllerExtension.swift */; };
 		05589EF62CE6F5C5003881AA /* Weather.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 05589EF52CE6F5C5003881AA /* Weather.storyboard */; };
+		05589EF92CE6F808003881AA /* FeatrueTitleBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05589EF82CE6F808003881AA /* FeatrueTitleBar.swift */; };
+		05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */; };
+		05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245E92D0A7EB800C6C048 /* TagLineView.swift */; };
+		05E245EC2D0A7EB800C6C048 /* TagLineView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05E245EA2D0A7EB800C6C048 /* TagLineView.xib */; };
+		05E245EF2D0A7F9B00C6C048 /* UILabelPadding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245EE2D0A7F9B00C6C048 /* UILabelPadding.swift */; };
+		05E245F12D0A801000C6C048 /* UILabelExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245F02D0A801000C6C048 /* UILabelExtension.swift */; };
 		05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E672DF2CDB0C78006CF3BF /* APILoggerPlugin.swift */; };
 		05E672E42CDB0CB3006CF3BF /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */; };
+		05F3BED42D92824C00DDAC72 /* TideDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F3BED32D92824C00DDAC72 /* TideDataModel.swift */; };
 		34CB838C47F0B8332479937F /* Pods_FishBuddy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 403AA25D1C561EBE052111F9 /* Pods_FishBuddy.framework */; };
 /* End PBXBuildFile section */
 
@@ -55,8 +62,15 @@
 		05589EF12CE6F0A7003881AA /* UIStoryboardExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIStoryboardExtension.swift; sourceTree = "<group>"; };
 		05589EF32CE6F2D2003881AA /* UIViewControllerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewControllerExtension.swift; sourceTree = "<group>"; };
 		05589EF52CE6F5C5003881AA /* Weather.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Weather.storyboard; sourceTree = "<group>"; };
+		05589EF82CE6F808003881AA /* FeatrueTitleBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatrueTitleBar.swift; sourceTree = "<group>"; };
+		05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FeatureTitleBar.xib; sourceTree = "<group>"; };
+		05E245E92D0A7EB800C6C048 /* TagLineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagLineView.swift; sourceTree = "<group>"; };
+		05E245EA2D0A7EB800C6C048 /* TagLineView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TagLineView.xib; sourceTree = "<group>"; };
+		05E245EE2D0A7F9B00C6C048 /* UILabelPadding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelPadding.swift; sourceTree = "<group>"; };
+		05E245F02D0A801000C6C048 /* UILabelExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelExtension.swift; sourceTree = "<group>"; };
 		05E672DF2CDB0C78006CF3BF /* APILoggerPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APILoggerPlugin.swift; sourceTree = "<group>"; };
 		05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
+		05F3BED32D92824C00DDAC72 /* TideDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideDataModel.swift; sourceTree = "<group>"; };
 		403AA25D1C561EBE052111F9 /* Pods_FishBuddy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FishBuddy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		93D4B919CA5B1C4E00C568C4 /* Pods-FishBuddy.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FishBuddy.debug.xcconfig"; path = "Target Support Files/Pods-FishBuddy/Pods-FishBuddy.debug.xcconfig"; sourceTree = "<group>"; };
 		9E8680C797A3C5BAD69C85F4 /* Pods-FishBuddy.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FishBuddy.release.xcconfig"; path = "Target Support Files/Pods-FishBuddy/Pods-FishBuddy.release.xcconfig"; sourceTree = "<group>"; };
@@ -95,6 +109,7 @@
 		054C84412CD9B994005595EF /* FishBuddy */ = {
 			isa = PBXGroup;
 			children = (
+				05589EF72CE6F7DE003881AA /* Componet */,
 				054C845B2CD9C030005595EF /* Common */,
 				054C84562CD9BD37005595EF /* APIService */,
 				05589EE32CE6ECA4003881AA /* Metohd */,
@@ -179,6 +194,7 @@
 			isa = PBXGroup;
 			children = (
 				054C846D2CDB06AA005595EF /* WeatherAllModel.swift */,
+				05F3BED32D92824C00DDAC72 /* TideDataModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -238,8 +254,45 @@
 			children = (
 				05589EF12CE6F0A7003881AA /* UIStoryboardExtension.swift */,
 				05589EF32CE6F2D2003881AA /* UIViewControllerExtension.swift */,
+				05E245F02D0A801000C6C048 /* UILabelExtension.swift */,
 			);
 			path = Extension;
+			sourceTree = "<group>";
+		};
+		05589EF72CE6F7DE003881AA /* Componet */ = {
+			isa = PBXGroup;
+			children = (
+				05E245ED2D0A7F5100C6C048 /* UILabelPadding */,
+				05E245E82D0A7E5400C6C048 /* TagLineView */,
+				05589EFA2CE6F811003881AA /* TitleBar */,
+			);
+			path = Componet;
+			sourceTree = "<group>";
+		};
+		05589EFA2CE6F811003881AA /* TitleBar */ = {
+			isa = PBXGroup;
+			children = (
+				05589EF82CE6F808003881AA /* FeatrueTitleBar.swift */,
+				05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */,
+			);
+			path = TitleBar;
+			sourceTree = "<group>";
+		};
+		05E245E82D0A7E5400C6C048 /* TagLineView */ = {
+			isa = PBXGroup;
+			children = (
+				05E245E92D0A7EB800C6C048 /* TagLineView.swift */,
+				05E245EA2D0A7EB800C6C048 /* TagLineView.xib */,
+			);
+			path = TagLineView;
+			sourceTree = "<group>";
+		};
+		05E245ED2D0A7F5100C6C048 /* UILabelPadding */ = {
+			isa = PBXGroup;
+			children = (
+				05E245EE2D0A7F9B00C6C048 /* UILabelPadding.swift */,
+			);
+			path = UILabelPadding;
 			sourceTree = "<group>";
 		};
 		05E672E12CDB0C93006CF3BF /* DebugLogger */ = {
@@ -328,7 +381,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				054C844C2CD9B995005595EF /* Assets.xcassets in Resources */,
+				05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */,
 				05589EF62CE6F5C5003881AA /* Weather.storyboard in Resources */,
+				05E245EC2D0A7EB800C6C048 /* TagLineView.xib in Resources */,
 				054C844F2CD9B995005595EF /* Base in Resources */,
 				054C844A2CD9B994005595EF /* Base in Resources */,
 			);
@@ -390,16 +445,21 @@
 				05589EEF2CE6EFF3003881AA /* LobbyVM.swift in Sources */,
 				054C84472CD9B994005595EF /* LobbyViewController.swift in Sources */,
 				054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */,
+				05F3BED42D92824C00DDAC72 /* TideDataModel.swift in Sources */,
 				054C84432CD9B994005595EF /* AppDelegate.swift in Sources */,
 				05589EE72CE6ED93003881AA /* WeatherLobbyViewController.swift in Sources */,
 				054C84602CD9C0AF005595EF /* UIControlPublisher.swift in Sources */,
+				05589EF92CE6F808003881AA /* FeatrueTitleBar.swift in Sources */,
 				05589EF22CE6F0A7003881AA /* UIStoryboardExtension.swift in Sources */,
 				05E672E42CDB0CB3006CF3BF /* DebugLogger.swift in Sources */,
 				054C84582CD9BD76005595EF /* APIService.swift in Sources */,
 				05589EE52CE6ECD8003881AA /* Display.swift in Sources */,
+				05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */,
 				054C84452CD9B994005595EF /* SceneDelegate.swift in Sources */,
 				05589EE92CE6EDBF003881AA /* WeatherLobbyVM.swift in Sources */,
+				05E245EF2D0A7F9B00C6C048 /* UILabelPadding.swift in Sources */,
 				054C845A2CD9BDE5005595EF /* APIConfig.swift in Sources */,
+				05E245F12D0A801000C6C048 /* UILabelExtension.swift in Sources */,
 				054C84622CD9C0E3005595EF /* PublisherExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
