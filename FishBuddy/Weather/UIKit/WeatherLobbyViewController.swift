@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import SwiftUI
 
 class WeatherLobbyViewController: UIViewController {
 
@@ -15,8 +16,9 @@ class WeatherLobbyViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        fetchWeatherAPI()
+        fetchWeatherAPI()
         fetchTideAPI()
+        addSwiftUIView()
     }
 
     /// 測試呼叫天氣 API
@@ -35,13 +37,13 @@ class WeatherLobbyViewController: UIViewController {
                 }
                 return data
             }
-            .decode(type: WeatherAllModel.self, decoder: JSONDecoder())
+            .decode(type: WeatherResponse.self, decoder: JSONDecoder())
             .sink(receiveCompletion: { completion in
                 if case .failure(let error) = completion {
                     print("Request failed with error: \(error.localizedDescription)")
                 }
-            }, receiveValue: { (model: WeatherAllModel) in
-                print("成功")
+            }, receiveValue: { (model: WeatherResponse) in
+                self.vm.weatherResponse = model
             })
             .store(in: &vm.cancellables)
     }
@@ -73,5 +75,23 @@ class WeatherLobbyViewController: UIViewController {
                 print("成功")
             })
             .store(in: &vm.cancellables)
+    }
+
+    private func addSwiftUIView() {
+        let swiftUIView = WeatherView(vm: vm)
+        let hostingController = UIHostingController(rootView: swiftUIView)
+
+        addChild(hostingController)
+        view.addSubview(hostingController.view)
+        
+        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
+            hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
+        hostingController.didMove(toParent: self)
     }
 }

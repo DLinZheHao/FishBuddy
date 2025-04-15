@@ -7,9 +7,12 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
-class WeatherLobbyVM {
+class WeatherLobbyVM: ObservableObject {
     // 綁訂事件
     var cancellables = Set<AnyCancellable>()
 
+    /// 今明 36 小時天氣預報資料
+    @Published var weatherResponse: WeatherResponse?
 }
