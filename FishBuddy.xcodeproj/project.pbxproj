@@ -229,8 +229,6 @@
 		05589EEA2CE6EE19003881AA /* Lobby */ = {
 			isa = PBXGroup;
 			children = (
-				05589EED2CE6EE51003881AA /* Model */,
-				05589EEC2CE6EE4A003881AA /* View */,
 				05589EEB2CE6EE43003881AA /* ViewModel */,
 				054C84482CD9B994005595EF /* Main.storyboard */,
 				054C84462CD9B994005595EF /* LobbyViewController.swift */,
@@ -244,20 +242,6 @@
 				05589EEE2CE6EFF3003881AA /* LobbyVM.swift */,
 			);
 			path = ViewModel;
-			sourceTree = "<group>";
-		};
-		05589EEC2CE6EE4A003881AA /* View */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
-		05589EED2CE6EE51003881AA /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
 			sourceTree = "<group>";
 		};
 		05589EF02CE6F084003881AA /* Extension */ = {
