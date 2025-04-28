@@ -71,7 +71,8 @@ private func screenSafeAreaHeight() -> CGFloat {
     if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
        let window = windowScene.windows.first {
         let safeAreaInsets = window.safeAreaInsets
-        let navigationBarHeight: CGFloat = currentNavigationBarHeight() // 預設 NavigationBar 高度，大部分是 44
+        // 預設 NavigationBar 高度，大部分是 44
+        let navigationBarHeight: CGFloat = currentNavigationBarHeight()
         return window.bounds.height - safeAreaInsets.top - safeAreaInsets.bottom - navigationBarHeight - 20
     }
     return UIScreen.main.bounds.height
