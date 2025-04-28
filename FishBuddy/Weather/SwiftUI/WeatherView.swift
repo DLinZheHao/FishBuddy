@@ -11,7 +11,9 @@ import SwiftUI
 struct WeatherView: View {
     
     @ObservedObject var vm: WeatherLobbyVM
-        
+   
+    @State var selectedDate = Date()
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 8) {
@@ -52,21 +54,24 @@ struct WeatherView: View {
                 }
             } else {
                 // TODO: 實作 Loading 動畫
-                VStack {
-                    CenteredView(text: "Item \(2)")
-                        .frame(minHeight: screenSafeAreaHeight()) // 這裡自動撐到螢幕高度
-                                            .background(Color.blue.opacity(0.3))
-                                            .cornerRadius(10)
-                                            .padding(.horizontal)
-                        
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+//                VStack {
+//                    CenteredView(text: "Item \(2)")
+//                        .frame(minHeight: screenSafeAreaHeight()) // 這裡自動撐到螢幕高度
+//                                            .background(Color.blue.opacity(0.3))
+//                                            .cornerRadius(10)
+//                                            .padding(.horizontal)
+//                        
+//                    }
+//                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                CalendarView()
+                    .frame(height: 200)
             }
         }
     }
 }
 
-/// 計算非 safeArea 、非 titleBar 
+
+/// 計算非 safeArea 、非 titleBar
 private func screenSafeAreaHeight() -> CGFloat {
     if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
        let window = windowScene.windows.first {
