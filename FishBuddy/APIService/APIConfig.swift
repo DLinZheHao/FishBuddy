@@ -76,8 +76,9 @@ public enum APIMediaType: Int {
 
 class APIBaseURLConfig {
     /// 本地 domain
-    static var domainAPI = "http://192.168.0.224:3000"
-    
+    static var domainAPI = "http://10.10.114.29:3000"
+//    "http://192.168.0.224:3000"
+    // http://10.10.114.29:3000
     /// 氣象署天氣服務
     static var weatherBaseURL: URL {
         return URL(string: domainAPI + "/forecast")!

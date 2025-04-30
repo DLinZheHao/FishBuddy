@@ -30,6 +30,7 @@
 		05589EF62CE6F5C5003881AA /* Weather.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 05589EF52CE6F5C5003881AA /* Weather.storyboard */; };
 		05589EF92CE6F808003881AA /* FeatrueTitleBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05589EF82CE6F808003881AA /* FeatrueTitleBar.swift */; };
 		05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */; };
+		058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058877022DC1BE4D00B1D13E /* WeatherView2.swift */; };
 		05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245E92D0A7EB800C6C048 /* TagLineView.swift */; };
 		05E245EC2D0A7EB800C6C048 /* TagLineView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05E245EA2D0A7EB800C6C048 /* TagLineView.xib */; };
 		05E245EF2D0A7F9B00C6C048 /* UILabelPadding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245EE2D0A7F9B00C6C048 /* UILabelPadding.swift */; };
@@ -66,6 +67,7 @@
 		05589EF52CE6F5C5003881AA /* Weather.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Weather.storyboard; sourceTree = "<group>"; };
 		05589EF82CE6F808003881AA /* FeatrueTitleBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatrueTitleBar.swift; sourceTree = "<group>"; };
 		05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FeatureTitleBar.xib; sourceTree = "<group>"; };
+		058877022DC1BE4D00B1D13E /* WeatherView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView2.swift; sourceTree = "<group>"; };
 		05E245E92D0A7EB800C6C048 /* TagLineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagLineView.swift; sourceTree = "<group>"; };
 		05E245EA2D0A7EB800C6C048 /* TagLineView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TagLineView.xib; sourceTree = "<group>"; };
 		05E245EE2D0A7F9B00C6C048 /* UILabelPadding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelPadding.swift; sourceTree = "<group>"; };
@@ -213,6 +215,7 @@
 		05513A412DAE44050021573F /* SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				058877022DC1BE4D00B1D13E /* WeatherView2.swift */,
 				05513A422DAE44540021573F /* WeatherView.swift */,
 			);
 			path = SwiftUI;
@@ -453,6 +456,7 @@
 				05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */,
 				054C84452CD9B994005595EF /* SceneDelegate.swift in Sources */,
 				05589EE92CE6EDBF003881AA /* WeatherLobbyVM.swift in Sources */,
+				058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */,
 				05E245EF2D0A7F9B00C6C048 /* UILabelPadding.swift in Sources */,
 				054C845A2CD9BDE5005595EF /* APIConfig.swift in Sources */,
 				05E245F12D0A801000C6C048 /* UILabelExtension.swift in Sources */,
@@ -609,7 +613,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z4U4RWP3LA;
+				DEVELOPMENT_TEAM = Z64LB69QMK;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FishBuddy/Info.plist;
@@ -640,7 +644,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z4U4RWP3LA;
+				DEVELOPMENT_TEAM = Z64LB69QMK;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FishBuddy/Info.plist;

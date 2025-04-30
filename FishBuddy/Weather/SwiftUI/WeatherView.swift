@@ -78,6 +78,7 @@ private func screenSafeAreaHeight() -> CGFloat {
     return UIScreen.main.bounds.height
 }
 
+/// 計算目前 navigationBar 高度
 private func currentNavigationBarHeight() -> CGFloat {
     guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
           let window = windowScene.windows.first,
