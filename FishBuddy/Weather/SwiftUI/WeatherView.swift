@@ -64,8 +64,10 @@ struct WeatherView: View {
 //                        
 //                    }
 //                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                CalendarView()
-                    .frame(height: 200)
+                
+                VStack(alignment: .leading) {
+                    CalendarView()
+                }
             }
         }
     }

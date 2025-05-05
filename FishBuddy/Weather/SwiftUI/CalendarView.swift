@@ -23,12 +23,12 @@ struct CalendarView: View {
                         monthOffset: offset,
                         selectedDates: $selectedDates
                     )
-                    .frame(width: UIScreen.main.bounds.width - 32,
-                           height: CalendarMonthView.dynamicHeightForMonth(offset: offset))
                     .background(Color.gray.opacity(0.1))
                     .tag(offset)
                 }
             }
+            // 外層 frame 根據 currentPage 的高度設定（這是重點！）
+            .frame(height: CalendarMonthView.dynamicHeightForMonth(offset: currentPage))
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
         }
         .onAppear {
@@ -36,6 +36,11 @@ struct CalendarView: View {
         }
         .padding(16)
     }
+}
+
+#Preview {
+    CalendarView()
+//        .environmentObject(SettingStore())
 }
 
 struct CalendarMonthView: View {
@@ -46,12 +51,14 @@ struct CalendarMonthView: View {
     private let columns = Array(repeating: GridItem(.flexible()), count: 7)
     
     private static let rowHeight: CGFloat = 44 // 每一排的高度
-    private static let headerHeight: CGFloat = 40 // 星期幾的高度 + 標題高度
+    private static let headerHeight: CGFloat = 76 // 星期幾的高度 + 標題高度
 
+    /// 年份 + 月份
     private var monthDate: Date {
         calendar.date(byAdding: .month, value: monthOffset, to: Date())!
     }
     
+    /// 月份天數資料
     private var monthDays: [Date] {
         guard let monthInterval = calendar.dateInterval(of: .month, for: monthDate) else { return [] }
         var dates: [Date] = []
@@ -63,11 +70,13 @@ struct CalendarMonthView: View {
         return dates
     }
     
+    /// 起始位移
     private var startWeekdayOffset: Int {
         let weekday = calendar.component(.weekday, from: calendar.dateInterval(of: .month, for: monthDate)!.start)
         return (weekday - calendar.firstWeekday + 7) % 7
     }
     
+    /// 列數
     private var numberOfRows: Int {
         let totalItems = startWeekdayOffset + monthDays.count
         return Int(ceil(Double(totalItems) / 7.0))
