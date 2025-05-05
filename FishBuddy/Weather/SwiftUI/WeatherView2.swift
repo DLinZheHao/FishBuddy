@@ -20,15 +20,8 @@ struct WeatherView2: View {
                     VStack {
                         Image("晴天")
                             .resizable()
-//                            .aspectRatio(contentMode: .fit)
-                            .frame(height: geo.size.height
-                                   - lazyVGridHeight
-                                   - geo.safeAreaInsets.bottom
-                                   )
                             .frame(maxWidth: .infinity)
-                            .aspectRatio(contentMode: .fit)
                             .ignoresSafeArea(edges: .top)
-                        Spacer()
                     }
                     
                     VStack(spacing: 50) {
@@ -62,27 +55,8 @@ struct WeatherView2: View {
                         Spacer()
                     }
                     .padding(.bottom, 16)
-                    // 高度顯示區塊，置於 ZStack 最上層右上角
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Text("高度：\(lazyVGridHeight, specifier: "%.1f")")
-                            .foregroundColor(.white)
-                            .font(.system(size: 12))
-                            .padding(8)
-                            .background(Color.black.opacity(0.5))
-                            .cornerRadius(8)
-
-                        Text("剩餘高：\((geo.size.height - lazyVGridHeight - 64 - geo.safeAreaInsets.bottom), specifier: "%.1f")")
-                            .foregroundColor(.white)
-                            .font(.system(size: 12))
-                            .padding(8)
-                            .background(Color.blue.opacity(0.5))
-                            .cornerRadius(8)
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .topTrailing)
                 }
-
-                Spacer()
+                .background(Color.blue)
                 
                 VStack {
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()),GridItem(.flexible())], spacing: 8) {
@@ -96,17 +70,15 @@ struct WeatherView2: View {
                         GeometryReader { gridGeo in
                             Color.clear
                                 .onAppear {
-                                    lazyVGridHeight = gridGeo.size.height + 32 // include Spacer height
-                                    let _ = print(lazyVGridHeight)
-                                    let remainingHeight = geo.size.height - lazyVGridHeight - 16 - geo.safeAreaInsets.bottom
-                                    print("🟢 剩餘高度: \(remainingHeight)")
+                                    lazyVGridHeight = gridGeo.size.height  // include Spacer height
                                 }
                                 .onChange(of: gridGeo.size.height) { newValue in
-                                    lazyVGridHeight = newValue + 16
+                                    lazyVGridHeight = newValue
                                 }
                         }
                     )
                 }
+                .background(Color.clear)
             }
         }
     }
