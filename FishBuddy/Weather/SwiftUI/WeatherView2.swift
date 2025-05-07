@@ -18,10 +18,7 @@ struct WeatherView2: View {
                 ZStack {
                     // 背景
                     VStack {
-                        Image("晴天")
-                            .resizable()
-                            .frame(maxWidth: .infinity)
-                            .ignoresSafeArea(edges: .top)
+                        AnimatedImageFromFramesView()
                     }
                     
                     VStack(spacing: 50) {
@@ -85,6 +82,45 @@ struct WeatherView2: View {
     
 }
 
+// 試驗版 gif 型圖片動畫
+struct AnimatedImageFromFramesView: View {
+    @State private var currentFrameIndex = 0
+    private let frames: [UIImage] = (0..<3).compactMap { UIImage(named: "animated_landscape_loop_\($0)") }
+    private let frameDuration = 0.3  // Total duration 10s / 5 frames = 2s per frame
+
+    var body: some View {
+        if !frames.isEmpty {
+            Image(uiImage: frames[currentFrameIndex])
+                .resizable()
+                .ignoresSafeArea(edges: .top)
+                .onAppear {
+                    Timer.scheduledTimer(withTimeInterval: frameDuration, repeats: true) { _ in
+                        currentFrameIndex = (currentFrameIndex + 1) % frames.count
+                    }
+                }
+        } else {
+            Color.black
+        }
+    }
+}
+
+// 圖片載入器
+struct AnimatedImageLoader {
+    static func load() -> UIImage? {
+        var frames: [UIImage] = []
+
+        // 這裡假設你有 5 張圖片（依你的 GIF）
+        for i in 0..<5 {
+            if let image = UIImage(named: "animated_landscape_loop_\(i)") {
+                frames.append(image)
+            }
+        }
+
+        // 將所有幀合成動畫，播放總時間為 10 秒
+        return UIImage.animatedImage(with: frames, duration: 0.01)
+    }
+}
+
 #Preview {
     WeatherView2()
 //        .environmentObject(SettingStore())
@@ -120,3 +156,18 @@ struct ForecastCardView: View {
         .cornerRadius(16)
     }
 }
+
+/*
+ Lazy Grid 對照表：
+ 
+ +----------------+----------------+--------------+----------------------+
+ |     元件       |  整體排列方向   |  捲動方向     | 每一列的排列方向       |
+ +----------------+----------------+--------------+----------------------+
+ | LazyVGrid      | 垂直（上下）     | 垂直捲動      | 水平（左右）           |
+ | LazyHGrid      | 水平（左右）     | 水平捲動      | 垂直（上下）           |
+ +----------------+----------------+--------------+----------------------+
+ 
+ 使用建議：
+ - LazyVGrid：常用於列表或卡片向下捲動的 UI。
+ - LazyHGrid：常用於橫向滑動的卡片排版。
+*/

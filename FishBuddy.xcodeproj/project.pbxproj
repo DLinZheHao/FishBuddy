@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0546FBB52DCB30F1001695D8 /* custom-icons.ttf */; };
 		054C84432CD9B994005595EF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84422CD9B994005595EF /* AppDelegate.swift */; };
 		054C84452CD9B994005595EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84442CD9B994005595EF /* SceneDelegate.swift */; };
 		054C84472CD9B994005595EF /* LobbyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84462CD9B994005595EF /* LobbyViewController.swift */; };
@@ -42,6 +43,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0546FBB52DCB30F1001695D8 /* custom-icons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "custom-icons.ttf"; sourceTree = "<group>"; };
 		054C843F2CD9B994005595EF /* FishBuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FishBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		054C84422CD9B994005595EF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		054C84442CD9B994005595EF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 				054C84662CDB04D5005595EF /* Weather */,
 				054C84422CD9B994005595EF /* AppDelegate.swift */,
 				054C84442CD9B994005595EF /* SceneDelegate.swift */,
+				0546FBB52DCB30F1001695D8 /* custom-icons.ttf */,
 				054C844B2CD9B995005595EF /* Assets.xcassets */,
 				054C844D2CD9B995005595EF /* LaunchScreen.storyboard */,
 				054C84502CD9B995005595EF /* Info.plist */,
@@ -379,6 +382,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				054C844C2CD9B995005595EF /* Assets.xcassets in Resources */,
+				0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */,
 				05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */,
 				05589EF62CE6F5C5003881AA /* Weather.storyboard in Resources */,
 				05E245EC2D0A7EB800C6C048 /* TagLineView.xib in Resources */,

@@ -11,7 +11,7 @@ import SwiftUI
 struct WeatherView: View {
     
     @ObservedObject var vm: WeatherLobbyVM
-        
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 8) {
