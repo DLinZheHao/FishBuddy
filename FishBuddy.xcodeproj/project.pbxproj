@@ -32,6 +32,7 @@
 		05589EF92CE6F808003881AA /* FeatrueTitleBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05589EF82CE6F808003881AA /* FeatrueTitleBar.swift */; };
 		05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */; };
 		058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058877022DC1BE4D00B1D13E /* WeatherView2.swift */; };
+		05D266B42DDABC1600F140D3 /* gestureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D266B32DDABC1600F140D3 /* gestureView.swift */; };
 		05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245E92D0A7EB800C6C048 /* TagLineView.swift */; };
 		05E245EC2D0A7EB800C6C048 /* TagLineView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05E245EA2D0A7EB800C6C048 /* TagLineView.xib */; };
 		05E245EF2D0A7F9B00C6C048 /* UILabelPadding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245EE2D0A7F9B00C6C048 /* UILabelPadding.swift */; };
@@ -39,6 +40,13 @@
 		05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E672DF2CDB0C78006CF3BF /* APILoggerPlugin.swift */; };
 		05E672E42CDB0CB3006CF3BF /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */; };
 		05F3BED42D92824C00DDAC72 /* TideDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F3BED32D92824C00DDAC72 /* TideDataModel.swift */; };
+		05FAEF132DF2743900E9BD08 /* bottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF122DF2743900E9BD08 /* bottomSheetView.swift */; };
+		05FAEF162DF2782400E9BD08 /* RestaurantModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF152DF2782400E9BD08 /* RestaurantModel.swift */; };
+		05FAEF182DF279A700E9BD08 /* BottomSheetSubViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF172DF279A700E9BD08 /* BottomSheetSubViews.swift */; };
+		05FAEF1C2DF2C22A00E9BD08 /* TripModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF1B2DF2C22A00E9BD08 /* TripModel.swift */; };
+		05FAEF1E2DF2C24F00E9BD08 /* GestureAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF1D2DF2C24F00E9BD08 /* GestureAnimationView.swift */; };
+		05FAEF202DF2C2AD00E9BD08 /* GestureAnimationSubViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF1F2DF2C2AD00E9BD08 /* GestureAnimationSubViews.swift */; };
+		05FAEF232DF2D45700E9BD08 /* GestureAnimationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF222DF2D45700E9BD08 /* GestureAnimationViewModel.swift */; };
 		34CB838C47F0B8332479937F /* Pods_FishBuddy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 403AA25D1C561EBE052111F9 /* Pods_FishBuddy.framework */; };
 /* End PBXBuildFile section */
 
@@ -70,6 +78,7 @@
 		05589EF82CE6F808003881AA /* FeatrueTitleBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatrueTitleBar.swift; sourceTree = "<group>"; };
 		05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FeatureTitleBar.xib; sourceTree = "<group>"; };
 		058877022DC1BE4D00B1D13E /* WeatherView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView2.swift; sourceTree = "<group>"; };
+		05D266B32DDABC1600F140D3 /* gestureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gestureView.swift; sourceTree = "<group>"; };
 		05E245E92D0A7EB800C6C048 /* TagLineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagLineView.swift; sourceTree = "<group>"; };
 		05E245EA2D0A7EB800C6C048 /* TagLineView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TagLineView.xib; sourceTree = "<group>"; };
 		05E245EE2D0A7F9B00C6C048 /* UILabelPadding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelPadding.swift; sourceTree = "<group>"; };
@@ -77,6 +86,13 @@
 		05E672DF2CDB0C78006CF3BF /* APILoggerPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APILoggerPlugin.swift; sourceTree = "<group>"; };
 		05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
 		05F3BED32D92824C00DDAC72 /* TideDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideDataModel.swift; sourceTree = "<group>"; };
+		05FAEF122DF2743900E9BD08 /* bottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = bottomSheetView.swift; sourceTree = "<group>"; };
+		05FAEF152DF2782400E9BD08 /* RestaurantModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantModel.swift; sourceTree = "<group>"; };
+		05FAEF172DF279A700E9BD08 /* BottomSheetSubViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetSubViews.swift; sourceTree = "<group>"; };
+		05FAEF1B2DF2C22A00E9BD08 /* TripModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripModel.swift; sourceTree = "<group>"; };
+		05FAEF1D2DF2C24F00E9BD08 /* GestureAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureAnimationView.swift; sourceTree = "<group>"; };
+		05FAEF1F2DF2C2AD00E9BD08 /* GestureAnimationSubViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureAnimationSubViews.swift; sourceTree = "<group>"; };
+		05FAEF222DF2D45700E9BD08 /* GestureAnimationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureAnimationViewModel.swift; sourceTree = "<group>"; };
 		403AA25D1C561EBE052111F9 /* Pods_FishBuddy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FishBuddy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		93D4B919CA5B1C4E00C568C4 /* Pods-FishBuddy.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FishBuddy.debug.xcconfig"; path = "Target Support Files/Pods-FishBuddy/Pods-FishBuddy.debug.xcconfig"; sourceTree = "<group>"; };
 		9E8680C797A3C5BAD69C85F4 /* Pods-FishBuddy.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FishBuddy.release.xcconfig"; path = "Target Support Files/Pods-FishBuddy/Pods-FishBuddy.release.xcconfig"; sourceTree = "<group>"; };
@@ -115,6 +131,7 @@
 		054C84412CD9B994005595EF /* FishBuddy */ = {
 			isa = PBXGroup;
 			children = (
+				05D266AF2DDABBE400F140D3 /* Pratice */,
 				05589EF72CE6F7DE003881AA /* Componet */,
 				054C845B2CD9C030005595EF /* Common */,
 				054C84562CD9BD37005595EF /* APIService */,
@@ -279,6 +296,24 @@
 			path = TitleBar;
 			sourceTree = "<group>";
 		};
+		05D266AF2DDABBE400F140D3 /* Pratice */ = {
+			isa = PBXGroup;
+			children = (
+				05FAEF192DF2C1ED00E9BD08 /* GestureAnimation */,
+				05FAEF112DF2740700E9BD08 /* BottomSheet */,
+				05D266B02DDABBF500F140D3 /* gesture */,
+			);
+			path = Pratice;
+			sourceTree = "<group>";
+		};
+		05D266B02DDABBF500F140D3 /* gesture */ = {
+			isa = PBXGroup;
+			children = (
+				05D266B32DDABC1600F140D3 /* gestureView.swift */,
+			);
+			path = gesture;
+			sourceTree = "<group>";
+		};
 		05E245E82D0A7E5400C6C048 /* TagLineView */ = {
 			isa = PBXGroup;
 			children = (
@@ -302,6 +337,51 @@
 				05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */,
 			);
 			path = DebugLogger;
+			sourceTree = "<group>";
+		};
+		05FAEF112DF2740700E9BD08 /* BottomSheet */ = {
+			isa = PBXGroup;
+			children = (
+				05FAEF142DF2780F00E9BD08 /* Model */,
+				05FAEF122DF2743900E9BD08 /* bottomSheetView.swift */,
+				05FAEF172DF279A700E9BD08 /* BottomSheetSubViews.swift */,
+			);
+			path = BottomSheet;
+			sourceTree = "<group>";
+		};
+		05FAEF142DF2780F00E9BD08 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				05FAEF152DF2782400E9BD08 /* RestaurantModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		05FAEF192DF2C1ED00E9BD08 /* GestureAnimation */ = {
+			isa = PBXGroup;
+			children = (
+				05FAEF212DF2D40A00E9BD08 /* ViewModel */,
+				05FAEF1A2DF2C21400E9BD08 /* Model */,
+				05FAEF1D2DF2C24F00E9BD08 /* GestureAnimationView.swift */,
+				05FAEF1F2DF2C2AD00E9BD08 /* GestureAnimationSubViews.swift */,
+			);
+			path = GestureAnimation;
+			sourceTree = "<group>";
+		};
+		05FAEF1A2DF2C21400E9BD08 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				05FAEF1B2DF2C22A00E9BD08 /* TripModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		05FAEF212DF2D40A00E9BD08 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				05FAEF222DF2D45700E9BD08 /* GestureAnimationViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		A618D7BF026182D6CF0FD035 /* Frameworks */ = {
@@ -442,25 +522,33 @@
 			files = (
 				054C846E2CDB06AA005595EF /* WeatherAllModel.swift in Sources */,
 				05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */,
+				05FAEF162DF2782400E9BD08 /* RestaurantModel.swift in Sources */,
 				05589EF42CE6F2D2003881AA /* UIViewControllerExtension.swift in Sources */,
 				054C84652CD9C144005595EF /* WeatherService.swift in Sources */,
 				05589EEF2CE6EFF3003881AA /* LobbyVM.swift in Sources */,
 				054C84472CD9B994005595EF /* LobbyViewController.swift in Sources */,
+				05FAEF182DF279A700E9BD08 /* BottomSheetSubViews.swift in Sources */,
+				05FAEF1C2DF2C22A00E9BD08 /* TripModel.swift in Sources */,
 				054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */,
 				05F3BED42D92824C00DDAC72 /* TideDataModel.swift in Sources */,
 				054C84432CD9B994005595EF /* AppDelegate.swift in Sources */,
 				05589EE72CE6ED93003881AA /* WeatherLobbyViewController.swift in Sources */,
+				05D266B42DDABC1600F140D3 /* gestureView.swift in Sources */,
 				054C84602CD9C0AF005595EF /* UIControlPublisher.swift in Sources */,
 				05589EF92CE6F808003881AA /* FeatrueTitleBar.swift in Sources */,
+				05FAEF202DF2C2AD00E9BD08 /* GestureAnimationSubViews.swift in Sources */,
 				05589EF22CE6F0A7003881AA /* UIStoryboardExtension.swift in Sources */,
 				05E672E42CDB0CB3006CF3BF /* DebugLogger.swift in Sources */,
 				054C84582CD9BD76005595EF /* APIService.swift in Sources */,
+				05FAEF1E2DF2C24F00E9BD08 /* GestureAnimationView.swift in Sources */,
 				05513A432DAE44540021573F /* WeatherView.swift in Sources */,
 				05589EE52CE6ECD8003881AA /* Display.swift in Sources */,
+				05FAEF232DF2D45700E9BD08 /* GestureAnimationViewModel.swift in Sources */,
 				05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */,
 				054C84452CD9B994005595EF /* SceneDelegate.swift in Sources */,
 				05589EE92CE6EDBF003881AA /* WeatherLobbyVM.swift in Sources */,
 				058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */,
+				05FAEF132DF2743900E9BD08 /* bottomSheetView.swift in Sources */,
 				05E245EF2D0A7F9B00C6C048 /* UILabelPadding.swift in Sources */,
 				054C845A2CD9BDE5005595EF /* APIConfig.swift in Sources */,
 				05E245F12D0A801000C6C048 /* UILabelExtension.swift in Sources */,
@@ -626,7 +714,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -657,7 +745,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
