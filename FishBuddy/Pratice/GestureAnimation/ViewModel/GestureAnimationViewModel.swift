@@ -12,6 +12,7 @@ enum DragState {
     case pressing
     case dragging(translation: CGSize)
     
+    /// 更新拖曳狀態 -> 使用者手勢移動物件的位置數值
     var translation: CGSize {
         switch self {
         case .inactive, .pressing:
@@ -21,6 +22,7 @@ enum DragState {
         }
     }
     
+    /// 是否正在拖曳或按壓
     var isDragging: Bool {
         switch self {
         case .dragging:
@@ -30,6 +32,7 @@ enum DragState {
         }
     }
     
+    /// 是否正在按壓
     var isPressing: Bool {
         switch self {
         case .pressing, .dragging:

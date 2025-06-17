@@ -14,13 +14,14 @@ struct CardView: View, Identifiable {
     let image: String
     let title: String
     
+    @State var isVisible: Bool = true  
+    
     var body: some View {
         Image(image)
             .resizable()
             .scaledToFill()
             .frame(minWidth: 0, maxWidth: .infinity)
             .cornerRadius(10)
-            .padding(15)
             .overlay(alignment: .bottom) {
                 VStack {
                     Text(title)
@@ -31,10 +32,11 @@ struct CardView: View, Identifiable {
                         .background(.white)
                         .cornerRadius(5)
                 }
-                .padding(.bottom, 20)
+                .padding(.bottom, 10)
             }
+            .padding(15)
     }
-    
+
 }
 
 struct TopBarMenu: View {
