@@ -47,6 +47,11 @@
 		05FAEF1E2DF2C24F00E9BD08 /* GestureAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF1D2DF2C24F00E9BD08 /* GestureAnimationView.swift */; };
 		05FAEF202DF2C2AD00E9BD08 /* GestureAnimationSubViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF1F2DF2C2AD00E9BD08 /* GestureAnimationSubViews.swift */; };
 		05FAEF232DF2D45700E9BD08 /* GestureAnimationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF222DF2D45700E9BD08 /* GestureAnimationViewModel.swift */; };
+		05FAEF2E2E00F41800E9BD08 /* CardDM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF2D2E00F41800E9BD08 /* CardDM.swift */; };
+		05FAEF302E00F4F200E9BD08 /* TransactionsDM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF2F2E00F4F200E9BD08 /* TransactionsDM.swift */; };
+		05FAEF322E00F52500E9BD08 /* CardSliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF312E00F52500E9BD08 /* CardSliderView.swift */; };
+		05FAEF342E00F53D00E9BD08 /* CardSliderSubViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF332E00F52F00E9BD08 /* CardSliderSubViews.swift */; };
+		05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF382E013B6B00E9BD08 /* CardSliderVM.swift */; };
 		34CB838C47F0B8332479937F /* Pods_FishBuddy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 403AA25D1C561EBE052111F9 /* Pods_FishBuddy.framework */; };
 /* End PBXBuildFile section */
 
@@ -93,6 +98,11 @@
 		05FAEF1D2DF2C24F00E9BD08 /* GestureAnimationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureAnimationView.swift; sourceTree = "<group>"; };
 		05FAEF1F2DF2C2AD00E9BD08 /* GestureAnimationSubViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureAnimationSubViews.swift; sourceTree = "<group>"; };
 		05FAEF222DF2D45700E9BD08 /* GestureAnimationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureAnimationViewModel.swift; sourceTree = "<group>"; };
+		05FAEF2D2E00F41800E9BD08 /* CardDM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDM.swift; sourceTree = "<group>"; };
+		05FAEF2F2E00F4F200E9BD08 /* TransactionsDM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionsDM.swift; sourceTree = "<group>"; };
+		05FAEF312E00F52500E9BD08 /* CardSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderView.swift; sourceTree = "<group>"; };
+		05FAEF332E00F52F00E9BD08 /* CardSliderSubViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderSubViews.swift; sourceTree = "<group>"; };
+		05FAEF382E013B6B00E9BD08 /* CardSliderVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderVM.swift; sourceTree = "<group>"; };
 		403AA25D1C561EBE052111F9 /* Pods_FishBuddy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FishBuddy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		93D4B919CA5B1C4E00C568C4 /* Pods-FishBuddy.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FishBuddy.debug.xcconfig"; path = "Target Support Files/Pods-FishBuddy/Pods-FishBuddy.debug.xcconfig"; sourceTree = "<group>"; };
 		9E8680C797A3C5BAD69C85F4 /* Pods-FishBuddy.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FishBuddy.release.xcconfig"; path = "Target Support Files/Pods-FishBuddy/Pods-FishBuddy.release.xcconfig"; sourceTree = "<group>"; };
@@ -299,6 +309,7 @@
 		05D266AF2DDABBE400F140D3 /* Pratice */ = {
 			isa = PBXGroup;
 			children = (
+				05FAEF2A2E00F3CE00E9BD08 /* CardSlider */,
 				05FAEF192DF2C1ED00E9BD08 /* GestureAnimation */,
 				05FAEF112DF2740700E9BD08 /* BottomSheet */,
 				05D266B02DDABBF500F140D3 /* gesture */,
@@ -380,6 +391,42 @@
 			isa = PBXGroup;
 			children = (
 				05FAEF222DF2D45700E9BD08 /* GestureAnimationViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		05FAEF2A2E00F3CE00E9BD08 /* CardSlider */ = {
+			isa = PBXGroup;
+			children = (
+				05FAEF372E013B6400E9BD08 /* ViewModel */,
+				05FAEF2C2E00F3F300E9BD08 /* View */,
+				05FAEF2B2E00F3E500E9BD08 /* Model */,
+				05FAEF312E00F52500E9BD08 /* CardSliderView.swift */,
+			);
+			path = CardSlider;
+			sourceTree = "<group>";
+		};
+		05FAEF2B2E00F3E500E9BD08 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				05FAEF2D2E00F41800E9BD08 /* CardDM.swift */,
+				05FAEF2F2E00F4F200E9BD08 /* TransactionsDM.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		05FAEF2C2E00F3F300E9BD08 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				05FAEF332E00F52F00E9BD08 /* CardSliderSubViews.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		05FAEF372E013B6400E9BD08 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				05FAEF382E013B6B00E9BD08 /* CardSliderVM.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -522,14 +569,18 @@
 			files = (
 				054C846E2CDB06AA005595EF /* WeatherAllModel.swift in Sources */,
 				05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */,
+				05FAEF342E00F53D00E9BD08 /* CardSliderSubViews.swift in Sources */,
+				05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */,
 				05FAEF162DF2782400E9BD08 /* RestaurantModel.swift in Sources */,
 				05589EF42CE6F2D2003881AA /* UIViewControllerExtension.swift in Sources */,
+				05FAEF302E00F4F200E9BD08 /* TransactionsDM.swift in Sources */,
 				054C84652CD9C144005595EF /* WeatherService.swift in Sources */,
 				05589EEF2CE6EFF3003881AA /* LobbyVM.swift in Sources */,
 				054C84472CD9B994005595EF /* LobbyViewController.swift in Sources */,
 				05FAEF182DF279A700E9BD08 /* BottomSheetSubViews.swift in Sources */,
 				05FAEF1C2DF2C22A00E9BD08 /* TripModel.swift in Sources */,
 				054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */,
+				05FAEF322E00F52500E9BD08 /* CardSliderView.swift in Sources */,
 				05F3BED42D92824C00DDAC72 /* TideDataModel.swift in Sources */,
 				054C84432CD9B994005595EF /* AppDelegate.swift in Sources */,
 				05589EE72CE6ED93003881AA /* WeatherLobbyViewController.swift in Sources */,
@@ -544,6 +595,7 @@
 				05513A432DAE44540021573F /* WeatherView.swift in Sources */,
 				05589EE52CE6ECD8003881AA /* Display.swift in Sources */,
 				05FAEF232DF2D45700E9BD08 /* GestureAnimationViewModel.swift in Sources */,
+				05FAEF2E2E00F41800E9BD08 /* CardDM.swift in Sources */,
 				05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */,
 				054C84452CD9B994005595EF /* SceneDelegate.swift in Sources */,
 				05589EE92CE6EDBF003881AA /* WeatherLobbyVM.swift in Sources */,
