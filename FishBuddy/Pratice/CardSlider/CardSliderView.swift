@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CardSliderView: View {
     /// 所有卡片
-    var cards: [Card] = testCards
+    @State var cards: [Card] = testCards
     /// 每張卡片的偏移量
     private static let cardOffset: CGFloat = 50.0
     /// 卡片是否已經呈現
@@ -50,24 +50,29 @@ struct CardSliderView: View {
                                         selectdCard = isCardPressed ? card : nil
                                     }
                                 })
+                                // 手勢合併 的一種寫法，目的在於讓兩個手勢互斥（exclusive）執行
                                 // 這是一種讓 點擊與拖動不衝突 的處理方式。若不這樣寫，可能會導致手勢失敗或誤觸。
-                                .exclusively(before: DragGesture(minimumDistance: 0.05))
-                                // 辨識手勢順序用
-                                .sequenced(before: DragGesture())
-                                .updating(self.$dragState, body: { (value, state, transaction) in
-                                    switch value {
-                                    case .first(_):
-                                        state = .pressing(index: self.index(for: card))
-                                    case .second(_, let drag):
-                                        state = .dragging(index: self.index(for: card),
-                                                          translation: drag?.translation ?? .zero)
-                                    }
-                                })
-                                .onEnded({ (value) in
-                                    guard case .second(_, let drag) = value else { return }
-                                    // 重新排列卡片
-                                })
-                                    
+                                .exclusively(before: LongPressGesture(minimumDuration: 0.05)
+                                    .sequenced(before: DragGesture())
+                                    .updating(self.$dragState, body: { (value, state, transaction) in
+                                        switch value {
+                                        case .first(true):
+                                            state = .pressing(index: self.index(for: card))
+                                        case .second(true, let drag):
+                                            state = .dragging(index: self.index(for: card), translation: drag?.translation ?? .zero)
+                                        default:
+                                            break
+                                        }
+                                        
+                                    })
+                                    .onEnded({ (value) in
+                                        guard case .second(_, let drag?) = value else { return }
+                                        // 重新排列卡片
+                                        withAnimation(.spring) {
+                                            rearrangeCards(with: card, dragOffset: drag.translation)
+                                        }
+                                    })
+                            )
                         )
                 }
             }
@@ -85,6 +90,19 @@ struct CardSliderView: View {
         }
         
     }
+    
+    /// 重新排序卡片序列
+    private func rearrangeCards(with card: Card, dragOffset: CGSize) {
+        guard let draggingCardIndex = index(for: card) else { return }
+        
+        var newIndex = draggingCardIndex + Int(-dragOffset.height / Self.cardOffset)
+        newIndex = newIndex >= cards.count ? cards.count - 1 : newIndex
+        newIndex = newIndex < 0 ? 0 : newIndex
+        
+        let removedCard = cards.remove(at: draggingCardIndex)
+        cards.insert(removedCard, at: newIndex)
+    }
+    
     
     /// 卡片轉場動畫
     private func transitionAnimation(for card: Card) -> Animation {
@@ -126,8 +144,11 @@ struct CardSliderView: View {
         
         if let draggingIndex = dragState.index,
            cardIndex == draggingIndex {
+            
+            // 進入拖曳狀態時，將卡片往上移動一點
             pressedOffset.height = dragState.isPressing ? -20 : 0
             
+            // 位移的狀態
             switch dragState.translation.width {
             case let width where width < -10: pressedOffset.width = -20
             case let width where width > 10: pressedOffset.width = 20
@@ -143,10 +164,21 @@ struct CardSliderView: View {
     
     /// 獲取卡片的 ZIndex 值 -> 按照順序
     private func zIndex(for card: Card) -> Double {
+        // 最前面一張為 0
         guard let cardIndex = index(for: card) else {
             return 0.0
         }
-        return -Double(cardIndex)
+        
+        let defaultZIndex = -Double(cardIndex)
+        // 如果是拖曳狀態的卡片
+        if let draggingIndex = dragState.index,
+           cardIndex == draggingIndex {
+            // 根據位移的高度來計算新的 z-index：每張卡的位移會是 index * cardOffset， 所以位移的高度 / cardOffset 可以得到是否要前往下一個 index
+            return defaultZIndex + Double(dragState.translation.height / Self.cardOffset)
+        }
+        
+        // 回傳預設的 z-index
+        return defaultZIndex
     }
 
     /// 獲取卡片的辨識碼
@@ -158,11 +190,6 @@ struct CardSliderView: View {
     }
 
 }
-
-
-
-
-
 
 #Preview {
     CardSliderView()
