@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct WeatherView2: View {
-    
-    @State private var lazyVGridHeight: CGFloat = 0
-    
+        
     var body: some View {
         GeometryReader { geo in
             VStack(spacing: 0) {
@@ -51,7 +49,7 @@ struct WeatherView2: View {
 
                         Spacer()
                     }
-                    .padding(.bottom, 16)
+                    
                 }
                 .background(Color.blue)
                 
@@ -63,17 +61,6 @@ struct WeatherView2: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 16)
-                    .background(
-                        GeometryReader { gridGeo in
-                            Color.clear
-                                .onAppear {
-                                    lazyVGridHeight = gridGeo.size.height  // include Spacer height
-                                }
-                                .onChange(of: gridGeo.size.height) { newValue in
-                                    lazyVGridHeight = newValue
-                                }
-                        }
-                    )
                 }
                 .background(Color.clear)
             }
