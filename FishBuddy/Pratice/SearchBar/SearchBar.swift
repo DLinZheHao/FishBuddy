@@ -65,7 +65,6 @@ struct SearchBar: View {
                     Text("Cancel")
                 }
                 .padding(.trailing, 10)
-                .transition(.move(edge: .trailing))
             }
         }
     }
@@ -73,8 +72,8 @@ struct SearchBar: View {
 
 
 #Preview {
-//    @Previewable @State var text: String = ""
-//    SearchBar(text: $text)
+    @Previewable @State var text: String = ""
+    SearchBar(text: $text)
 }
 
 

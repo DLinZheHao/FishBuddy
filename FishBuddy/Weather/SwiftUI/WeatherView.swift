@@ -9,64 +9,76 @@ import Foundation
 import SwiftUI
 
 struct WeatherView: View {
-    
+    /// ViewModel
     @ObservedObject var vm: WeatherLobbyVM
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("天氣預報")
-                    .font(.largeTitle)
-                    .bold()
-                    .padding(.horizontal)
-                Divider()
-            }
-            
-            if let cityData = vm.weatherResponse?.data {
-                VStack(alignment: .leading, spacing: 16) {
-                    ForEach(cityData) { cityWeather in
-                        VStack(alignment: .leading, spacing: 8) {
-                            if let dateStr = cityWeather.weather.first?.startTime,
-                               let startDate = formatDateOnly(dateStr),
-                               let date2Str = cityWeather.weather.last?.endTime,
-                               let endDate = formatDateOnly(date2Str) {
-                                HStack(alignment: .bottom) {
-                                    Text("\(cityWeather.city)")
-                                        .font(.title2)
-                                    Text("\(startDate) -> \(endDate)")
-                                        .font(.system(size: 16))
-                                }
-                                .padding(.bottom, 4)
-                            } else {
-                                Text(cityWeather.city)
-                                    .font(.title2)
-                                    .padding(.bottom, 4)
-                            }
-
-                            ForEach(cityWeather.weather) { info in
-                                WeatherInfoView(info: info)
-                            }
-                        }
-                        .padding()
-                    }
+        GeometryReader { geo in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("天氣預報")
+                        .font(.largeTitle)
+                        .bold()
+                        .padding(.horizontal)
+                    Divider()
+                    
+                    SearchBar(text: $vm.searchText)
+                        .padding(.horizontal, 16)
                 }
-            } else {
-                // TODO: 實作 Loading 動畫
-                VStack {
-                    CenteredView(text: "Item \(2)")
-                        .frame(minHeight: screenSafeAreaHeight()) // 這裡自動撐到螢幕高度
-                                            .background(Color.blue.opacity(0.3))
-                                            .cornerRadius(10)
-                                            .padding(.horizontal)
-                        
+                
+                if let cityData = vm.weatherResponse?.data {
+                    VStack(alignment: .leading, spacing: 16) {
+                       ForEach(cityData.filter { cityWeather in
+                           let keyword = vm.searchText.lowercased()
+                           return keyword.isEmpty ||
+                               cityWeather.city.lowercased().contains(keyword) ||
+                               cityWeather.weather.contains(where: { weather in
+                                   weather.description.lowercased().contains(keyword) ||
+                                   weather.comfort.lowercased().contains(keyword)
+                               })
+                       }) { cityWeather in
+                            VStack(alignment: .leading, spacing: 8) {
+                                if let dateStr = cityWeather.weather.first?.startTime,
+                                   let startDate = formatDateOnly(dateStr),
+                                   let date2Str = cityWeather.weather.last?.endTime,
+                                   let endDate = formatDateOnly(date2Str) {
+                                    HStack(alignment: .bottom) {
+                                        Text("\(cityWeather.city)")
+                                            .font(.title2)
+                                        Text("\(startDate) -> \(endDate)")
+                                            .font(.system(size: 16))
+                                    }
+                                    .padding(.bottom, 4)
+                                } else {
+                                    Text(cityWeather.city)
+                                        .font(.title2)
+                                        .padding(.bottom, 4)
+                                }
+
+                                ForEach(cityWeather.weather) { info in
+                                    WeatherInfoView(info: info)
+                                }
+                            }
+                            .padding()
+                        }
+                    }
+                } else {
+                    VStack {
+                        Spacer()
+                            .frame(height: geo.size.height / 3)
+                        ProgressView("載入中...")
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .padding()
+                        Spacer()
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
             }
         }
     }
 }
 
-/// 計算非 safeArea 、非 titleBar 
+/// 計算非 safeArea 、非 titleBar
 private func screenSafeAreaHeight() -> CGFloat {
     if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
        let window = windowScene.windows.first {
@@ -106,7 +118,7 @@ struct CenteredView: View {
             .onAppear {
                 visibleHeight = geo.size.height
             }
-            .onChange(of: geo.frame(in: .global)) { frame in
+            .onChange(of: geo.frame(in: .global)) { oldFrame,frame in
                 if let screen = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                    let window = screen.windows.first {
                     let screenHeight = window.frame.height

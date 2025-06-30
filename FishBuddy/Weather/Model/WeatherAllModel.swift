@@ -13,16 +13,22 @@ struct WeatherResponse: Codable {
 
 struct CityWeather: Codable, Identifiable {
     /// 唯一識別碼
-    var id: String { city }
+    let uuid = UUID()
+    var id: UUID { uuid }
     /// 城市名稱
     @Default var city: String
     /// 城市天氣資料
     @Default var weather: [WeatherInfo]
+    
+    enum CodingKeys: String, CodingKey {
+        case city, weather
+    }
 }
 
 struct WeatherInfo: Codable, Identifiable {
     /// 唯一識別碼
-    var id: String { startTime + endTime }
+    let uuid = UUID()
+    var id: UUID { uuid }
     /// 起始時間
     @Default var startTime: String
     /// 結束時間
@@ -35,6 +41,15 @@ struct WeatherInfo: Codable, Identifiable {
     @Default var maxTemp: String
     /// 舒適度
     @Default var comfort: String
+    
+    enum CodingKeys: String, CodingKey {
+        case startTime = "startTime"
+        case endTime = "endTime"
+        case description = "description"
+        case minTemp = "minTemp"
+        case maxTemp = "maxTemp"
+        case comfort = "comfort"
+    }
 }
 
 
