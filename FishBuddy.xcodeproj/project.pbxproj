@@ -31,6 +31,7 @@
 		05589EF62CE6F5C5003881AA /* Weather.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 05589EF52CE6F5C5003881AA /* Weather.storyboard */; };
 		05589EF92CE6F808003881AA /* FeatrueTitleBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05589EF82CE6F808003881AA /* FeatrueTitleBar.swift */; };
 		05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */; };
+		05623FD02E1234D300B33D2D /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05623FCF2E1234D300B33D2D /* SearchBar.swift */; };
 		058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058877022DC1BE4D00B1D13E /* WeatherView2.swift */; };
 		05D266B42DDABC1600F140D3 /* gestureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D266B32DDABC1600F140D3 /* gestureView.swift */; };
 		05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245E92D0A7EB800C6C048 /* TagLineView.swift */; };
@@ -82,6 +83,7 @@
 		05589EF52CE6F5C5003881AA /* Weather.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Weather.storyboard; sourceTree = "<group>"; };
 		05589EF82CE6F808003881AA /* FeatrueTitleBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatrueTitleBar.swift; sourceTree = "<group>"; };
 		05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FeatureTitleBar.xib; sourceTree = "<group>"; };
+		05623FCF2E1234D300B33D2D /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		058877022DC1BE4D00B1D13E /* WeatherView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView2.swift; sourceTree = "<group>"; };
 		05D266B32DDABC1600F140D3 /* gestureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gestureView.swift; sourceTree = "<group>"; };
 		05E245E92D0A7EB800C6C048 /* TagLineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagLineView.swift; sourceTree = "<group>"; };
@@ -306,9 +308,18 @@
 			path = TitleBar;
 			sourceTree = "<group>";
 		};
+		05623FCE2E12296C00B33D2D /* SearchBar */ = {
+			isa = PBXGroup;
+			children = (
+				05623FCF2E1234D300B33D2D /* SearchBar.swift */,
+			);
+			path = SearchBar;
+			sourceTree = "<group>";
+		};
 		05D266AF2DDABBE400F140D3 /* Pratice */ = {
 			isa = PBXGroup;
 			children = (
+				05623FCE2E12296C00B33D2D /* SearchBar */,
 				05FAEF2A2E00F3CE00E9BD08 /* CardSlider */,
 				05FAEF192DF2C1ED00E9BD08 /* GestureAnimation */,
 				05FAEF112DF2740700E9BD08 /* BottomSheet */,
@@ -593,6 +604,7 @@
 				054C84582CD9BD76005595EF /* APIService.swift in Sources */,
 				05FAEF1E2DF2C24F00E9BD08 /* GestureAnimationView.swift in Sources */,
 				05513A432DAE44540021573F /* WeatherView.swift in Sources */,
+				05623FD02E1234D300B33D2D /* SearchBar.swift in Sources */,
 				05589EE52CE6ECD8003881AA /* Display.swift in Sources */,
 				05FAEF232DF2D45700E9BD08 /* GestureAnimationViewModel.swift in Sources */,
 				05FAEF2E2E00F41800E9BD08 /* CardDM.swift in Sources */,
