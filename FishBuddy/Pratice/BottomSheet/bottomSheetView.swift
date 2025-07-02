@@ -13,26 +13,29 @@ struct bottomSheetView: View {
     
     @State private var selectedRestaurant: Restaurant?
     
-    
     var body: some View {
-        NavigationStack {
-            List {
-                ForEach(restaurants) { restaurant in
-                    BasicImageRow(restaurant: restaurant)
-                        .onTapGesture {
-                            selectedRestaurant = restaurant
-                        }
+        if #available(iOS 16.0, *) {
+            NavigationStack {
+                List {
+                    ForEach(restaurants) { restaurant in
+                        BasicImageRow(restaurant: restaurant)
+                            .onTapGesture {
+                                selectedRestaurant = restaurant
+                            }
+                    }
                 }
+                .listStyle(.plain)
+                
+                .navigationTitle("Restaurants")
             }
-            .listStyle(.plain)
-            
-            .navigationTitle("Restaurants")
-        }
-        .sheet(item: $selectedRestaurant) { restaurant in
-            RestaurantDetailView(restaurant: restaurant)
-                .ignoresSafeArea()
-                .presentationDetents([.medium, .large])
-                .presentationDragIndicator(.hidden)
+            .sheet(item: $selectedRestaurant) { restaurant in
+                RestaurantDetailView(restaurant: restaurant)
+                    .ignoresSafeArea()
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.hidden)
+            }
+        } else {
+            // Fallback on earlier versions
         }
     }
 }
@@ -40,6 +43,12 @@ struct bottomSheetView: View {
 #Preview {
     bottomSheetView()
 }
+
+// NavigationLink(destination: RestaurantDetailView(restaurant: restaurant)
+//                           .ignoresSafeArea()
+//           ) {
+//               BasicImageRow(restaurant: restaurant)
+//           }
 
 // 通過 presentationDetents （內建修飾器）調整 bottomSheet 大小
 // .medium .large .height .fraction

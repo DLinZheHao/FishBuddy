@@ -65,7 +65,7 @@ struct HeaderView: View {
                         Text(restaurant.name)
                             .foregroundStyle(.white)
                             .font(.system(.largeTitle, design: .rounded))
-                            .bold()
+//                            .bold()
                         
                         Text(restaurant.type)
                             .font(.system(.headline, design: .rounded))

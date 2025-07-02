@@ -52,7 +52,7 @@ class WeatherLobbyViewController: UIViewController {
     private func fetchTideAPI() {
         var param = [String: Any]()
         // 只需要放入地點其餘後端 app-api 會處理
-        param["location"] = "宜蘭"
+        param["location"] = "新北"
         let target = WeatherAPIService.tideForecast.init(params: param)
         
         /// 接收範例

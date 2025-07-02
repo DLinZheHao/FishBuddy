@@ -17,4 +17,5 @@ class WeatherLobbyVM: ObservableObject {
     @Published var searchText: String = ""
     /// 今明 36 小時天氣預報資料
     @Published var weatherResponse: WeatherResponse?
+
 }

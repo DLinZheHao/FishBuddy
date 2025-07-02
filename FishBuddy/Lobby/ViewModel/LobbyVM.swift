@@ -24,15 +24,23 @@ extension LobbyVM {
     enum Tab {
         // 天氣狀態首頁
         case weather
+        // 潮汐資料狀態首頁
+        
         
         /// 創建 tab 使用的 vc
         func initVC() -> UIViewController {
             let controller: UIViewController
             switch self {
+            // 天氣
             case .weather:
                 let storyboard = UIStoryboard.weatherLobby
                 controller = storyboard.instantiateViewController(withIdentifier: WeatherLobbyViewController.identifier)
                 controller.tabBarItem = makeTabBarItem("天氣")
+            // 潮汐
+//                
+//                let swiftUIView = WeatherView(vm: vm)
+//                let hostingController = UIHostingController(rootView: swiftUIView)
+                
             }
             return controller
         }

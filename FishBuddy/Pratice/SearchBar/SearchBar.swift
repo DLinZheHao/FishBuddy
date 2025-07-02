@@ -71,10 +71,10 @@ struct SearchBar: View {
 }
 
 
-#Preview {
-    @Previewable @State var text: String = ""
-    SearchBar(text: $text)
-}
+//#Preview {
+//    @Previewable @State var text: String = ""
+//    SearchBar(text: $text)
+//}
 
 
 

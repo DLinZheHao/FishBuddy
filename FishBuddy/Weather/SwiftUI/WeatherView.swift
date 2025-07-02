@@ -118,18 +118,18 @@ struct CenteredView: View {
             .onAppear {
                 visibleHeight = geo.size.height
             }
-            .onChange(of: geo.frame(in: .global)) { oldFrame,frame in
-                if let screen = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                   let window = screen.windows.first {
-                    let screenHeight = window.frame.height
-//                    •    frame.minY 是 View 的上緣座標
-//                    •    frame.maxY 是 View 的下緣座標
-//                    •    screenHeight 是螢幕的底端座標（通常是 y = 螢幕高）
-                    // 計算交集高度
-                    let visible = max(0, min(frame.maxY, screenHeight) - max(frame.minY, 0))
-                    visibleHeight = visible
-                }
-            }
+//            .onChange(of: geo.frame(in: .global)) { oldFrame,frame in
+//                if let screen = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+//                   let window = screen.windows.first {
+//                    let screenHeight = window.frame.height
+////                    •    frame.minY 是 View 的上緣座標
+////                    •    frame.maxY 是 View 的下緣座標
+////                    •    screenHeight 是螢幕的底端座標（通常是 y = 螢幕高）
+//                    // 計算交集高度
+//                    let visible = max(0, min(frame.maxY, screenHeight) - max(frame.minY, 0))
+//                    visibleHeight = visible
+//                }
+//            }
         }
     }
 }
