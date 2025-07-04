@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		053127E92E1762C900B25378 /* SkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053127E82E1762C900B25378 /* SkeletonView.swift */; };
+		053127EC2E1770CE00B25378 /* CustomRounded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053127EB2E1770CE00B25378 /* CustomRounded.swift */; };
+		053127EF2E1771F100B25378 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053127EE2E1771F100B25378 /* ViewExtension.swift */; };
 		0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0546FBB52DCB30F1001695D8 /* custom-icons.ttf */; };
 		054C84432CD9B994005595EF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84422CD9B994005595EF /* AppDelegate.swift */; };
 		054C84452CD9B994005595EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84442CD9B994005595EF /* SceneDelegate.swift */; };
@@ -59,6 +62,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		053127E82E1762C900B25378 /* SkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonView.swift; sourceTree = "<group>"; };
+		053127EB2E1770CE00B25378 /* CustomRounded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRounded.swift; sourceTree = "<group>"; };
+		053127EE2E1771F100B25378 /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
 		0546FBB52DCB30F1001695D8 /* custom-icons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "custom-icons.ttf"; sourceTree = "<group>"; };
 		054C843F2CD9B994005595EF /* FishBuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FishBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		054C84422CD9B994005595EF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -126,6 +132,46 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		053127E42E17629400B25378 /* SkeletonView */ = {
+			isa = PBXGroup;
+			children = (
+				053127E72E1762B400B25378 /* Model */,
+				053127E62E1762AB00B25378 /* View */,
+				053127E52E1762A400B25378 /* ViewModel */,
+				053127E82E1762C900B25378 /* SkeletonView.swift */,
+			);
+			path = SkeletonView;
+			sourceTree = "<group>";
+		};
+		053127E52E1762A400B25378 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		053127E62E1762AB00B25378 /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		053127E72E1762B400B25378 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		053127EA2E17703100B25378 /* CustomRounded */ = {
+			isa = PBXGroup;
+			children = (
+				053127EB2E1770CE00B25378 /* CustomRounded.swift */,
+			);
+			path = CustomRounded;
+			sourceTree = "<group>";
+		};
 		054C84362CD9B994005595EF = {
 			isa = PBXGroup;
 			children = (
@@ -291,6 +337,7 @@
 				05589EF12CE6F0A7003881AA /* UIStoryboardExtension.swift */,
 				05589EF32CE6F2D2003881AA /* UIViewControllerExtension.swift */,
 				05E245F02D0A801000C6C048 /* UILabelExtension.swift */,
+				053127EE2E1771F100B25378 /* ViewExtension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -298,6 +345,8 @@
 		05589EF72CE6F7DE003881AA /* Componet */ = {
 			isa = PBXGroup;
 			children = (
+				053127EA2E17703100B25378 /* CustomRounded */,
+				053127E42E17629400B25378 /* SkeletonView */,
 				05E245ED2D0A7F5100C6C048 /* UILabelPadding */,
 				05E245E82D0A7E5400C6C048 /* TagLineView */,
 				05589EFA2CE6F811003881AA /* TitleBar */,
@@ -590,6 +639,7 @@
 				05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */,
 				05FAEF162DF2782400E9BD08 /* RestaurantModel.swift in Sources */,
 				05589EF42CE6F2D2003881AA /* UIViewControllerExtension.swift in Sources */,
+				053127EF2E1771F100B25378 /* ViewExtension.swift in Sources */,
 				05FAEF302E00F4F200E9BD08 /* TransactionsDM.swift in Sources */,
 				054C84652CD9C144005595EF /* WeatherService.swift in Sources */,
 				05589EEF2CE6EFF3003881AA /* LobbyVM.swift in Sources */,
@@ -606,6 +656,7 @@
 				054C84602CD9C0AF005595EF /* UIControlPublisher.swift in Sources */,
 				05589EF92CE6F808003881AA /* FeatrueTitleBar.swift in Sources */,
 				05FAEF202DF2C2AD00E9BD08 /* GestureAnimationSubViews.swift in Sources */,
+				053127EC2E1770CE00B25378 /* CustomRounded.swift in Sources */,
 				05589EF22CE6F0A7003881AA /* UIStoryboardExtension.swift in Sources */,
 				05E672E42CDB0CB3006CF3BF /* DebugLogger.swift in Sources */,
 				054C84582CD9BD76005595EF /* APIService.swift in Sources */,
@@ -613,6 +664,7 @@
 				059556712E150AF10050147C /* TideLobbyVM.swift in Sources */,
 				05513A432DAE44540021573F /* WeatherView.swift in Sources */,
 				05623FD02E1234D300B33D2D /* SearchBar.swift in Sources */,
+				053127E92E1762C900B25378 /* SkeletonView.swift in Sources */,
 				05589EE52CE6ECD8003881AA /* Display.swift in Sources */,
 				05FAEF232DF2D45700E9BD08 /* GestureAnimationViewModel.swift in Sources */,
 				05FAEF2E2E00F41800E9BD08 /* CardDM.swift in Sources */,
