@@ -19,3 +19,16 @@ extension View {
                                     lineWidth: lineWidth))
     }
 }
+
+// 骨架效果
+extension View {
+    /// 為 View 套用閃爍效果
+    func shimmering() -> some View {
+        self.modifier(ShimmerModifier())
+    }
+
+    /// 根據 isActive 狀態切換成骨架載入畫面
+    func skeletonize(isActive: Bool) -> some View {
+        modifier(SkeletonizeModifier(isActive: isActive))
+    }
+}

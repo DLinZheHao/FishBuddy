@@ -30,17 +30,17 @@ struct SkeletonView: View {
         switch shape {
         case .rectangle:
             RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(Color.gray.opacity(0.3))
+                .fill(Color(white: 0.92))
                 .frame(width: size?.width, height: size?.height ?? 20)
                 .shimmering()
         case .circle:
             Circle()
-                .fill(Color.gray.opacity(0.3))
+                .fill(Color(white: 0.92))
                 .frame(width: size?.width, height: size?.height ?? 20)
                 .shimmering()
         case .capsule:
             Capsule()
-                .fill(Color.gray.opacity(0.3))
+                .fill(Color(white: 0.92))
                 .frame(width: size?.width, height: size?.height ?? 20)
                 .shimmering()
         }
@@ -55,39 +55,38 @@ struct ShimmerModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .overlay(
-                // 套上線性漸層作為閃爍效果的遮罩
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        .gray.opacity(0.3),
-                        .gray.opacity(0.1),
-                        .gray.opacity(0.3)
-                    ]),
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-                .rotationEffect(.degrees(30))
-                .offset(x: phase * 300) // 動態偏移造成閃爍感
+                GeometryReader { geometry in
+                    let width = geometry.size.width
+
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.white.opacity(0.0),
+                            Color.white.opacity(0.4),
+                            Color.white.opacity(0.0)
+                        ]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                    .frame(width: width / 2)
+                    //                .rotationEffect(.degrees(30))
+                    // 這裡的 offset 計算是為了讓閃爍的亮光從左邊畫面外滑入，
+                    // 透過 phase 狀態控制位置，範圍從 -1 到 1.5，
+                    // 寬度則是整個骨架寬度加上亮光本身寬度（width + width/2），
+                    // 確保亮光完全滑過骨架視圖並滑出右邊畫面外，呈現流暢閃爍效果。
+                    .offset(x: phase * (width + width / 2))
+                    
+                }
+                // 使用混合模式讓亮光漸層與下方骨架背景融合，避免死白遮蓋
+                // 可以想像顏料混合那樣
                 .blendMode(.overlay)
-                .mask(content)
+                .mask(content) // <<== 這裡：把亮光裁切成 content 的形狀
             )
             .onAppear {
                 // 設定無限動畫
-                withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
+                withAnimation(.linear(duration: 1.85).repeatForever(autoreverses: false)) {
                     phase = 1.5
                 }
             }
-    }
-}
-
-extension View {
-    /// 為 View 套用閃爍效果
-    func shimmering() -> some View {
-        self.modifier(ShimmerModifier())
-    }
-
-    /// 根據 isActive 狀態切換成骨架載入畫面
-    func skeletonize(isActive: Bool) -> some View {
-        modifier(SkeletonizeModifier(isActive: isActive))
     }
 }
 
@@ -96,6 +95,7 @@ extension View {
 /// 用來擷取 View 實際大小的 PreferenceKey
 /// - 使用 GeometryReader 搭配此 key 可讓我們取得元件的寬高資訊
 private struct SizePreferenceKey: PreferenceKey {
+    // defaultValue 和 reduce 是實作 PreferenceKey 協定（protocol）時的必要成員
     /// 初始值為 nil，表示尚未取得大小
     static var defaultValue: CGSize? = nil
 
@@ -108,7 +108,7 @@ private struct SizePreferenceKey: PreferenceKey {
 }
 
 /// View 的自定義 Modifier：在 loading 狀態下顯示骨架載入畫面
-private struct SkeletonizeModifier: ViewModifier {
+struct SkeletonizeModifier: ViewModifier {
     /// 控制是否顯示骨架
     let isActive: Bool
     /// 儲存原始 View 尺寸
@@ -133,11 +133,12 @@ private struct SkeletonizeModifier: ViewModifier {
         }
         // 當尺寸變化時，更新 state
         .onPreferenceChange(SizePreferenceKey.self) { value in
-            self.size = value
+            if let value {
+                self.size = value
+            }
         }
     }
 }
-
 
 // MARK: - Demo View
 
@@ -191,3 +192,4 @@ struct DemoSkeletonView: View {
 #Preview {
     DemoSkeletonView()
 }
+
