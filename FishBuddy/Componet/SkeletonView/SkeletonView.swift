@@ -82,8 +82,8 @@ struct ShimmerModifier: ViewModifier {
                 .mask(content) // <<== 這裡：把亮光裁切成 content 的形狀
             )
             .onAppear {
-                // 設定無限動畫
-                withAnimation(.linear(duration: 1.85).repeatForever(autoreverses: false)) {
+                // 設定無限動畫，這個 func 會自動處理 phase 的值回歸原本的狀態，好執行動畫
+                withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
                     phase = 1.5
                 }
             }
@@ -125,6 +125,7 @@ struct SkeletonizeModifier: ViewModifier {
                 content
                     .background(
                         GeometryReader { geo in
+                            // 用來量尺寸用的
                             Color.clear
                                 .preference(key: SizePreferenceKey.self, value: geo.size)
                         }
@@ -137,6 +138,22 @@ struct SkeletonizeModifier: ViewModifier {
                 self.size = value
             }
         }
+    }
+}
+
+struct SkeletonGroupModifier: ViewModifier {
+    let isActive: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .redacted(reason: isActive ? .placeholder : [])
+            .skeletonize(isActive: isActive)
+    }
+}
+
+extension View {
+    func skeletonizeGroup(isActive: Bool) -> some View {
+        self.modifier(SkeletonGroupModifier(isActive: isActive))
     }
 }
 
@@ -177,6 +194,7 @@ struct DemoSkeletonView: View {
                     .font(.subheadline)
                     .skeletonize(isActive: isLoading)
             }
+            
 
             // 切換載入狀態的按鈕
             Button(isLoading ? "載入中..." : "重新載入") {

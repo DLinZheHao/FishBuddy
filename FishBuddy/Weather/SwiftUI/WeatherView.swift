@@ -63,15 +63,17 @@ struct WeatherView: View {
                         }
                     }
                 } else {
-                    VStack {
-                        Spacer()
-                            .frame(height: geo.size.height / 3)
-                        ProgressView("載入中...")
-                            .progressViewStyle(CircularProgressViewStyle())
-                            .padding()
-                        Spacer()
+                    let itemHeight: CGFloat = 120
+                    let count = Int(ceil(geo.size.height / itemHeight)) + 1
+                    
+                    VStack(alignment: .leading, spacing: 16) {
+                        ForEach(0..<count, id: \.self) { _ in
+                            SkeletonWeatherInfoView()
+                                .frame(height: itemHeight)
+                                .padding(.horizontal)
+                        }
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(.top)
                 }
             }
         }
@@ -189,4 +191,27 @@ private func formatDateOnly(_ str: String) -> String? {
         return formatter.string(from: date)
     }
     return nil
+}
+
+struct SkeletonWeatherInfoView: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("時間範圍")
+                .font(.headline)
+            Text("天氣描述")
+                .font(.subheadline)
+            HStack {
+                Text("溫度：--°C - --°C")
+                Spacer()
+                Text("舒適度")
+            }
+            .font(.footnote)
+            .foregroundColor(.secondary)
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
+        .shadow(radius: 2)
+        .redacted(reason: .placeholder)
+    }
 }
