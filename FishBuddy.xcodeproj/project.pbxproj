@@ -35,6 +35,7 @@
 		058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058877022DC1BE4D00B1D13E /* WeatherView2.swift */; };
 		0595566F2E14D5BA0050147C /* TideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0595566E2E14D5B90050147C /* TideView.swift */; };
 		059556712E150AF10050147C /* TideLobbyVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059556702E150AF10050147C /* TideLobbyVM.swift */; };
+		0598C8C02E5AAE0A00F3098B /* ImageUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0598C8BF2E5AAE0A00F3098B /* ImageUtils.swift */; };
 		05D266B42DDABC1600F140D3 /* gestureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D266B32DDABC1600F140D3 /* gestureView.swift */; };
 		05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245E92D0A7EB800C6C048 /* TagLineView.swift */; };
 		05E245EC2D0A7EB800C6C048 /* TagLineView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05E245EA2D0A7EB800C6C048 /* TagLineView.xib */; };
@@ -89,6 +90,7 @@
 		058877022DC1BE4D00B1D13E /* WeatherView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView2.swift; sourceTree = "<group>"; };
 		0595566E2E14D5B90050147C /* TideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideView.swift; sourceTree = "<group>"; };
 		059556702E150AF10050147C /* TideLobbyVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideLobbyVM.swift; sourceTree = "<group>"; };
+		0598C8BF2E5AAE0A00F3098B /* ImageUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUtils.swift; sourceTree = "<group>"; };
 		05D266B32DDABC1600F140D3 /* gestureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gestureView.swift; sourceTree = "<group>"; };
 		05E245E92D0A7EB800C6C048 /* TagLineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagLineView.swift; sourceTree = "<group>"; };
 		05E245EA2D0A7EB800C6C048 /* TagLineView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TagLineView.xib; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 		054C84412CD9B994005595EF /* FishBuddy */ = {
 			isa = PBXGroup;
 			children = (
+				0598C8BD2E5AAD3C00F3098B /* ImageRecognition */,
 				05D266AF2DDABBE400F140D3 /* Pratice */,
 				05589EF72CE6F7DE003881AA /* Componet */,
 				054C845B2CD9C030005595EF /* Common */,
@@ -320,6 +323,22 @@
 				05623FCF2E1234D300B33D2D /* SearchBar.swift */,
 			);
 			path = SearchBar;
+			sourceTree = "<group>";
+		};
+		0598C8BD2E5AAD3C00F3098B /* ImageRecognition */ = {
+			isa = PBXGroup;
+			children = (
+				0598C8BE2E5AAD9200F3098B /* ImageUtils */,
+			);
+			path = ImageRecognition;
+			sourceTree = "<group>";
+		};
+		0598C8BE2E5AAD9200F3098B /* ImageUtils */ = {
+			isa = PBXGroup;
+			children = (
+				0598C8BF2E5AAE0A00F3098B /* ImageUtils.swift */,
+			);
+			path = ImageUtils;
 			sourceTree = "<group>";
 		};
 		05D266AF2DDABBE400F140D3 /* Pratice */ = {
@@ -625,6 +644,7 @@
 				054C845A2CD9BDE5005595EF /* APIConfig.swift in Sources */,
 				05E245F12D0A801000C6C048 /* UILabelExtension.swift in Sources */,
 				054C84622CD9C0E3005595EF /* PublisherExtension.swift in Sources */,
+				0598C8C02E5AAE0A00F3098B /* ImageUtils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
