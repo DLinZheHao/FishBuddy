@@ -8,13 +8,14 @@
 import Foundation
 import UIKit
 import Combine
+import SwiftUI
 
 class LobbyVM {
     // 綁訂事件
     var cancellables = Set<AnyCancellable>()
     
     // tabs 資料
-    var tabs: [Tab] = [.weather]
+    var tabs: [Tab] = [.weather, .imageRecognition]
     
 }
 
@@ -26,6 +27,8 @@ extension LobbyVM {
         case weather
         // 潮汐資料狀態首頁
         
+        // 圖片辨識
+        case imageRecognition
         
         /// 創建 tab 使用的 vc
         func initVC() -> UIViewController {
@@ -41,6 +44,10 @@ extension LobbyVM {
 //                let swiftUIView = WeatherView(vm: vm)
 //                let hostingController = UIHostingController(rootView: swiftUIView)
                 
+            
+            case .imageRecognition:
+                controller = CameraStreamVC(rootView: CameraStreamView())
+                controller.tabBarItem = makeTabBarItem("辨識")
             }
             return controller
         }
@@ -82,4 +89,16 @@ extension LobbyVM {
         
     }
     
+}
+
+// MARK: - Hosting Controllers
+class CameraStreamVC: UIHostingController<CameraStreamView> {
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.setNeedsUpdateOfSupportedInterfaceOrientations()
+    }
+    
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
 }

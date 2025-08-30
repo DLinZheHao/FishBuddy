@@ -36,6 +36,10 @@
 		0595566F2E14D5BA0050147C /* TideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0595566E2E14D5B90050147C /* TideView.swift */; };
 		059556712E150AF10050147C /* TideLobbyVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059556702E150AF10050147C /* TideLobbyVM.swift */; };
 		0598C8C02E5AAE0A00F3098B /* ImageUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0598C8BF2E5AAE0A00F3098B /* ImageUtils.swift */; };
+		0598C8C42E60711B00F3098B /* mobileclip_s1_image.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 0598C8C32E60711B00F3098B /* mobileclip_s1_image.mlpackage */; };
+		0598C8C92E60778300F3098B /* CameraStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0598C8C82E60778300F3098B /* CameraStreamView.swift */; };
+		0598C8CB2E60785C00F3098B /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0598C8CA2E60785100F3098B /* CameraController.swift */; };
+		0598C8E22E628DF400F3098B /* CLIPFeatureExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0598C8E12E628DF400F3098B /* CLIPFeatureExtractor.swift */; };
 		05D266B42DDABC1600F140D3 /* gestureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D266B32DDABC1600F140D3 /* gestureView.swift */; };
 		05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245E92D0A7EB800C6C048 /* TagLineView.swift */; };
 		05E245EC2D0A7EB800C6C048 /* TagLineView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05E245EA2D0A7EB800C6C048 /* TagLineView.xib */; };
@@ -91,6 +95,10 @@
 		0595566E2E14D5B90050147C /* TideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideView.swift; sourceTree = "<group>"; };
 		059556702E150AF10050147C /* TideLobbyVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideLobbyVM.swift; sourceTree = "<group>"; };
 		0598C8BF2E5AAE0A00F3098B /* ImageUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUtils.swift; sourceTree = "<group>"; };
+		0598C8C32E60711B00F3098B /* mobileclip_s1_image.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = mobileclip_s1_image.mlpackage; sourceTree = "<group>"; };
+		0598C8C82E60778300F3098B /* CameraStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraStreamView.swift; sourceTree = "<group>"; };
+		0598C8CA2E60785100F3098B /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
+		0598C8E12E628DF400F3098B /* CLIPFeatureExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIPFeatureExtractor.swift; sourceTree = "<group>"; };
 		05D266B32DDABC1600F140D3 /* gestureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gestureView.swift; sourceTree = "<group>"; };
 		05E245E92D0A7EB800C6C048 /* TagLineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagLineView.swift; sourceTree = "<group>"; };
 		05E245EA2D0A7EB800C6C048 /* TagLineView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TagLineView.xib; sourceTree = "<group>"; };
@@ -149,6 +157,7 @@
 		054C84412CD9B994005595EF /* FishBuddy */ = {
 			isa = PBXGroup;
 			children = (
+				0598C8C32E60711B00F3098B /* mobileclip_s1_image.mlpackage */,
 				0598C8BD2E5AAD3C00F3098B /* ImageRecognition */,
 				05D266AF2DDABBE400F140D3 /* Pratice */,
 				05589EF72CE6F7DE003881AA /* Componet */,
@@ -328,6 +337,8 @@
 		0598C8BD2E5AAD3C00F3098B /* ImageRecognition */ = {
 			isa = PBXGroup;
 			children = (
+				0598C8CA2E60785100F3098B /* CameraController.swift */,
+				0598C8C82E60778300F3098B /* CameraStreamView.swift */,
 				0598C8BE2E5AAD9200F3098B /* ImageUtils */,
 			);
 			path = ImageRecognition;
@@ -337,6 +348,7 @@
 			isa = PBXGroup;
 			children = (
 				0598C8BF2E5AAE0A00F3098B /* ImageUtils.swift */,
+				0598C8E12E628DF400F3098B /* CLIPFeatureExtractor.swift */,
 			);
 			path = ImageUtils;
 			sourceTree = "<group>";
@@ -612,9 +624,12 @@
 				05FAEF302E00F4F200E9BD08 /* TransactionsDM.swift in Sources */,
 				054C84652CD9C144005595EF /* WeatherService.swift in Sources */,
 				05589EEF2CE6EFF3003881AA /* LobbyVM.swift in Sources */,
+				0598C8E22E628DF400F3098B /* CLIPFeatureExtractor.swift in Sources */,
+				0598C8CB2E60785C00F3098B /* CameraController.swift in Sources */,
 				054C84472CD9B994005595EF /* LobbyViewController.swift in Sources */,
 				0595566F2E14D5BA0050147C /* TideView.swift in Sources */,
 				05FAEF182DF279A700E9BD08 /* BottomSheetSubViews.swift in Sources */,
+				0598C8C92E60778300F3098B /* CameraStreamView.swift in Sources */,
 				05FAEF1C2DF2C22A00E9BD08 /* TripModel.swift in Sources */,
 				054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */,
 				05FAEF322E00F52500E9BD08 /* CardSliderView.swift in Sources */,
@@ -641,6 +656,7 @@
 				058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */,
 				05FAEF132DF2743900E9BD08 /* bottomSheetView.swift in Sources */,
 				05E245EF2D0A7F9B00C6C048 /* UILabelPadding.swift in Sources */,
+				0598C8C42E60711B00F3098B /* mobileclip_s1_image.mlpackage in Sources */,
 				054C845A2CD9BDE5005595EF /* APIConfig.swift in Sources */,
 				05E245F12D0A801000C6C048 /* UILabelExtension.swift in Sources */,
 				054C84622CD9C0E3005595EF /* PublisherExtension.swift in Sources */,
@@ -806,7 +822,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -837,7 +853,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
