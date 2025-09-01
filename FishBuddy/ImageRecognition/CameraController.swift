@@ -9,12 +9,17 @@ import AVFoundation
 import CoreImage
 import UIKit
 
+@MainActor
+protocol CameraControllerOutputs {
+    var onSessionReady: ((AVCaptureSession) -> Void)? { get set }
+    var onPhoto: ((UIImage) -> Void)? { get set }   // 拍照完成回呼（新）
+}
+
 // CameraController 負責管理相機的存取、權限、相機切換、相機資料流的取得與釋放等功能
-class CameraController: NSObject, ObservableObject {
+final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
 
     // 將外露型別改為已送出可跨執行緒的資料：[Float]（CLIP 向量）
     private var embeddingContinuation: AsyncStream<[Float]>.Continuation?
-
     // 專用推論佇列，避免阻塞相機輸出回呼
     private let inferenceQueue = DispatchQueue(label: "inferenceQueue")
     // 由外部注入或稍後設定的 CLIP 特徵擷取器
@@ -22,6 +27,9 @@ class CameraController: NSObject, ObservableObject {
     // 簡單節流：以時間為準（每 ≥150ms 才做一次推論）
     private var lastInferenceTime = DispatchTime.now()
     private let minInferenceIntervalNS: UInt64 = 150_000_000 // 150ms
+
+    // Still-photo output（拍照輸出）
+    private var photoOutput: AVCapturePhotoOutput?
 
     // 重用 CIContext（優先用 Metal）避免每幀建立花費
     private var ciContext: CIContext = {
@@ -56,7 +64,11 @@ class CameraController: NSObject, ObservableObject {
     // 紀錄相機是否正在運行，避免重複啟動
     private(set) var isRunning: Bool = false
 
+    /// 當 session 準備完成後，回傳
     var onSessionReady: ((AVCaptureSession) -> Void)?
+    
+    /// 當拍完照後的回傳
+    var onPhotoReady: ((UIImage) -> Void)?
     
 //    •    你在 CameraController 裡面用了 AsyncStream<CMSampleBuffer> 來建立一個非同步的影格（frame）資料流。
 //    •    Swift 在建立 AsyncStream 時，會給你一個 Continuation 物件。
@@ -100,6 +112,35 @@ class CameraController: NSObject, ObservableObject {
             self.setupCaptureSession(position: backCamera ? .back : .front) // 設定鏡頭
             captureSession.startRunning() // 開始擷取影像
             isRunning = true
+        }
+    }
+
+    /// 觸發單張拍照（不破壞原本即時串流邏輯）
+    /// - Parameters:
+    ///   - flashMode: 閃光燈模式，預設 .auto
+    ///   - highResolution: 是否要求高解析照片（若裝置支援）
+    public func capturePhoto(flashMode: AVCaptureDevice.FlashMode = .auto,
+                             highResolution: Bool = true) {
+        sessionQueue.async { [weak self] in
+            guard let self, let photoOutput = self.photoOutput else { return }
+
+            let settings = AVCapturePhotoSettings()
+
+            // 高解析度
+            if highResolution {
+                // 例如確認裝置支援的最大尺寸比預設大
+                let maxDimensions = photoOutput.maxPhotoDimensions
+                if maxDimensions.width > 1920 || maxDimensions.height > 1080 {
+                    settings.maxPhotoDimensions = maxDimensions
+                }
+            }
+
+            // 閃光燈（若支援）
+            if photoOutput.supportedFlashModes.contains(flashMode) {
+                settings.flashMode = flashMode
+            }
+
+            photoOutput.capturePhoto(with: settings, delegate: self)
         }
     }
 
@@ -215,6 +256,13 @@ class CameraController: NSObject, ObservableObject {
         // 設定畫質（解析度）
         captureSession.sessionPreset = AVCaptureSession.Preset.vga640x480
 
+        // 新增拍照輸出（不影響既有串流流程）
+        let photoOutput = AVCapturePhotoOutput()
+        if captureSession.canAddOutput(photoOutput) {
+            captureSession.addOutput(photoOutput)
+            self.photoOutput = photoOutput
+        }
+
         // 根據裝置類型決定方向設定
         if videoDevice.isContinuityCamera {
             setOrientation(.portrait)
@@ -256,6 +304,22 @@ extension CameraController: AVCaptureVideoDataOutputSampleBufferDelegate {
                     }
                 }
             }
+        }
+    }
+}
+
+extension CameraController: AVCapturePhotoCaptureDelegate {
+    func photoOutput(_ output: AVCapturePhotoOutput,
+                     didFinishProcessingPhoto photo: AVCapturePhoto,
+                     error: Error?) {
+        if let error = error {
+            print("拍照失敗: \(error)")
+            return
+        }
+        guard let data = photo.fileDataRepresentation(),
+              let image = UIImage(data: data) else { return }
+        DispatchQueue.main.async { [weak self] in
+            self?.onPhotoReady?(image)
         }
     }
 }

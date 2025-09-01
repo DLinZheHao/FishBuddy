@@ -11,16 +11,16 @@ import CoreML
 
 struct CameraStreamView: View {
     @StateObject private var camera = CameraController()
-    @State private var embeddings: AsyncStream<[Float]>?
-    @State private var captureSession: AVCaptureSession?
-    @State private var didLoadExtractor = false
-    @State private var streamID = UUID()
+    @ObservedObject private var vm = CameraStreamVM()
+    @State private var lastPhoto: UIImage?
+    
+    typealias CaptureMode = CameraStreamVM.CaptureMode
     
     var body: some View {
         VStack {
             // 穩定掛載 Preview；session 之後可遲到更新
             ZStack {
-                CameraPreview(session: captureSession)
+                CameraPreview(session: vm.captureSession)
                     .frame(height: 300)
                     .cornerRadius(12)
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(.secondary.opacity(0.4), lineWidth: 1))
@@ -33,8 +33,32 @@ struct CameraStreamView: View {
                 }
             }
             // 當換成「新的」 AVCaptureSession 實例時，強制 SwiftUI 重新建構預覽
-            .id(camera.captureSession.map { ObjectIdentifier($0) })
+            .id(camera.captureSession.map { ObjectIdentifier($0) }) // ObjectIdentifier 是一種「以物件記憶體身份作為唯一值」的東西
             .padding(.horizontal)
+            
+            HStack {
+                Button {
+                    camera.capturePhoto()
+                } label: {
+                    Label("拍照", systemImage: "camera.circle")
+                        .font(.title2)
+                }
+                .buttonStyle(.borderedProminent)
+
+                Spacer()
+
+                if let image = lastPhoto {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 56, height: 56)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(.secondary.opacity(0.4), lineWidth: 1))
+                        .accessibilityLabel("最新拍攝縮圖")
+                }
+            }
+            .padding(.horizontal)
+            
             // 切換前/後鏡頭
             Toggle("後鏡頭", isOn: Binding(
                 get: { camera.backCamera },
@@ -42,9 +66,20 @@ struct CameraStreamView: View {
             ))
             .padding()
 
-            // 用 Task 讀取 embedding（此處只示範取到就計數/處理）
-            if let embeddings {
-                EmbeddingConsumer(stream: embeddings, id: streamID)
+            Spacer()
+            
+//            Picker("Mode", selection: $vm.mode) {
+//                Text("Stream").tag(CaptureMode.stream)
+//                Text("Photo").tag(CaptureMode.photo)
+//            }
+//            .pickerStyle(.segmented)
+//            .onChange(of: vm.mode) { mode in
+//                camera.setMode(mode)
+//            }
+            
+            // 用 Task 讀取 embedding
+            if let embeddings = vm.embeddings {
+                EmbeddingConsumer(stream: embeddings, id: vm.streamID)
             } else {
                 Text("尚未啟動相機")
             }
@@ -57,11 +92,11 @@ struct CameraStreamView: View {
                 // 僅在尚未啟動時才會真正啟動相機
                 camera.startIfNeeded()
             }
-            self.embeddings = stream
-            self.streamID = UUID()
+            vm.embeddings = stream
+            vm.streamID = UUID()
 
             // 只在第一次載入時建立與預熱 CLIP 模型
-            if !didLoadExtractor {
+            if !vm.didLoadExtractor {
                 Task.detached(priority: .userInitiated) {
                     let extractor = CLIPFeatureExtractor()
                     // 預熱：讓第一次推論不卡
@@ -73,13 +108,18 @@ struct CameraStreamView: View {
                     _ = extractor.embedding(for: warmup)
                     await MainActor.run {
                         camera.clipExtractor = extractor
-                        didLoadExtractor = true
+                        vm.didLoadExtractor = true
                     }
                 }
             }
 
             camera.onSessionReady = { session in
-                captureSession = session
+                DispatchQueue.main.async {
+                    self.vm.captureSession = session
+                }
+            }
+            camera.onPhotoReady = { image in
+                self.lastPhoto = image
             }
         }
         .onDisappear {

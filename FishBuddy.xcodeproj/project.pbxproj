@@ -40,6 +40,10 @@
 		0598C8C92E60778300F3098B /* CameraStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0598C8C82E60778300F3098B /* CameraStreamView.swift */; };
 		0598C8CB2E60785C00F3098B /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0598C8CA2E60785100F3098B /* CameraController.swift */; };
 		0598C8E22E628DF400F3098B /* CLIPFeatureExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0598C8E12E628DF400F3098B /* CLIPFeatureExtractor.swift */; };
+		059F9D9D2E651EA600ABFDFC /* EmbeddingImgModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059F9D9C2E651E8D00ABFDFC /* EmbeddingImgModel.swift */; };
+		059F9DA02E651F2800ABFDFC /* embeddings_test_Img.json in Resources */ = {isa = PBXBuildFile; fileRef = 059F9D9F2E651F2800ABFDFC /* embeddings_test_Img.json */; };
+		059F9DA22E651F7600ABFDFC /* JsonUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059F9DA12E651F7600ABFDFC /* JsonUtils.swift */; };
+		059F9DA52E65255400ABFDFC /* CameraStreamVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059F9DA42E65255400ABFDFC /* CameraStreamVM.swift */; };
 		05D266B42DDABC1600F140D3 /* gestureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D266B32DDABC1600F140D3 /* gestureView.swift */; };
 		05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245E92D0A7EB800C6C048 /* TagLineView.swift */; };
 		05E245EC2D0A7EB800C6C048 /* TagLineView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05E245EA2D0A7EB800C6C048 /* TagLineView.xib */; };
@@ -99,6 +103,10 @@
 		0598C8C82E60778300F3098B /* CameraStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraStreamView.swift; sourceTree = "<group>"; };
 		0598C8CA2E60785100F3098B /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
 		0598C8E12E628DF400F3098B /* CLIPFeatureExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIPFeatureExtractor.swift; sourceTree = "<group>"; };
+		059F9D9C2E651E8D00ABFDFC /* EmbeddingImgModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddingImgModel.swift; sourceTree = "<group>"; };
+		059F9D9F2E651F2800ABFDFC /* embeddings_test_Img.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = embeddings_test_Img.json; sourceTree = "<group>"; };
+		059F9DA12E651F7600ABFDFC /* JsonUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonUtils.swift; sourceTree = "<group>"; };
+		059F9DA42E65255400ABFDFC /* CameraStreamVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraStreamVM.swift; sourceTree = "<group>"; };
 		05D266B32DDABC1600F140D3 /* gestureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gestureView.swift; sourceTree = "<group>"; };
 		05E245E92D0A7EB800C6C048 /* TagLineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagLineView.swift; sourceTree = "<group>"; };
 		05E245EA2D0A7EB800C6C048 /* TagLineView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TagLineView.xib; sourceTree = "<group>"; };
@@ -337,6 +345,9 @@
 		0598C8BD2E5AAD3C00F3098B /* ImageRecognition */ = {
 			isa = PBXGroup;
 			children = (
+				059F9DA32E65252800ABFDFC /* ViewModel */,
+				059F9D9E2E651F0000ABFDFC /* Database */,
+				059F9D9B2E651E7F00ABFDFC /* Model */,
 				0598C8CA2E60785100F3098B /* CameraController.swift */,
 				0598C8C82E60778300F3098B /* CameraStreamView.swift */,
 				0598C8BE2E5AAD9200F3098B /* ImageUtils */,
@@ -349,8 +360,33 @@
 			children = (
 				0598C8BF2E5AAE0A00F3098B /* ImageUtils.swift */,
 				0598C8E12E628DF400F3098B /* CLIPFeatureExtractor.swift */,
+				059F9DA12E651F7600ABFDFC /* JsonUtils.swift */,
 			);
 			path = ImageUtils;
+			sourceTree = "<group>";
+		};
+		059F9D9B2E651E7F00ABFDFC /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				059F9D9C2E651E8D00ABFDFC /* EmbeddingImgModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		059F9D9E2E651F0000ABFDFC /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				059F9D9F2E651F2800ABFDFC /* embeddings_test_Img.json */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
+		059F9DA32E65252800ABFDFC /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				059F9DA42E65255400ABFDFC /* CameraStreamVM.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		05D266AF2DDABBE400F140D3 /* Pratice */ = {
@@ -561,6 +597,7 @@
 				05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */,
 				05589EF62CE6F5C5003881AA /* Weather.storyboard in Resources */,
 				05E245EC2D0A7EB800C6C048 /* TagLineView.xib in Resources */,
+				059F9DA02E651F2800ABFDFC /* embeddings_test_Img.json in Resources */,
 				054C844F2CD9B995005595EF /* Base in Resources */,
 				054C844A2CD9B994005595EF /* Base in Resources */,
 			);
@@ -620,6 +657,7 @@
 				05FAEF342E00F53D00E9BD08 /* CardSliderSubViews.swift in Sources */,
 				05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */,
 				05FAEF162DF2782400E9BD08 /* RestaurantModel.swift in Sources */,
+				059F9DA22E651F7600ABFDFC /* JsonUtils.swift in Sources */,
 				05589EF42CE6F2D2003881AA /* UIViewControllerExtension.swift in Sources */,
 				05FAEF302E00F4F200E9BD08 /* TransactionsDM.swift in Sources */,
 				054C84652CD9C144005595EF /* WeatherService.swift in Sources */,
@@ -629,6 +667,7 @@
 				054C84472CD9B994005595EF /* LobbyViewController.swift in Sources */,
 				0595566F2E14D5BA0050147C /* TideView.swift in Sources */,
 				05FAEF182DF279A700E9BD08 /* BottomSheetSubViews.swift in Sources */,
+				059F9DA52E65255400ABFDFC /* CameraStreamVM.swift in Sources */,
 				0598C8C92E60778300F3098B /* CameraStreamView.swift in Sources */,
 				05FAEF1C2DF2C22A00E9BD08 /* TripModel.swift in Sources */,
 				054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */,
@@ -656,6 +695,7 @@
 				058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */,
 				05FAEF132DF2743900E9BD08 /* bottomSheetView.swift in Sources */,
 				05E245EF2D0A7F9B00C6C048 /* UILabelPadding.swift in Sources */,
+				059F9D9D2E651EA600ABFDFC /* EmbeddingImgModel.swift in Sources */,
 				0598C8C42E60711B00F3098B /* mobileclip_s1_image.mlpackage in Sources */,
 				054C845A2CD9BDE5005595EF /* APIConfig.swift in Sources */,
 				05E245F12D0A801000C6C048 /* UILabelExtension.swift in Sources */,
