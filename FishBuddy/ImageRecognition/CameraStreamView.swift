@@ -18,7 +18,7 @@ struct CameraStreamView: View {
     
     var body: some View {
         VStack {
-            // 穩定掛載 Preview；session 之後可遲到更新
+            // 相機鏡頭畫面：穩定掛載 Preview；session 之後可遲到更新
             ZStack {
                 CameraPreview(session: vm.captureSession)
                     .frame(height: 300)
@@ -36,6 +36,7 @@ struct CameraStreamView: View {
             .id(camera.captureSession.map { ObjectIdentifier($0) }) // ObjectIdentifier 是一種「以物件記憶體身份作為唯一值」的東西
             .padding(.horizontal)
             
+            // 拍照按鍵與拍攝縮圖
             HStack {
                 Button {
                     camera.capturePhoto()
@@ -76,7 +77,46 @@ struct CameraStreamView: View {
 //            .onChange(of: vm.mode) { mode in
 //                camera.setMode(mode)
 //            }
-            
+            // 搜尋結果顯示
+            if let results = vm.imageSearchResult, !results.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("📷 搜尋結果")
+                        .font(.headline)
+                        .padding(.bottom, 4)
+
+                    ForEach(results.prefix(3), id: \.id) { r in
+                        HStack {
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(.blue.opacity(0.1))
+                                .frame(width: 40, height: 40)
+                                .overlay(
+                                    Text(String(r.id.prefix(2))) // 先用 id 前兩碼做佔位
+                                        .font(.caption)
+                                        .foregroundStyle(.blue)
+                                )
+
+                            VStack(alignment: .leading) {
+                                Text("ID: \(r.id)")
+                                    .font(.subheadline)
+                                    .foregroundColor(.primary)
+                                Text(String(format: "相似度: %.2f", r.score))
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+
+                            Spacer()
+                        }
+                        .padding(.vertical, 4)
+                        .padding(.horizontal, 8)
+                        .background(RoundedRectangle(cornerRadius: 8).fill(.secondary.opacity(0.1)))
+                    }
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                .padding(.horizontal)
+            }
+                        
             // 用 Task 讀取 embedding
             if let embeddings = vm.embeddings {
                 EmbeddingConsumer(stream: embeddings, id: vm.streamID)
@@ -85,6 +125,9 @@ struct CameraStreamView: View {
             }
         }
         .onAppear {
+            // 讀取 database
+            vm.loadDatabaseIfNeeded()
+            
             // 每次回到此頁都重新建立一條新的 embeddings stream，
             // 讓消費端的 for-await 能可靠重啟；Camera 本身不會重開。
             let stream = AsyncStream<[Float]> { continuation in
@@ -118,8 +161,9 @@ struct CameraStreamView: View {
                     self.vm.captureSession = session
                 }
             }
-            camera.onPhotoReady = { image in
-                self.lastPhoto = image
+            camera.onPhotoReady = { data in
+                self.lastPhoto = data.1
+                self.vm.search(query: data.0)
             }
         }
         .onDisappear {

@@ -345,8 +345,8 @@
 		0598C8BD2E5AAD3C00F3098B /* ImageRecognition */ = {
 			isa = PBXGroup;
 			children = (
-				059F9DA32E65252800ABFDFC /* ViewModel */,
 				059F9D9E2E651F0000ABFDFC /* Database */,
+				059F9DA32E65252800ABFDFC /* ViewModel */,
 				059F9D9B2E651E7F00ABFDFC /* Model */,
 				0598C8CA2E60785100F3098B /* CameraController.swift */,
 				0598C8C82E60778300F3098B /* CameraStreamView.swift */,

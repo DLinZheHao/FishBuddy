@@ -127,7 +127,7 @@ func l2Distance(_ a: [CGFloat], _ b: [CGFloat]) -> CGFloat {
 }
 
 /// 計算 cos：多相似
-func cosineSimilarity(_ a: [CGFloat], _ b: [CGFloat]) -> CGFloat {
+func cosineSimilarity(_ a: [Float], _ b: [Float]) -> Float {
     let dot = zip(a, b).map { $0 * $1 }.reduce(0, +)
     let normA = sqrt(a.map { $0 * $0 }.reduce(0, +))
     let normB = sqrt(b.map { $0 * $0 }.reduce(0, +))
@@ -173,12 +173,12 @@ struct L2Metric: SimilarityMetric {
     }
 }
 
-struct CosineMetric: SimilarityMetric {
-    let name = "cosine"
-    func score(query: [CGFloat], candidate: [CGFloat]) -> CGFloat {
-        cosineSimilarity(query, candidate) // 越大越像
-    }
-}
+//struct CosineMetric: SimilarityMetric {
+//    let name = "cosine"
+//    func score(query: [CGFloat], candidate: [CGFloat]) -> CGFloat {
+//        cosineSimilarity(query, candidate) // 越大越像
+//    }
+//}
 
 struct NormL2Metric: SimilarityMetric {
     let name = "normL2"
@@ -247,21 +247,21 @@ struct ImageItem {
 }
 
 // MARK: - 搜尋
-func searchSimilar(queryImage: UIImage, in db: [ImageItem], topK: Int = 3, useCosine: Bool = false) -> [ImageItem] {
-    guard let queryFeature = queryImage.averageRGBFeature() else { return [] }
-    
-    let scored = db.map { item -> (ImageItem, CGFloat) in
-        let score: CGFloat
-        if useCosine {
-            score = cosineSimilarity(queryFeature, item.feature) // 越大越相似
-        } else {
-            score = -l2Distance(queryFeature, item.feature) // 越小越相似 → 取負號
-        }
-        return (item, score)
-    }
-    
-    return scored.sorted { $0.1 > $1.1 }.prefix(topK).map { $0.0 }
-}
+//func searchSimilar(queryImage: UIImage, in db: [ImageItem], topK: Int = 3, useCosine: Bool = false) -> [ImageItem] {
+//    guard let queryFeature = queryImage.averageRGBFeature() else { return [] }
+//    
+//    let scored = db.map { item -> (ImageItem, CGFloat) in
+//        let score: CGFloat
+//        if useCosine {
+//            score = cosineSimilarity(queryFeature, item.feature) // 越大越相似
+//        } else {
+//            score = -l2Distance(queryFeature, item.feature) // 越小越相似 → 取負號
+//        }
+//        return (item, score)
+//    }
+//    
+//    return scored.sorted { $0.1 > $1.1 }.prefix(topK).map { $0.0 }
+//}
 
 // MARK: - 相似度與距離
 enum Metric {
@@ -407,27 +407,27 @@ final class ViewController: UIViewController {
             return
         }
 
-        // 計分：Cosine 越大越好；L2 越小越好（取負號讓分數大者在前）
-        results = database.map { item in
-            switch currentMetric {
-            case .l2:
-                let d = l2Distance(qFeat, item.feature)
-                return (item, -d)
-            case .cosine:
-                let s = cosineSimilarity(qFeat, item.feature)
-                return (item, s)
-            case .normL2:
-                let qn = normalized(qFeat)
-                let fn = normalized(item.feature)
-                let d = l2Distance(qn, fn)
-                return (item, -d)
-            }
-        }
-        .sorted { $0.score > $1.score }
-        .prefix(3)
-        .map { $0 }
-
-        tableView.reloadData()
+//        // 計分：Cosine 越大越好；L2 越小越好（取負號讓分數大者在前）
+//        results = database.map { item in
+//            switch currentMetric {
+//            case .l2:
+//                let d = l2Distance(qFeat, item.feature)
+//                return (item, -d)
+//            case .cosine:
+//                let s = cosineSimilarity(qFeat, item.feature)
+//                return (item, s)
+//            case .normL2:
+//                let qn = normalized(qFeat)
+//                let fn = normalized(item.feature)
+//                let d = l2Distance(qn, fn)
+//                return (item, -d)
+//            }
+//        }
+//        .sorted { $0.score > $1.score }
+//        .prefix(3)
+//        .map { $0 }
+//
+//        tableView.reloadData()
     }
 }
 

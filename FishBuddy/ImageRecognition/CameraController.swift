@@ -18,19 +18,8 @@ protocol CameraControllerOutputs {
 // CameraController 負責管理相機的存取、權限、相機切換、相機資料流的取得與釋放等功能
 final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
 
-    // 將外露型別改為已送出可跨執行緒的資料：[Float]（CLIP 向量）
-    private var embeddingContinuation: AsyncStream<[Float]>.Continuation?
-    // 專用推論佇列，避免阻塞相機輸出回呼
-    private let inferenceQueue = DispatchQueue(label: "inferenceQueue")
     // 由外部注入或稍後設定的 CLIP 特徵擷取器
     var clipExtractor: CLIPFeatureExtractor?
-    // 簡單節流：以時間為準（每 ≥150ms 才做一次推論）
-    private var lastInferenceTime = DispatchTime.now()
-    private let minInferenceIntervalNS: UInt64 = 150_000_000 // 150ms
-
-    // Still-photo output（拍照輸出）
-    private var photoOutput: AVCapturePhotoOutput?
-
     // 重用 CIContext（優先用 Metal）避免每幀建立花費
     private var ciContext: CIContext = {
         if let device = MTLCreateSystemDefaultDevice() {
@@ -39,6 +28,29 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
             return CIContext(options: nil)
         }
     }()
+    
+    // 專用推論佇列，避免阻塞相機輸出回呼
+    private let inferenceQueue = DispatchQueue(label: "inferenceQueue")
+    // session 的專用序列，確保相機操作執行緒安全
+    private let sessionQueue = DispatchQueue(label: "sessionQueue")
+    
+    // 送出可跨執行緒的資料：[Float]（CLIP 向量）
+    private var embeddingContinuation: AsyncStream<[Float]>.Continuation?
+    
+    // 簡單節流：以時間為準（每 ≥150ms 才做一次推論）
+    private var lastInferenceTime = DispatchTime.now()
+    private let minInferenceIntervalNS: UInt64 = 150_000_000 // 150ms
+
+    // Still-photo output（拍照輸出）
+    private var photoOutput: AVCapturePhotoOutput?
+
+    // 相機的 session 實體，負責管理輸入與輸出
+    var captureSession: AVCaptureSession? {
+        didSet {
+            guard let captureSession else { return }
+            onSessionReady?(captureSession)
+        }
+    }
 
     // 控制目前是否使用後鏡頭，true 表示使用後鏡頭，false 表示前鏡頭
     // 當此屬性變動時，會自動停止並重新啟動相機以切換鏡頭
@@ -52,23 +64,14 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
 
     // 用來記錄是否已獲得相機權限
     private var permissionGranted = true
-    // 相機的 session 實體，負責管理輸入與輸出
-    var captureSession: AVCaptureSession? {
-        didSet {
-            guard let captureSession else { return }
-            onSessionReady?(captureSession)
-        }
-    }
-    // session 的專用序列，確保相機操作執行緒安全
-    private let sessionQueue = DispatchQueue(label: "sessionQueue")
     // 紀錄相機是否正在運行，避免重複啟動
     private(set) var isRunning: Bool = false
 
     /// 當 session 準備完成後，回傳
     var onSessionReady: ((AVCaptureSession) -> Void)?
     
-    /// 當拍完照後的回傳
-    var onPhotoReady: ((UIImage) -> Void)?
+    /// 當拍完照後的回傳 -> 回傳處理過的 embeeding
+    var onPhotoReady: ((([Float], UIImage)) -> Void)?
     
 //    •    你在 CameraController 裡面用了 AsyncStream<CMSampleBuffer> 來建立一個非同步的影格（frame）資料流。
 //    •    Swift 在建立 AsyncStream 時，會給你一個 Continuation 物件。
@@ -299,7 +302,7 @@ extension CameraController: AVCaptureVideoDataOutputSampleBufferDelegate {
                 let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
                 if let cgImage = self.ciContext.createCGImage(ciImage, from: ciImage.extent) {
                     let uiImage = UIImage(cgImage: cgImage)
-                    if let embedding = clip.embedding(for: uiImage) {
+                    if let embedding = clip.multiCropAverageEmbedding(for: uiImage, cropScale: 0.85) {
                         self.embeddingContinuation?.yield(embedding)
                     }
                 }
@@ -319,7 +322,11 @@ extension CameraController: AVCapturePhotoCaptureDelegate {
         guard let data = photo.fileDataRepresentation(),
               let image = UIImage(data: data) else { return }
         DispatchQueue.main.async { [weak self] in
-            self?.onPhotoReady?(image)
+            guard let self else { return }
+            guard let clip = clipExtractor else { return }
+            if let embedding = clip.multiCropAverageEmbedding(for: image, cropScale: 0.85) {
+                self.onPhotoReady?((embedding, image))
+            }
         }
     }
 }
