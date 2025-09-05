@@ -35,6 +35,10 @@
 		058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058877022DC1BE4D00B1D13E /* WeatherView2.swift */; };
 		0595566F2E14D5BA0050147C /* TideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0595566E2E14D5B90050147C /* TideView.swift */; };
 		059556712E150AF10050147C /* TideLobbyVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059556702E150AF10050147C /* TideLobbyVM.swift */; };
+		05C94D7E2E6ABE460051B078 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D7D2E6ABE460051B078 /* CombineMoya */; };
+		05C94D802E6ABE460051B078 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D7F2E6ABE460051B078 /* Moya */; };
+		05C94D822E6ABE460051B078 /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D812E6ABE460051B078 /* ReactiveMoya */; };
+		05C94D842E6ABE460051B078 /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D832E6ABE460051B078 /* RxMoya */; };
 		05D266B42DDABC1600F140D3 /* gestureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D266B32DDABC1600F140D3 /* gestureView.swift */; };
 		05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245E92D0A7EB800C6C048 /* TagLineView.swift */; };
 		05E245EC2D0A7EB800C6C048 /* TagLineView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05E245EA2D0A7EB800C6C048 /* TagLineView.xib */; };
@@ -55,7 +59,6 @@
 		05FAEF322E00F52500E9BD08 /* CardSliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF312E00F52500E9BD08 /* CardSliderView.swift */; };
 		05FAEF342E00F53D00E9BD08 /* CardSliderSubViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF332E00F52F00E9BD08 /* CardSliderSubViews.swift */; };
 		05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF382E013B6B00E9BD08 /* CardSliderVM.swift */; };
-		34CB838C47F0B8332479937F /* Pods_FishBuddy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 403AA25D1C561EBE052111F9 /* Pods_FishBuddy.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -109,9 +112,6 @@
 		05FAEF312E00F52500E9BD08 /* CardSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderView.swift; sourceTree = "<group>"; };
 		05FAEF332E00F52F00E9BD08 /* CardSliderSubViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderSubViews.swift; sourceTree = "<group>"; };
 		05FAEF382E013B6B00E9BD08 /* CardSliderVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderVM.swift; sourceTree = "<group>"; };
-		403AA25D1C561EBE052111F9 /* Pods_FishBuddy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FishBuddy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		93D4B919CA5B1C4E00C568C4 /* Pods-FishBuddy.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FishBuddy.debug.xcconfig"; path = "Target Support Files/Pods-FishBuddy/Pods-FishBuddy.debug.xcconfig"; sourceTree = "<group>"; };
-		9E8680C797A3C5BAD69C85F4 /* Pods-FishBuddy.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FishBuddy.release.xcconfig"; path = "Target Support Files/Pods-FishBuddy/Pods-FishBuddy.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,7 +119,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				34CB838C47F0B8332479937F /* Pods_FishBuddy.framework in Frameworks */,
+				05C94D802E6ABE460051B078 /* Moya in Frameworks */,
+				05C94D7E2E6ABE460051B078 /* CombineMoya in Frameworks */,
+				05C94D842E6ABE460051B078 /* RxMoya in Frameworks */,
+				05C94D822E6ABE460051B078 /* ReactiveMoya in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,9 +133,8 @@
 			isa = PBXGroup;
 			children = (
 				054C84412CD9B994005595EF /* FishBuddy */,
+				05C94D7C2E6ABE3E0051B078 /* Frameworks */,
 				054C84402CD9B994005595EF /* Products */,
-				E7D8B280684BFC7DCF7FA2DE /* Pods */,
-				A618D7BF026182D6CF0FD035 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -322,6 +324,13 @@
 			path = SearchBar;
 			sourceTree = "<group>";
 		};
+		05C94D7C2E6ABE3E0051B078 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		05D266AF2DDABBE400F140D3 /* Pratice */ = {
 			isa = PBXGroup;
 			children = (
@@ -448,23 +457,6 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
-		A618D7BF026182D6CF0FD035 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				403AA25D1C561EBE052111F9 /* Pods_FishBuddy.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		E7D8B280684BFC7DCF7FA2DE /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				93D4B919CA5B1C4E00C568C4 /* Pods-FishBuddy.debug.xcconfig */,
-				9E8680C797A3C5BAD69C85F4 /* Pods-FishBuddy.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -472,11 +464,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 054C84532CD9B995005595EF /* Build configuration list for PBXNativeTarget "FishBuddy" */;
 			buildPhases = (
-				EF467FFFF9E3D44383CF03AB /* [CP] Check Pods Manifest.lock */,
 				054C843B2CD9B994005595EF /* Sources */,
 				054C843C2CD9B994005595EF /* Frameworks */,
 				054C843D2CD9B994005595EF /* Resources */,
-				23817F403BEBDB90FE9A1AA6 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -511,6 +501,9 @@
 				Base,
 			);
 			mainGroup = 054C84362CD9B994005595EF;
+			packageReferences = (
+				05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */,
+			);
 			productRefGroup = 054C84402CD9B994005595EF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -536,48 +529,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		23817F403BEBDB90FE9A1AA6 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-FishBuddy/Pods-FishBuddy-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-FishBuddy/Pods-FishBuddy-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-FishBuddy/Pods-FishBuddy-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		EF467FFFF9E3D44383CF03AB /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-FishBuddy-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		054C843B2CD9B994005595EF /* Sources */ = {
@@ -771,7 +722,6 @@
 		};
 		054C84542CD9B995005595EF /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 93D4B919CA5B1C4E00C568C4 /* Pods-FishBuddy.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -802,7 +752,6 @@
 		};
 		054C84552CD9B995005595EF /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9E8680C797A3C5BAD69C85F4 /* Pods-FishBuddy.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -853,6 +802,40 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Moya/Moya.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 15.0.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		05C94D7D2E6ABE460051B078 /* CombineMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = CombineMoya;
+		};
+		05C94D7F2E6ABE460051B078 /* Moya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = Moya;
+		};
+		05C94D812E6ABE460051B078 /* ReactiveMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = ReactiveMoya;
+		};
+		05C94D832E6ABE460051B078 /* RxMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = RxMoya;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 054C84372CD9B994005595EF /* Project object */;
 }
