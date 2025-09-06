@@ -13,10 +13,12 @@ import AVFoundation
 class CameraStreamVM: ObservableObject {
     
     @Published private(set) var database: [EmbeddingImgModel] = []
+    /// 單例 in-memory 向量索引（從 SQLite 讀出後打包，僅建立一次）
+    @Published private(set) var vectorIndex: InMemoryVectorIndex?
     /// 由 CameraController 提供的影像特徵向量串流
     /// - 使用 AsyncStream<[Float]> 表示一連串的 embedding 資料
     /// - 每一筆 [Float] 就是一個 frame 的向量化結果
-    @Published var embeddings: AsyncStream<[Float]>?
+    @Published var embeddings: AsyncStream<[Float32]>?
     /// 與 CameraPreview 綁定用的「目前活躍的相機工作階段」
     /// - 當 CameraController 建立/切換新的 AVCaptureSession 時會更新此屬性
     @Published var captureSession: AVCaptureSession?
@@ -34,42 +36,57 @@ class CameraStreamVM: ObservableObject {
     /// 由 CameraController 提供的相片特徵向量串流
     @Published var imageSearchResult: [SearchResult]?
     
+    /// 讀取資料庫：目前是直接讀取 json 資料作為資料庫
     func loadDatabaseIfNeeded() {
         guard database.isEmpty else { return }
         Task(priority: .utility) {
             do {
-                let db = try await EmbeddingStore.shared.database()
-                await MainActor.run { self.database = db }
+                // 依你的模型維度設定（例如 512 或 768）。這裡先用 512，你可視實際模型調整。
+                let index = try await EmbeddingStore.shared.getIndex(dim: 512)
+                await MainActor.run {
+                    self.vectorIndex = index
+                    // 舊的 database 陣列可以不再使用；若 UI 其他處仍依賴可留著
+                    self.database = []
+                }
             } catch {
-                print("❌ 讀取 embedding JSON 失敗:", error)
+                print("❌ 建立/取得 InMemoryVectorIndex 失敗:", error)
             }
         }
     }
     
+    /// 搜尋結果：目前自己計算，並產出結果
     func search(query: [Float], topK: Int = 3) {
+        // 優先使用記憶體向量索引（效能最佳）。若尚未就緒，退回舊的陣列比對。
+        if let index = vectorIndex {
+            let results = index.search(query: query, topK: topK)
+            // 門檻 + 與次高分差距規則
+            if let best = results.first {
+                let gapOK = results.count < 2 || (best.score - results[1].score) >= minGapDelta
+                if best.score >= acceptThreshold && gapOK {
+                    self.imageSearchResult = results.map { SearchResult(id: $0.id, score: $0.score) }
+                    return
+                }
+            }
+            self.imageSearchResult = []
+            print("沒有符合的結果")
+            return
+        }
+
+        // Fallback：尚未建立索引時，用舊的陣列方式
         guard !database.isEmpty else { self.imageSearchResult = []; return }
         let scored = database.map { entry in
             (id: entry.id, score: cosineSimilarity(query, entry.vector))
         }.sorted { $0.score > $1.score }
-
-        // 取前 K 名
         let top = Array(scored.prefix(max(1, topK)))
-
-        // 動態門檻：需要同時通過「固定分數」與「與次高分差距」
         if let best = top.first {
-            let gapOK: Bool
-            if top.count >= 2 {
-                let second = top[1]
-                gapOK = (best.score - second.score) >= minGapDelta
-            } else {
-                gapOK = true
-            }
+            let gapOK: Bool = top.count >= 2 ? (best.score - top[1].score) >= minGapDelta : true
             if best.score >= acceptThreshold && gapOK {
                 self.imageSearchResult = top.map { SearchResult(id: $0.id, score: $0.score) }
                 return
             }
         }
-        self.imageSearchResult = [] // 不確定時回空陣列
+        self.imageSearchResult = []
+        print("沒有符合的結果（舊邏輯）")
     }
     
 }
@@ -82,6 +99,6 @@ extension CameraStreamVM {
         /// 即時串流
         case stream
         /// 拍照
-        case photo      
+        case photo
     }
 }

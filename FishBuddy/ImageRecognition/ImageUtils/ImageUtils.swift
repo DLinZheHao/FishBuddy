@@ -401,11 +401,11 @@ final class ViewController: UIViewController {
     }
 
     private func runSearchIfPossible() {
-        guard let query = currentQuery, let qFeat = query.averageRGBFeature(), !database.isEmpty else {
-            results = []
-            tableView.reloadData()
-            return
-        }
+//        guard let query = currentQuery, let qFeat = query.averageRGBFeature(), !database.isEmpty else {
+//            results = []
+//            tableView.reloadData()
+//            return
+//        }
 
 //        // 計分：Cosine 越大越好；L2 越小越好（取負號讓分數大者在前）
 //        results = database.map { item in

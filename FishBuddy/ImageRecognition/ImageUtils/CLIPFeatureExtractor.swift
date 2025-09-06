@@ -12,7 +12,7 @@ import UIKit
 /// 通用的 CLIP 影像編碼器封裝：
 /// 1) 讀取模型的 imageConstraint，自動把 CGImage 轉成正確的輸入
 /// 2) 不依賴特定自動生成的 Input/Output 名稱（動態找第一個 Image 輸入、第一個 MultiArray 輸出）
-/// 3) 回傳 L2-normalized 的 [Float]
+/// 3) 回傳 L2-normalized 的 [Float32]
 final class CLIPFeatureExtractor {
     /// 你的自動產生類別（請確保專案裡存在）。
     /// 我們只取出裡面的 `MLModel` 來用，避免卡在固定的 Input 型別。
@@ -27,15 +27,15 @@ final class CLIPFeatureExtractor {
     }
 
     /// 從 UIImage 取 embedding。若失敗回傳 nil。
-    func embedding(for uiImage: UIImage) -> [Float]? {
+    func embedding(for uiImage: UIImage) -> [Float32]? {
         guard let cg = uiImage.cgImage else { return nil }
         return embedding(fromCGImage: cg)
     }
 
     /// 對單張圖片做多視窗裁切（five-crop）後各自取 embedding，最後做平均並 L2 正規化。
     /// - 視窗位置：center / left / right / top / bottom，視窗邊長為短邊的 `cropScale` 倍（預設 0.85）。
-    /// - 輸入：UIImage；輸出：L2-normalized [Float]
-    func multiCropAverageEmbedding(for uiImage: UIImage, cropScale: CGFloat = 0.85) -> [Float]? {
+    /// - 輸入：UIImage；輸出：L2-normalized [Float32]
+    func multiCropAverageEmbedding(for uiImage: UIImage, cropScale: CGFloat = 0.85) -> [Float32]? {
         guard let cg = uiImage.cgImage else { return nil }
         let w = cg.width, h = cg.height
         let shortSide = CGFloat(min(w, h))
@@ -57,7 +57,7 @@ final class CLIPFeatureExtractor {
             rect(cx, CGFloat(h) - cropSize)  // bottom
         ]
 
-        var acc: [Float] = []
+        var acc: [Float32] = []
         var count: Int = 0
         for r in rects {
             if let sub = cg.cropping(to: r) {
@@ -73,15 +73,15 @@ final class CLIPFeatureExtractor {
         }
         guard count > 0 else { return nil }
         // 取平均
-        var inv = 1.0 / Float(count)
+        var inv = Float32(1.0) / Float32(count)
         vDSP_vsmul(acc, 1, &inv, &acc, 1, vDSP_Length(acc.count))
         // 再做 L2 normalize
-        let norm = sqrt(acc.reduce(0) { $0 + $1 * $1 })
+        let norm = sqrt(acc.reduce(Float32(0)) { $0 + $1 * $1 })
         return norm > 0 ? acc.map { $0 / norm } : acc
     }
 
     /// 以 CGImage 作為輸入跑一次模型，回傳 L2-normalized 向量
-    private func embedding(fromCGImage cg: CGImage) -> [Float]? {
+    private func embedding(fromCGImage cg: CGImage) -> [Float32]? {
         let md = coreMLModel.modelDescription
         // 動態尋找第一個影像輸入的名稱與限制條件
         guard let (inputName, constraint) = md.inputDescriptionsByName.first(where: { _, desc in
@@ -104,10 +104,10 @@ final class CLIPFeatureExtractor {
         guard let embeddingArray = out.featureNames
             .compactMap({ out.featureValue(for: $0)?.multiArrayValue })
             .first else { return nil }
-        // 將 MLMultiArray 轉換成 [Float]
+        // 將 MLMultiArray 轉換成 [Float32]
         let floats = embeddingArray.toFloatArray()
         // 計算 L2 範數並正規化向量
-        let norm = sqrt(floats.reduce(0) { $0 + $1 * $1 })
+        let norm = sqrt(floats.reduce(Float32(0)) { $0 + $1 * $1 })
         return norm > 0 ? floats.map { $0 / norm } : floats
     }
 }
@@ -115,23 +115,23 @@ final class CLIPFeatureExtractor {
 // MARK: - Utilities
 import Accelerate
 private extension MLMultiArray {
-    func toFloatArray() -> [Float] {
+    func toFloatArray() -> [Float32] {
         switch dataType {
         case .float32:
             let count = self.count
-            let ptr = self.dataPointer.bindMemory(to: Float.self, capacity: count)
+            let ptr = self.dataPointer.bindMemory(to: Float32.self, capacity: count)
             let buffer = UnsafeBufferPointer(start: ptr, count: count)
             return Array(buffer)
         case .float64:
             let count = self.count
             let dptr = self.dataPointer.bindMemory(to: Double.self, capacity: count)
             let dbuf = UnsafeBufferPointer(start: dptr, count: count)
-            var out = [Float](repeating: 0, count: count)
+            var out = [Float32](repeating: 0, count: count)
             vDSP_vdpsp(dbuf.baseAddress!, 1, &out, 1, vDSP_Length(count))
             return out
         default:
             // 其他型別不常見，保險起見做個通用拷貝
-            return (0..<count).map { i in Float(truncating: self[i]) }
+            return (0..<count).map { i in Float32(truncating: self[i]) }
         }
     }
 }

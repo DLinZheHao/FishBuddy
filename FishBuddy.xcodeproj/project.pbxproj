@@ -48,6 +48,10 @@
 		05C94D992E6ABF7C0051B078 /* CameraStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C94D902E6ABF7C0051B078 /* CameraStreamView.swift */; };
 		05C94D9A2E6ABF7C0051B078 /* EmbeddingImgModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C94D8B2E6ABF7C0051B078 /* EmbeddingImgModel.swift */; };
 		05C94D9B2E6ABF7C0051B078 /* embeddings_test_Img.json in Resources */ = {isa = PBXBuildFile; fileRef = 05C94D852E6ABF7C0051B078 /* embeddings_test_Img.json */; };
+		05C94DA32E6AC4070051B078 /* Toast in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94DA22E6AC4070051B078 /* Toast */; };
+		05C94DA52E6AC4E80051B078 /* UIViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C94DA42E6AC4E80051B078 /* UIViewExtension.swift */; };
+		05C94DA82E6ACA4C0051B078 /* FishDBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C94DA72E6ACA4C0051B078 /* FishDBManager.swift */; };
+		05C94DB62E6BDA160051B078 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94DB52E6BDA160051B078 /* SQLite */; };
 		05D266B42DDABC1600F140D3 /* gestureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D266B32DDABC1600F140D3 /* gestureView.swift */; };
 		05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245E92D0A7EB800C6C048 /* TagLineView.swift */; };
 		05E245EC2D0A7EB800C6C048 /* TagLineView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05E245EA2D0A7EB800C6C048 /* TagLineView.xib */; };
@@ -110,6 +114,8 @@
 		05C94D8F2E6ABF7C0051B078 /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
 		05C94D902E6ABF7C0051B078 /* CameraStreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraStreamView.swift; sourceTree = "<group>"; };
 		05C94D922E6ABF7C0051B078 /* mobileclip_s1_image.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = mobileclip_s1_image.mlpackage; sourceTree = "<group>"; };
+		05C94DA42E6AC4E80051B078 /* UIViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtension.swift; sourceTree = "<group>"; };
+		05C94DA72E6ACA4C0051B078 /* FishDBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FishDBManager.swift; sourceTree = "<group>"; };
 		05D266B32DDABC1600F140D3 /* gestureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gestureView.swift; sourceTree = "<group>"; };
 		05E245E92D0A7EB800C6C048 /* TagLineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagLineView.swift; sourceTree = "<group>"; };
 		05E245EA2D0A7EB800C6C048 /* TagLineView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TagLineView.xib; sourceTree = "<group>"; };
@@ -137,9 +143,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05C94DB62E6BDA160051B078 /* SQLite in Frameworks */,
 				05C94D802E6ABE460051B078 /* Moya in Frameworks */,
 				05C94D7E2E6ABE460051B078 /* CombineMoya in Frameworks */,
 				05C94D842E6ABE460051B078 /* RxMoya in Frameworks */,
+				05C94DA32E6AC4070051B078 /* Toast in Frameworks */,
 				05C94D822E6ABE460051B078 /* ReactiveMoya in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -313,6 +321,7 @@
 				05589EF12CE6F0A7003881AA /* UIStoryboardExtension.swift */,
 				05589EF32CE6F2D2003881AA /* UIViewControllerExtension.swift */,
 				05E245F02D0A801000C6C048 /* UILabelExtension.swift */,
+				05C94DA42E6AC4E80051B078 /* UIViewExtension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -351,12 +360,12 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		05C94D862E6ABF7C0051B078 /* Database */ = {
+		05C94D862E6ABF7C0051B078 /* DatabaseJson */ = {
 			isa = PBXGroup;
 			children = (
 				05C94D852E6ABF7C0051B078 /* embeddings_test_Img.json */,
 			);
-			path = Database;
+			path = DatabaseJson;
 			sourceTree = "<group>";
 		};
 		05C94D8A2E6ABF7C0051B078 /* ImageUtils */ = {
@@ -388,7 +397,7 @@
 		05C94D912E6ABF7C0051B078 /* ImageRecognition */ = {
 			isa = PBXGroup;
 			children = (
-				05C94D862E6ABF7C0051B078 /* Database */,
+				05C94DA62E6AC9760051B078 /* Persistence */,
 				05C94D8A2E6ABF7C0051B078 /* ImageUtils */,
 				05C94D8C2E6ABF7C0051B078 /* Model */,
 				05C94D8E2E6ABF7C0051B078 /* ViewModel */,
@@ -396,6 +405,15 @@
 				05C94D902E6ABF7C0051B078 /* CameraStreamView.swift */,
 			);
 			path = ImageRecognition;
+			sourceTree = "<group>";
+		};
+		05C94DA62E6AC9760051B078 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				05C94D862E6ABF7C0051B078 /* DatabaseJson */,
+				05C94DA72E6ACA4C0051B078 /* FishDBManager.swift */,
+			);
+			path = Persistence;
 			sourceTree = "<group>";
 		};
 		05D266AF2DDABBE400F140D3 /* Pratice */ = {
@@ -570,6 +588,8 @@
 			mainGroup = 054C84362CD9B994005595EF;
 			packageReferences = (
 				05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */,
+				05C94DA12E6AC4070051B078 /* XCRemoteSwiftPackageReference "Toast-Swift" */,
+				05C94DB42E6BDA160051B078 /* XCRemoteSwiftPackageReference "SQLite" */,
 			);
 			productRefGroup = 054C84402CD9B994005595EF /* Products */;
 			projectDirPath = "";
@@ -603,6 +623,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05C94DA82E6ACA4C0051B078 /* FishDBManager.swift in Sources */,
 				054C846E2CDB06AA005595EF /* WeatherAllModel.swift in Sources */,
 				05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */,
 				05FAEF342E00F53D00E9BD08 /* CardSliderSubViews.swift in Sources */,
@@ -623,6 +644,7 @@
 				05589EE72CE6ED93003881AA /* WeatherLobbyViewController.swift in Sources */,
 				05D266B42DDABC1600F140D3 /* gestureView.swift in Sources */,
 				054C84602CD9C0AF005595EF /* UIControlPublisher.swift in Sources */,
+				05C94DA52E6AC4E80051B078 /* UIViewExtension.swift in Sources */,
 				05589EF92CE6F808003881AA /* FeatrueTitleBar.swift in Sources */,
 				05FAEF202DF2C2AD00E9BD08 /* GestureAnimationSubViews.swift in Sources */,
 				05589EF22CE6F0A7003881AA /* UIStoryboardExtension.swift in Sources */,
@@ -888,6 +910,22 @@
 				minimumVersion = 15.0.3;
 			};
 		};
+		05C94DA12E6AC4070051B078 /* XCRemoteSwiftPackageReference "Toast-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scalessec/Toast-Swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.1.1;
+			};
+		};
+		05C94DB42E6BDA160051B078 /* XCRemoteSwiftPackageReference "SQLite" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.4;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -910,6 +948,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */;
 			productName = RxMoya;
+		};
+		05C94DA22E6AC4070051B078 /* Toast */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05C94DA12E6AC4070051B078 /* XCRemoteSwiftPackageReference "Toast-Swift" */;
+			productName = Toast;
+		};
+		05C94DB52E6BDA160051B078 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05C94DB42E6BDA160051B078 /* XCRemoteSwiftPackageReference "SQLite" */;
+			productName = SQLite;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

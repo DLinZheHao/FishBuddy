@@ -130,7 +130,7 @@ struct CameraStreamView: View {
             
             // 每次回到此頁都重新建立一條新的 embeddings stream，
             // 讓消費端的 for-await 能可靠重啟；Camera 本身不會重開。
-            let stream = AsyncStream<[Float]> { continuation in
+            let stream = AsyncStream<[Float32]> { continuation in
                 camera.attachEmbedding(continuation: continuation)
                 // 僅在尚未啟動時才會真正啟動相機
                 camera.startIfNeeded()
@@ -198,7 +198,7 @@ struct CameraPreview: UIViewRepresentable {
 
 // 僅傳遞 [Float]，避免 CMSampleBuffer 的 Sendable 問題
 struct EmbeddingConsumer: View {
-    let stream: AsyncStream<[Float]>
+    let stream: AsyncStream<[Float32]>
     let id: UUID
 
     var body: some View {
