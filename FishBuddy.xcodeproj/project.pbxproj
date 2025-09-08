@@ -7,9 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		053127E92E1762C900B25378 /* SkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053127E82E1762C900B25378 /* SkeletonView.swift */; };
-		053127EC2E1770CE00B25378 /* CustomRounded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053127EB2E1770CE00B25378 /* CustomRounded.swift */; };
-		053127EF2E1771F100B25378 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053127EE2E1771F100B25378 /* ViewExtension.swift */; };
+		051B882F2E6E8A7400209CDB /* SkeletonListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B882C2E6E8A7400209CDB /* SkeletonListView.swift */; };
+		051B88302E6E8A7400209CDB /* SkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B882D2E6E8A7400209CDB /* SkeletonView.swift */; };
+		051B88322E6E8A9600209CDB /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B88312E6E8A9600209CDB /* ViewExtension.swift */; };
+		051B88382E6E8AE600209CDB /* CustomRounded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B88362E6E8AE600209CDB /* CustomRounded.swift */; };
 		0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0546FBB52DCB30F1001695D8 /* custom-icons.ttf */; };
 		054C84432CD9B994005595EF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84422CD9B994005595EF /* AppDelegate.swift */; };
 		054C84452CD9B994005595EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84442CD9B994005595EF /* SceneDelegate.swift */; };
@@ -38,7 +39,10 @@
 		058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058877022DC1BE4D00B1D13E /* WeatherView2.swift */; };
 		0595566F2E14D5BA0050147C /* TideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0595566E2E14D5B90050147C /* TideView.swift */; };
 		059556712E150AF10050147C /* TideLobbyVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059556702E150AF10050147C /* TideLobbyVM.swift */; };
-		059556772E1B5E9C0050147C /* SkeletonListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059556762E1B5E9C0050147C /* SkeletonListView.swift */; };
+		05C94D7E2E6ABE460051B078 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D7D2E6ABE460051B078 /* CombineMoya */; };
+		05C94D802E6ABE460051B078 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D7F2E6ABE460051B078 /* Moya */; };
+		05C94D822E6ABE460051B078 /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D812E6ABE460051B078 /* ReactiveMoya */; };
+		05C94D842E6ABE460051B078 /* RxMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D832E6ABE460051B078 /* RxMoya */; };
 		05D266B42DDABC1600F140D3 /* gestureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D266B32DDABC1600F140D3 /* gestureView.swift */; };
 		05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245E92D0A7EB800C6C048 /* TagLineView.swift */; };
 		05E245EC2D0A7EB800C6C048 /* TagLineView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05E245EA2D0A7EB800C6C048 /* TagLineView.xib */; };
@@ -59,13 +63,13 @@
 		05FAEF322E00F52500E9BD08 /* CardSliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF312E00F52500E9BD08 /* CardSliderView.swift */; };
 		05FAEF342E00F53D00E9BD08 /* CardSliderSubViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF332E00F52F00E9BD08 /* CardSliderSubViews.swift */; };
 		05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF382E013B6B00E9BD08 /* CardSliderVM.swift */; };
-		34CB838C47F0B8332479937F /* Pods_FishBuddy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 403AA25D1C561EBE052111F9 /* Pods_FishBuddy.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		053127E82E1762C900B25378 /* SkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonView.swift; sourceTree = "<group>"; };
-		053127EB2E1770CE00B25378 /* CustomRounded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRounded.swift; sourceTree = "<group>"; };
-		053127EE2E1771F100B25378 /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
+		051B882C2E6E8A7400209CDB /* SkeletonListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonListView.swift; sourceTree = "<group>"; };
+		051B882D2E6E8A7400209CDB /* SkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonView.swift; sourceTree = "<group>"; };
+		051B88312E6E8A9600209CDB /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
+		051B88362E6E8AE600209CDB /* CustomRounded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRounded.swift; sourceTree = "<group>"; };
 		0546FBB52DCB30F1001695D8 /* custom-icons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "custom-icons.ttf"; sourceTree = "<group>"; };
 		054C843F2CD9B994005595EF /* FishBuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FishBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		054C84422CD9B994005595EF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -96,7 +100,6 @@
 		058877022DC1BE4D00B1D13E /* WeatherView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView2.swift; sourceTree = "<group>"; };
 		0595566E2E14D5B90050147C /* TideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideView.swift; sourceTree = "<group>"; };
 		059556702E150AF10050147C /* TideLobbyVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideLobbyVM.swift; sourceTree = "<group>"; };
-		059556762E1B5E9C0050147C /* SkeletonListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonListView.swift; sourceTree = "<group>"; };
 		05D266B32DDABC1600F140D3 /* gestureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gestureView.swift; sourceTree = "<group>"; };
 		05E245E92D0A7EB800C6C048 /* TagLineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagLineView.swift; sourceTree = "<group>"; };
 		05E245EA2D0A7EB800C6C048 /* TagLineView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TagLineView.xib; sourceTree = "<group>"; };
@@ -117,9 +120,6 @@
 		05FAEF312E00F52500E9BD08 /* CardSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderView.swift; sourceTree = "<group>"; };
 		05FAEF332E00F52F00E9BD08 /* CardSliderSubViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderSubViews.swift; sourceTree = "<group>"; };
 		05FAEF382E013B6B00E9BD08 /* CardSliderVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderVM.swift; sourceTree = "<group>"; };
-		403AA25D1C561EBE052111F9 /* Pods_FishBuddy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FishBuddy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		93D4B919CA5B1C4E00C568C4 /* Pods-FishBuddy.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FishBuddy.debug.xcconfig"; path = "Target Support Files/Pods-FishBuddy/Pods-FishBuddy.debug.xcconfig"; sourceTree = "<group>"; };
-		9E8680C797A3C5BAD69C85F4 /* Pods-FishBuddy.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FishBuddy.release.xcconfig"; path = "Target Support Files/Pods-FishBuddy/Pods-FishBuddy.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,29 +127,53 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				34CB838C47F0B8332479937F /* Pods_FishBuddy.framework in Frameworks */,
+				05C94D802E6ABE460051B078 /* Moya in Frameworks */,
+				05C94D7E2E6ABE460051B078 /* CombineMoya in Frameworks */,
+				05C94D842E6ABE460051B078 /* RxMoya in Frameworks */,
+				05C94D822E6ABE460051B078 /* ReactiveMoya in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		053127E42E17629400B25378 /* SkeletonView */ = {
+		051B88292E6E8A7400209CDB /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				059556752E1B59F10050147C /* View */,
-				059556742E1B59E40050147C /* Model */,
-				059556732E1B59DD0050147C /* ViewModel */,
-				053127E82E1762C900B25378 /* SkeletonView.swift */,
-				059556762E1B5E9C0050147C /* SkeletonListView.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		051B882A2E6E8A7400209CDB /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		051B882B2E6E8A7400209CDB /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		051B882E2E6E8A7400209CDB /* SkeletonView */ = {
+			isa = PBXGroup;
+			children = (
+				051B88292E6E8A7400209CDB /* Model */,
+				051B882A2E6E8A7400209CDB /* View */,
+				051B882B2E6E8A7400209CDB /* ViewModel */,
+				051B882C2E6E8A7400209CDB /* SkeletonListView.swift */,
+				051B882D2E6E8A7400209CDB /* SkeletonView.swift */,
 			);
 			path = SkeletonView;
 			sourceTree = "<group>";
 		};
-		053127EA2E17703100B25378 /* CustomRounded */ = {
+		051B88372E6E8AE600209CDB /* CustomRounded */ = {
 			isa = PBXGroup;
 			children = (
-				053127EB2E1770CE00B25378 /* CustomRounded.swift */,
+				051B88362E6E8AE600209CDB /* CustomRounded.swift */,
 			);
 			path = CustomRounded;
 			sourceTree = "<group>";
@@ -158,9 +182,8 @@
 			isa = PBXGroup;
 			children = (
 				054C84412CD9B994005595EF /* FishBuddy */,
+				05C94D7C2E6ABE3E0051B078 /* Frameworks */,
 				054C84402CD9B994005595EF /* Products */,
-				E7D8B280684BFC7DCF7FA2DE /* Pods */,
-				A618D7BF026182D6CF0FD035 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -316,10 +339,10 @@
 		05589EF02CE6F084003881AA /* Extension */ = {
 			isa = PBXGroup;
 			children = (
+				051B88312E6E8A9600209CDB /* ViewExtension.swift */,
 				05589EF12CE6F0A7003881AA /* UIStoryboardExtension.swift */,
 				05589EF32CE6F2D2003881AA /* UIViewControllerExtension.swift */,
 				05E245F02D0A801000C6C048 /* UILabelExtension.swift */,
-				053127EE2E1771F100B25378 /* ViewExtension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -327,8 +350,8 @@
 		05589EF72CE6F7DE003881AA /* Componet */ = {
 			isa = PBXGroup;
 			children = (
-				053127EA2E17703100B25378 /* CustomRounded */,
-				053127E42E17629400B25378 /* SkeletonView */,
+				051B88372E6E8AE600209CDB /* CustomRounded */,
+				051B882E2E6E8A7400209CDB /* SkeletonView */,
 				05E245ED2D0A7F5100C6C048 /* UILabelPadding */,
 				05E245E82D0A7E5400C6C048 /* TagLineView */,
 				05589EFA2CE6F811003881AA /* TitleBar */,
@@ -353,25 +376,11 @@
 			path = SearchBar;
 			sourceTree = "<group>";
 		};
-		059556732E1B59DD0050147C /* ViewModel */ = {
+		05C94D7C2E6ABE3E0051B078 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 			);
-			path = ViewModel;
-			sourceTree = "<group>";
-		};
-		059556742E1B59E40050147C /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		059556752E1B59F10050147C /* View */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = View;
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		05D266AF2DDABBE400F140D3 /* Pratice */ = {
@@ -500,23 +509,6 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
-		A618D7BF026182D6CF0FD035 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				403AA25D1C561EBE052111F9 /* Pods_FishBuddy.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		E7D8B280684BFC7DCF7FA2DE /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				93D4B919CA5B1C4E00C568C4 /* Pods-FishBuddy.debug.xcconfig */,
-				9E8680C797A3C5BAD69C85F4 /* Pods-FishBuddy.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -524,11 +516,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 054C84532CD9B995005595EF /* Build configuration list for PBXNativeTarget "FishBuddy" */;
 			buildPhases = (
-				EF467FFFF9E3D44383CF03AB /* [CP] Check Pods Manifest.lock */,
 				054C843B2CD9B994005595EF /* Sources */,
 				054C843C2CD9B994005595EF /* Frameworks */,
 				054C843D2CD9B994005595EF /* Resources */,
-				23817F403BEBDB90FE9A1AA6 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -563,6 +553,9 @@
 				Base,
 			);
 			mainGroup = 054C84362CD9B994005595EF;
+			packageReferences = (
+				05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */,
+			);
 			productRefGroup = 054C84402CD9B994005595EF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -589,67 +582,27 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		23817F403BEBDB90FE9A1AA6 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-FishBuddy/Pods-FishBuddy-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-FishBuddy/Pods-FishBuddy-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-FishBuddy/Pods-FishBuddy-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		EF467FFFF9E3D44383CF03AB /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-FishBuddy-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		054C843B2CD9B994005595EF /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				054C846E2CDB06AA005595EF /* WeatherAllModel.swift in Sources */,
-				059556772E1B5E9C0050147C /* SkeletonListView.swift in Sources */,
 				05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */,
 				05FAEF342E00F53D00E9BD08 /* CardSliderSubViews.swift in Sources */,
 				05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */,
 				05FAEF162DF2782400E9BD08 /* RestaurantModel.swift in Sources */,
 				05589EF42CE6F2D2003881AA /* UIViewControllerExtension.swift in Sources */,
-				053127EF2E1771F100B25378 /* ViewExtension.swift in Sources */,
+				051B88322E6E8A9600209CDB /* ViewExtension.swift in Sources */,
 				05FAEF302E00F4F200E9BD08 /* TransactionsDM.swift in Sources */,
 				054C84652CD9C144005595EF /* WeatherService.swift in Sources */,
 				05589EEF2CE6EFF3003881AA /* LobbyVM.swift in Sources */,
 				054C84472CD9B994005595EF /* LobbyViewController.swift in Sources */,
 				0595566F2E14D5BA0050147C /* TideView.swift in Sources */,
 				05FAEF182DF279A700E9BD08 /* BottomSheetSubViews.swift in Sources */,
+				051B88382E6E8AE600209CDB /* CustomRounded.swift in Sources */,
+				051B882F2E6E8A7400209CDB /* SkeletonListView.swift in Sources */,
+				051B88302E6E8A7400209CDB /* SkeletonView.swift in Sources */,
 				05FAEF1C2DF2C22A00E9BD08 /* TripModel.swift in Sources */,
 				054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */,
 				05FAEF322E00F52500E9BD08 /* CardSliderView.swift in Sources */,
@@ -660,7 +613,6 @@
 				054C84602CD9C0AF005595EF /* UIControlPublisher.swift in Sources */,
 				05589EF92CE6F808003881AA /* FeatrueTitleBar.swift in Sources */,
 				05FAEF202DF2C2AD00E9BD08 /* GestureAnimationSubViews.swift in Sources */,
-				053127EC2E1770CE00B25378 /* CustomRounded.swift in Sources */,
 				05589EF22CE6F0A7003881AA /* UIStoryboardExtension.swift in Sources */,
 				05E672E42CDB0CB3006CF3BF /* DebugLogger.swift in Sources */,
 				054C84582CD9BD76005595EF /* APIService.swift in Sources */,
@@ -668,7 +620,6 @@
 				059556712E150AF10050147C /* TideLobbyVM.swift in Sources */,
 				05513A432DAE44540021573F /* WeatherView.swift in Sources */,
 				05623FD02E1234D300B33D2D /* SearchBar.swift in Sources */,
-				053127E92E1762C900B25378 /* SkeletonView.swift in Sources */,
 				05589EE52CE6ECD8003881AA /* Display.swift in Sources */,
 				05FAEF232DF2D45700E9BD08 /* GestureAnimationViewModel.swift in Sources */,
 				05FAEF2E2E00F41800E9BD08 /* CardDM.swift in Sources */,
@@ -827,7 +778,6 @@
 		};
 		054C84542CD9B995005595EF /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 93D4B919CA5B1C4E00C568C4 /* Pods-FishBuddy.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -858,7 +808,6 @@
 		};
 		054C84552CD9B995005595EF /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9E8680C797A3C5BAD69C85F4 /* Pods-FishBuddy.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -909,6 +858,40 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Moya/Moya.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 15.0.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		05C94D7D2E6ABE460051B078 /* CombineMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = CombineMoya;
+		};
+		05C94D7F2E6ABE460051B078 /* Moya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = Moya;
+		};
+		05C94D812E6ABE460051B078 /* ReactiveMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = ReactiveMoya;
+		};
+		05C94D832E6ABE460051B078 /* RxMoya */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */;
+			productName = RxMoya;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 054C84372CD9B994005595EF /* Project object */;
 }
