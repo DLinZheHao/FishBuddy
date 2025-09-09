@@ -7,11 +7,14 @@
 
 import Foundation
 
-struct WeatherResponse: Codable {
+struct WeatherResponse: Codable, DefaultValue {
+    static var defaultValue: WeatherResponse = WeatherResponse(data: .skeleton)
+    
     @Default var data: [CityWeather]
 }
 
-struct CityWeather: Codable, Identifiable {
+struct CityWeather: Codable, Identifiable, DefaultValue {
+    static var defaultValue: CityWeather = CityWeather(city: "", weather: .defaultValue)
     /// 唯一識別碼
     let uuid = UUID()
     var id: UUID { uuid }
@@ -25,7 +28,28 @@ struct CityWeather: Codable, Identifiable {
     }
 }
 
-struct WeatherInfo: Codable, Identifiable {
+extension Array where Element == CityWeather {
+    static var skeleton: [CityWeather] {
+        Array(repeating: .defaultValue, count: 3)
+    }
+}
+
+extension Array where Element == WeatherInfo {
+    static var skeleton: [WeatherInfo] {
+        Array(repeating: .defaultValue, count: 3)
+    }
+}
+
+struct WeatherInfo: Codable, Identifiable, DefaultValue {
+    static var defaultValue: WeatherInfo = WeatherInfo(
+        startTime: "",
+        endTime: "",
+        description: "",
+        minTemp: "",
+        maxTemp: "",
+        comfort: ""
+    )
+    
     /// 唯一識別碼
     let uuid = UUID()
     var id: UUID { uuid }
@@ -51,7 +75,6 @@ struct WeatherInfo: Codable, Identifiable {
         case comfort = "comfort"
     }
 }
-
 
 // MARK: - SwiftUI 重用機制說明
 //

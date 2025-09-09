@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		051B882F2E6E8A7400209CDB /* SkeletonListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B882C2E6E8A7400209CDB /* SkeletonListView.swift */; };
+		051B88302E6E8A7400209CDB /* SkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B882D2E6E8A7400209CDB /* SkeletonView.swift */; };
+		051B88322E6E8A9600209CDB /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B88312E6E8A9600209CDB /* ViewExtension.swift */; };
+		051B88382E6E8AE600209CDB /* CustomRounded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B88362E6E8AE600209CDB /* CustomRounded.swift */; };
 		0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0546FBB52DCB30F1001695D8 /* custom-icons.ttf */; };
 		054C84432CD9B994005595EF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84422CD9B994005595EF /* AppDelegate.swift */; };
 		054C84452CD9B994005595EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84442CD9B994005595EF /* SceneDelegate.swift */; };
@@ -75,6 +79,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		051B882C2E6E8A7400209CDB /* SkeletonListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonListView.swift; sourceTree = "<group>"; };
+		051B882D2E6E8A7400209CDB /* SkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonView.swift; sourceTree = "<group>"; };
+		051B88312E6E8A9600209CDB /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
+		051B88362E6E8AE600209CDB /* CustomRounded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRounded.swift; sourceTree = "<group>"; };
 		0546FBB52DCB30F1001695D8 /* custom-icons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "custom-icons.ttf"; sourceTree = "<group>"; };
 		054C843F2CD9B994005595EF /* FishBuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FishBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		054C84422CD9B994005595EF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -155,6 +163,47 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		051B88292E6E8A7400209CDB /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		051B882A2E6E8A7400209CDB /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		051B882B2E6E8A7400209CDB /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		051B882E2E6E8A7400209CDB /* SkeletonView */ = {
+			isa = PBXGroup;
+			children = (
+				051B88292E6E8A7400209CDB /* Model */,
+				051B882A2E6E8A7400209CDB /* View */,
+				051B882B2E6E8A7400209CDB /* ViewModel */,
+				051B882C2E6E8A7400209CDB /* SkeletonListView.swift */,
+				051B882D2E6E8A7400209CDB /* SkeletonView.swift */,
+			);
+			path = SkeletonView;
+			sourceTree = "<group>";
+		};
+		051B88372E6E8AE600209CDB /* CustomRounded */ = {
+			isa = PBXGroup;
+			children = (
+				051B88362E6E8AE600209CDB /* CustomRounded.swift */,
+			);
+			path = CustomRounded;
+			sourceTree = "<group>";
+		};
 		054C84362CD9B994005595EF = {
 			isa = PBXGroup;
 			children = (
@@ -318,6 +367,7 @@
 		05589EF02CE6F084003881AA /* Extension */ = {
 			isa = PBXGroup;
 			children = (
+				051B88312E6E8A9600209CDB /* ViewExtension.swift */,
 				05589EF12CE6F0A7003881AA /* UIStoryboardExtension.swift */,
 				05589EF32CE6F2D2003881AA /* UIViewControllerExtension.swift */,
 				05E245F02D0A801000C6C048 /* UILabelExtension.swift */,
@@ -329,6 +379,8 @@
 		05589EF72CE6F7DE003881AA /* Componet */ = {
 			isa = PBXGroup;
 			children = (
+				051B88372E6E8AE600209CDB /* CustomRounded */,
+				051B882E2E6E8A7400209CDB /* SkeletonView */,
 				05E245ED2D0A7F5100C6C048 /* UILabelPadding */,
 				05E245E82D0A7E5400C6C048 /* TagLineView */,
 				05589EFA2CE6F811003881AA /* TitleBar */,
@@ -630,12 +682,16 @@
 				05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */,
 				05FAEF162DF2782400E9BD08 /* RestaurantModel.swift in Sources */,
 				05589EF42CE6F2D2003881AA /* UIViewControllerExtension.swift in Sources */,
+				051B88322E6E8A9600209CDB /* ViewExtension.swift in Sources */,
 				05FAEF302E00F4F200E9BD08 /* TransactionsDM.swift in Sources */,
 				054C84652CD9C144005595EF /* WeatherService.swift in Sources */,
 				05589EEF2CE6EFF3003881AA /* LobbyVM.swift in Sources */,
 				054C84472CD9B994005595EF /* LobbyViewController.swift in Sources */,
 				0595566F2E14D5BA0050147C /* TideView.swift in Sources */,
 				05FAEF182DF279A700E9BD08 /* BottomSheetSubViews.swift in Sources */,
+				051B88382E6E8AE600209CDB /* CustomRounded.swift in Sources */,
+				051B882F2E6E8A7400209CDB /* SkeletonListView.swift in Sources */,
+				051B88302E6E8A7400209CDB /* SkeletonView.swift in Sources */,
 				05FAEF1C2DF2C22A00E9BD08 /* TripModel.swift in Sources */,
 				054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */,
 				05FAEF322E00F52500E9BD08 /* CardSliderView.swift in Sources */,
