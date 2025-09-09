@@ -118,28 +118,23 @@ struct SkeletonizeModifier: ViewModifier {
     @State private var size: CGSize? = nil
 
     func body(content: Content) -> some View {
-        ZStack {
+        ZStack(alignment: .topLeading) {
+            content
+                .background(
+                    GeometryReader { geo in
+                        Color.clear
+                            .preference(key: SizePreferenceKey.self, value: geo.size)
+                    }
+                )
+                .opacity(isActive ? 0 : 1)  // loading 時隱藏但保留版位
             if isActive {
-                // 顯示 SkeletonView，使用原始內容尺寸
                 SkeletonView(shape: shape, size: size)
                     .transition(.opacity)
-            } else {
-                // 顯示原始內容，並透過 GeometryReader 擷取其尺寸
-                content
-                    .background(
-                        GeometryReader { geo in
-                            // 用來量尺寸用的
-                            Color.clear
-                                .preference(key: SizePreferenceKey.self, value: geo.size)
-                        }
-                    )
+                    .allowsHitTesting(false)
             }
         }
-        // 當尺寸變化時，更新 state
         .onPreferenceChange(SizePreferenceKey.self) { value in
-            if let value {
-                self.size = value
-            }
+            if let value { self.size = value }
         }
     }
 }
