@@ -8,7 +8,7 @@
 import SwiftUI
 
 // 自定義圓角矩形
-extension View {
+public extension View {
     func customRounded(topLeft: CGFloat = 0,
                        topRight: CGFloat = 0,
                        bottomLeft: CGFloat = 0,
@@ -21,14 +21,14 @@ extension View {
 }
 
 // 骨架效果
-extension View {
+public extension View {
+    /// 根據 isActive 狀態切換成骨架載入畫面
+    func skeletonize(shapeType: SkeletonShape? = nil, isActive: Bool) -> some View {
+        modifier(SkeletonizeModifier(isActive: isActive, shape: shapeType))
+    }
+    
     /// 為 View 套用閃爍效果
     func shimmering() -> some View {
         self.modifier(ShimmerModifier())
-    }
-
-    /// 根據 isActive 狀態切換成骨架載入畫面
-    func skeletonize(isActive: Bool) -> some View {
-        modifier(SkeletonizeModifier(isActive: isActive))
     }
 }

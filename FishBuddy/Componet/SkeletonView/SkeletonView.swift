@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// 骨架的形狀類型
-enum SkeletonShape {
+public enum SkeletonShape {
     /// 矩形（可設定圓角）
     case rectangle
     /// 圓形（通常用於頭像、icon）
@@ -20,13 +20,14 @@ enum SkeletonShape {
 /// 可以自己選擇形狀的骨架視圖
 struct SkeletonView: View {
     /// 骨架的形狀
-    var shape: SkeletonShape = .rectangle
+    var shape: SkeletonShape?
     /// 圓角半徑
     var cornerRadius: CGFloat = 8
     /// 輸入的大小
     var size: CGSize?
 
     var body: some View {
+        let shape = shape ?? .rectangle
         switch shape {
         case .rectangle:
             RoundedRectangle(cornerRadius: cornerRadius)
@@ -111,6 +112,8 @@ private struct SizePreferenceKey: PreferenceKey {
 struct SkeletonizeModifier: ViewModifier {
     /// 控制是否顯示骨架
     let isActive: Bool
+    /// 控制自定義形狀
+    var shape: SkeletonShape?
     /// 儲存原始 View 尺寸
     @State private var size: CGSize? = nil
 
@@ -118,7 +121,7 @@ struct SkeletonizeModifier: ViewModifier {
         ZStack {
             if isActive {
                 // 顯示 SkeletonView，使用原始內容尺寸
-                SkeletonView(size: size)
+                SkeletonView(shape: shape, size: size)
                     .transition(.opacity)
             } else {
                 // 顯示原始內容，並透過 GeometryReader 擷取其尺寸
