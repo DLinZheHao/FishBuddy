@@ -10,7 +10,7 @@ import SwiftUI
 /// 骨架的形狀類型
 public enum SkeletonShape {
     /// 矩形（可設定圓角）
-    case rectangle
+    case rectangle(cornerRadius: CGFloat)
     /// 圓形（通常用於頭像、icon）
     case circle
     /// 膠囊形狀（常見於文字區塊或按鈕佔位）
@@ -21,15 +21,13 @@ public enum SkeletonShape {
 struct SkeletonView: View {
     /// 骨架的形狀
     var shape: SkeletonShape?
-    /// 圓角半徑
-    var cornerRadius: CGFloat = 8
     /// 輸入的大小
     var size: CGSize?
 
     var body: some View {
-        let shape = shape ?? .rectangle
+        let shape = shape ?? .rectangle(cornerRadius: 0)
         switch shape {
-        case .rectangle:
+        case .rectangle(let cornerRadius):
             RoundedRectangle(cornerRadius: cornerRadius)
                 .fill(Color(white: 0.92))
                 .frame(width: size?.width, height: size?.height ?? 20)
