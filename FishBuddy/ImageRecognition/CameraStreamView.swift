@@ -207,7 +207,7 @@ struct EmbeddingConsumer: View {
                 var idx = 0
                 for await vec in stream {
                     idx += 1
-                    print("[UI] got embedding #\(idx), dim=\(vec.count)")
+//                    print("[UI] got embedding #\(idx), dim=\(vec.count)")
                 }
             }
     }

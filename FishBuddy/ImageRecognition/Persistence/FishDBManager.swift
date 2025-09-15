@@ -12,34 +12,36 @@ import Foundation
 actor EmbeddingStore {
     /// 共用實例
     static let shared = EmbeddingStore()
-    /// 緩存
-    private var cache: [EmbeddingImgModel]?
     /// 資料庫
     var fishDB: FishDB?
+    /// 讀取的 taxonItem 暫存
+    var taxonItemCache: [TaxonItem] = []
     /// In-memory 向量索引快取（只建一次，除非資料有變動）
     private var indexCache: InMemoryVectorIndex?
     /// 當前索引的維度；避免用錯模型維度
     private var indexDim: Int = 0
     
-    
     init() {
         do {
-            let dbURL = try FileManager.default
-                .url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-                .appendingPathComponent("fish.sqlite3")
-            self.fishDB = try FishDB(path: dbURL.path)
-            print("DB 路徑在:", dbURL.path)
+            let fm = FileManager.default
+            let docs = try fm.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+            let dest = docs.appendingPathComponent("catalog.sqlite")
+
+            // 第一次啟動：若 Documents 裡沒有 DB，嘗試從 bundle 複製預載檔
+            if !fm.fileExists(atPath: dest.path) {
+                if let src = Bundle.main.url(forResource: "catalog", withExtension: "sqlite") {
+                    try fm.copyItem(at: src, to: dest)
+                    print("已從 bundle 複製 DB 至:", dest.path)
+                } else {
+                    print("⚠️ bundle 內找不到 catalog.sqlite，將在首次啟動時以 DDL 建立空 schema。")
+                }
+            }
+
+            self.fishDB = try FishDB(path: dest.path)
+            print("DB 路徑在:", dest.path)
         } catch {
             print("資料庫初始化失敗: \(error)")
         }
-    }
-    
-    /// 把 json 的資料取出來，轉換成資料結構
-    private func jsonDatabase() async throws -> [EmbeddingImgModel] {
-        if let cache { return cache }
-        let db = try JsonUtils.sharedInstance.loadEmbeddingJSONFromBundle(fileName: "embeddings_test_Img")
-        cache = db
-        return db
     }
     
     /// 取得（或建立）InMemoryVectorIndex：會從 SQLite 載入全部向量，打包成 N×D 矩陣，只做一次
@@ -50,57 +52,101 @@ actor EmbeddingStore {
             return idx
         }
         guard let fishDB else { throw NSError(domain: "EmbeddingStore", code: 1, userInfo: [NSLocalizedDescriptionKey: "FishDB 未初始化"]) }
+        
         // 從 SQLite 讀取全部資料列
-        let rows = try fishDB.loadAll()
+        var items: [TaxonItem]
+         
+        // 加入暫存機制，不用每次都讀取資料庫
+        if taxonItemCache.isEmpty {
+            items = try fishDB.loadAll()
+            
+            if taxonItemCache.isEmpty {
+                taxonItemCache = items
+            }
+        } else {
+            items = taxonItemCache
+        }
         // 以 dim 檢查每筆維度
-        guard rows.allSatisfy({ $0.vector.count == dim }) else {
+        guard items.allSatisfy({ $0.embedding.count == dim }) else {
             throw NSError(domain: "EmbeddingStore", code: 2, userInfo: [NSLocalizedDescriptionKey: "向量維度不一致或與 dim 不符"]) }
-        let idx = InMemoryVectorIndex(rows: rows, dim: dim)
+        let idx = InMemoryVectorIndex(items: items, dim: dim)
         indexCache = idx
         indexDim = dim
         return idx
-    }
-    
-    /// 把 json 的資料匯入 SQLite 資料庫（只需一次）
-    func importFromJSONIfNeeded() async throws {
-        let imported = UserDefaults.standard.bool(forKey: "didImportEmbeddings")
-        
-        /// 讀取 JSON 檔，讓 EmbeddingStore  cache 有已經處理好的資料
-        let entries = try await jsonDatabase()
-        guard !imported else { return }
-        
-        for e in entries {
-            try fishDB?.upsert(row: EmbeddingImgModel(id: e.id, name: e.name, vector: e.vector))
-        }
-        
-        // 匯入完畢後預先建立索引（忽略錯誤；之後 getIndex 會再嘗試）
-        Task { [weak self] in
-            try? await self?.getIndex(dim: entries.first?.vector.count ?? 512)
-        }
-        
-        UserDefaults.standard.set(true, forKey: "didImportEmbeddings")
     }
 }
 
 final class FishDB {
     /// 資料庫
     private let db: Connection
-    /// 資料表
-    private let fish = Table("fish")
-    /// 欄位: id, name, vector, meta
-    private let colId = SQLite.Expression<String>("id")
-    private let colName = SQLite.Expression<String>("name")
-    private let colVector = SQLite.Expression<SQLite.Blob>("vector")
-    private let colMeta = SQLite.Expression<String?>("meta")
+
+    // 以預處理時相同的 DDL 作為後援（僅在找不到任何表時才執行）
+    private static let schemaDDL: String = {
+        return """
+        PRAGMA journal_mode=OFF;
+        PRAGMA synchronous=OFF;
+        BEGIN IMMEDIATE;
+        CREATE TABLE species (
+          taxon_id INTEGER PRIMARY KEY,
+          scientific_name TEXT,
+          common_name TEXT,
+          rank TEXT,
+          slug TEXT
+        );
+        CREATE TABLE photos (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          taxon_id INTEGER NOT NULL,
+          url TEXT NOT NULL,
+          license_code TEXT,
+          attribution TEXT,
+          source TEXT
+        );
+        CREATE TABLE embeddings (
+          taxon_id INTEGER PRIMARY KEY,
+          dim INTEGER NOT NULL,
+          vec BLOB NOT NULL
+        );
+        CREATE TABLE species_meta (
+          taxon_id INTEGER PRIMARY KEY,
+          meta_json TEXT
+        );
+        CREATE TABLE embedding_meta (
+          taxon_id INTEGER PRIMARY KEY,
+          meta_json TEXT
+        );
+        CREATE INDEX idx_species_sci ON species(scientific_name);
+        CREATE INDEX idx_photos_taxon ON photos(taxon_id);
+        COMMIT;
+        """
+    }()
+
+    /// 若資料庫是新建且沒有任何預期的表，執行 DDL 建立 schema
+    private func bootstrapIfEmpty() throws {
+        let count = try db.scalar("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('species','photos','embeddings','species_meta','embedding_meta');") as! Int64
+        if count == 0 {
+            // SQLite.swift 的 db.run 不支援一次執行多條語句；需要逐條執行
+            let statements = FishDB.schemaDDL
+                .split(separator: ";")
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+
+            for sql in statements {
+                try db.run(sql)
+            }
+
+            let newCount = try db.scalar("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('species','photos','embeddings','species_meta','embedding_meta');") as! Int64
+            print("✅ 已執行 bootstrap DDL，建表完成（表數=\(newCount)）")
+        }
+    }
 
     init(path: String) throws {
+        // 先確保檔案存在：若文件不存在，SQLite.swift 會建立空白 DB，導致後續查詢找不到表
+        let fm = FileManager.default
+        if !fm.fileExists(atPath: path) {
+            print("⚠️ 指定路徑尚無 DB 檔，將建立空白資料庫並以 DDL 建立 schema: \(path)")
+        }
         db = try Connection(path)
-        try db.run(fish.create(ifNotExists: true) { t in
-            t.column(colId, primaryKey: true)
-            t.column(colName)
-            t.column(colVector)
-            t.column(colMeta)
-        })
+        try bootstrapIfEmpty()
     }
 
     // 小工具：Float 陣列 <-> Data(BLOB)
@@ -117,21 +163,94 @@ final class FishDB {
         b.bytes.withUnsafeBytes { Array($0.bindMemory(to: Float32.self)) }
     }
 
-    // 新增或更新一筆資料
-    func upsert(row: EmbeddingImgModel, meta: String? = nil) throws {
-        let blob = floatsToBlob(row.vector)
-        let insert = fish.insert(or: .replace, // 覆蓋原先的資料
-                                 colId <- row.id,
-                                 colName <- row.name,
-                                 colVector <- blob,
-                                 colMeta <- meta)
-        try db.run(insert)
-    }
-
     // 讀取所有資料
-    func loadAll() throws -> [EmbeddingImgModel] {
-        try db.prepare(fish.select(colId, colName, colVector)).map { r in
-            EmbeddingImgModel(id: r[colId], name: r[colName], vector: blobToFloats(r[colVector]))
+    func loadAll() throws -> [TaxonItem] {
+        // === 基礎表（species） ===
+        let speciesT = Table("species")
+        let s_taxon  = SQLite.Expression<Int>("taxon_id")
+        let s_sci    = SQLite.Expression<String?>("scientific_name")
+        let s_common = SQLite.Expression<String?>("common_name")
+        let s_slug   = SQLite.Expression<String?>("slug")
+
+        // === 關聯表（photos） ===
+        let photosT  = Table("photos")
+        let p_taxon  = SQLite.Expression<Int>("taxon_id")
+        let p_url    = SQLite.Expression<String?>("url")
+        let p_lic    = SQLite.Expression<String?>("license_code")
+        let p_attr   = SQLite.Expression<String?>("attribution")
+        let p_src    = SQLite.Expression<String?>("source")
+
+        // === 關聯表（embeddings） ===
+        let embedsT  = Table("embeddings")
+        let e_taxon  = SQLite.Expression<Int>("taxon_id")
+        let e_dim    = SQLite.Expression<Int>("dim")
+        let e_vec    = SQLite.Expression<SQLite.Blob>("vec")
+
+        // === 關聯表（meta JSON） ===
+        let sMetaT   = Table("species_meta")
+        let sm_taxon = SQLite.Expression<Int>("taxon_id")
+        let sm_json  = SQLite.Expression<String?>("meta_json")
+
+        let eMetaT   = Table("embedding_meta")
+        let em_taxon = SQLite.Expression<Int>("taxon_id")
+        let em_json  = SQLite.Expression<String?>("meta_json")
+
+        // 1) 撈全部 species
+        let speciesRows = try Array(db.prepare(speciesT.select(s_taxon, s_sci, s_common, s_slug)))
+
+        // 2) 撈 photos 並分組
+        var photosMap: [Int: [Photo]] = [:]
+        for r in try db.prepare(photosT.select(p_taxon, p_url, p_lic, p_attr, p_src)) {
+            let tid = r[p_taxon]
+            let photo = Photo(
+                url: r[p_url] ?? "",
+                licenseCode: r[p_lic],
+                attribution: r[p_attr],
+                source: r[p_src]
+            )
+            photosMap[tid, default: []].append(photo)
+        }
+
+        // 3) 撈 embeddings（BLOB → [Float]）
+        var embedMap: [Int: [Float]] = [:]
+        for r in try db.prepare(embedsT.select(e_taxon, e_dim, e_vec)) {
+            let tid = r[e_taxon]
+            let vec32: [Float32] = blobToFloats(r[e_vec])
+            embedMap[tid] = vec32.map { Float($0) }
+        }
+
+        // 4) 撈 meta（JSON 反序列化）
+        let decoder = JSONDecoder()
+        var speciesMetaMap: [Int: Meta] = [:]
+        for r in try db.prepare(sMetaT.select(sm_taxon, sm_json)) {
+            if let js = r[sm_json],
+               let data = js.data(using: .utf8),
+               let meta = try? decoder.decode(Meta.self, from: data) {
+                speciesMetaMap[r[sm_taxon]] = meta
+            }
+        }
+        var embedMetaMap: [Int: EmbeddingMeta] = [:]
+        for r in try db.prepare(eMetaT.select(em_taxon, em_json)) {
+            if let js = r[em_json],
+               let data = js.data(using: .utf8),
+               let meta = try? decoder.decode(EmbeddingMeta.self, from: data) {
+                embedMetaMap[r[em_taxon]] = meta
+            }
+        }
+
+        // 5) 組裝 TaxonItem
+        return speciesRows.map { r in
+            let tid = r[s_taxon]
+            return TaxonItem(
+                taxonId: tid,
+                scientificName: r[s_sci],
+                commonName: r[s_common],
+                slug: r[s_slug],
+                photos: photosMap[tid],
+                meta: speciesMetaMap[tid],
+                embedding: embedMap[tid] ?? [],
+                embeddingMeta: embedMetaMap[tid]
+            )
         }
     }
 }
@@ -156,20 +275,20 @@ final class InMemoryVectorIndex {
     /// 建構子：把輸入的多筆向量（每筆長度 = dim）pack 成連續的 row-major 矩陣
     /// - rows: 原始資料，假設每個 `vector` 都已經 L2 normalize（若要用 cosine 分數）
     /// - dim: 向量維度 D
-    init(rows: [EmbeddingImgModel], dim: Int) {
+    init(items: [TaxonItem], dim: Int) {
         self.dim = dim
-        self.ids = rows.map { $0.id }
-        self.names = rows.map { $0.name }
+        self.ids = items.map { String($0.taxonId) }
+        self.names = items.compactMap { $0.scientificName }
 
         // 建出 N×D 的連續 buffer，初始化為 0
-        self.matrix = [Float](repeating: 0, count: rows.count * dim)
+        self.matrix = [Float](repeating: 0, count: items.count * dim)
 
         // 將每一筆向量按列（row）塞進 matrix：
         // 第 i 列的區間是 [i*dim, (i+1)*dim)
-        for (i, r) in rows.enumerated() {
-            precondition(r.vector.count == dim, "維度不一致")
-            // 這裡使用 replaceSubrange 會將 r.vector 的內容複製到對應區段，形成連續的 row-major 版面
-            matrix.replaceSubrange(i*dim..<(i+1)*dim, with: r.vector)
+        for (i, item) in items.enumerated() {
+            precondition(item.embedding.count == dim, "維度不一致")
+            // 這裡使用 replaceSubrange 會將 item.embedding 的內容複製到對應區段，形成連續的 row-major 版面
+            matrix.replaceSubrange(i*dim..<(i+1)*dim, with: item.embedding)
         }
     }
 

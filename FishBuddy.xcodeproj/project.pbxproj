@@ -38,6 +38,7 @@
 		05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */; };
 		05623FD02E1234D300B33D2D /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05623FCF2E1234D300B33D2D /* SearchBar.swift */; };
 		058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058877022DC1BE4D00B1D13E /* WeatherView2.swift */; };
+		058F58A32E764D3A009913C5 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 058F58A22E764D3A009913C5 /* catalog.sqlite */; };
 		0595566F2E14D5BA0050147C /* TideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0595566E2E14D5B90050147C /* TideView.swift */; };
 		059556712E150AF10050147C /* TideLobbyVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059556702E150AF10050147C /* TideLobbyVM.swift */; };
 		05C94D7E2E6ABE460051B078 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D7D2E6ABE460051B078 /* CombineMoya */; };
@@ -113,6 +114,7 @@
 		05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FeatureTitleBar.xib; sourceTree = "<group>"; };
 		05623FCF2E1234D300B33D2D /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		058877022DC1BE4D00B1D13E /* WeatherView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView2.swift; sourceTree = "<group>"; };
+		058F58A22E764D3A009913C5 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
 		0595566E2E14D5B90050147C /* TideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideView.swift; sourceTree = "<group>"; };
 		059556702E150AF10050147C /* TideLobbyVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideLobbyVM.swift; sourceTree = "<group>"; };
 		05C94D852E6ABF7C0051B078 /* embeddings_test_Img.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = embeddings_test_Img.json; sourceTree = "<group>"; };
@@ -209,25 +211,9 @@
 		051B88392E73B3AF00209CDB /* LoddingCircle */ = {
 			isa = PBXGroup;
 			children = (
-				051B883B2E73B3D400209CDB /* ViewModel */,
-				051B883A2E73B3CD00209CDB /* Model */,
 				051B883C2E73B66900209CDB /* LoadingCircleView.swift */,
 			);
 			path = LoddingCircle;
-			sourceTree = "<group>";
-		};
-		051B883A2E73B3CD00209CDB /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		051B883B2E73B3D400209CDB /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		054C84362CD9B994005595EF = {
@@ -250,8 +236,8 @@
 		054C84412CD9B994005595EF /* FishBuddy */ = {
 			isa = PBXGroup;
 			children = (
-				05C94D912E6ABF7C0051B078 /* ImageRecognition */,
 				05C94D922E6ABF7C0051B078 /* mobileclip_s1_image.mlpackage */,
+				05C94D912E6ABF7C0051B078 /* ImageRecognition */,
 				05D266AF2DDABBE400F140D3 /* Pratice */,
 				05589EF72CE6F7DE003881AA /* Componet */,
 				054C845B2CD9C030005595EF /* Common */,
@@ -431,6 +417,14 @@
 			path = SearchBar;
 			sourceTree = "<group>";
 		};
+		058F58A12E764C79009913C5 /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				058F58A22E764D3A009913C5 /* catalog.sqlite */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
 		05C94D7C2E6ABE3E0051B078 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -488,6 +482,7 @@
 		05C94DA62E6AC9760051B078 /* Persistence */ = {
 			isa = PBXGroup;
 			children = (
+				058F58A12E764C79009913C5 /* Database */,
 				05C94D862E6ABF7C0051B078 /* DatabaseJson */,
 				05C94DA72E6ACA4C0051B078 /* FishDBManager.swift */,
 			);
@@ -684,6 +679,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				058F58A32E764D3A009913C5 /* catalog.sqlite in Resources */,
 				054C844C2CD9B995005595EF /* Assets.xcassets in Resources */,
 				0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */,
 				05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */,
