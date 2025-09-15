@@ -11,8 +11,6 @@ import Combine
 import AVFoundation
 
 class CameraStreamVM: ObservableObject {
-    
-    @Published private(set) var database: [EmbeddingImgModel] = []
     /// 單例 in-memory 向量索引（從 SQLite 讀出後打包，僅建立一次）
     @Published private(set) var vectorIndex: InMemoryVectorIndex?
     /// 由 CameraController 提供的影像特徵向量串流
@@ -25,7 +23,7 @@ class CameraStreamVM: ObservableObject {
     /// 相似度最低接受門檻（cosine），依你的資料集可微調，預設 0.5
     @Published var acceptThreshold: Float = 0.5
     /// 與次高分的最小差距（動態門檻），預設 0.1；可設為 0 表示不啟用
-    @Published var minGapDelta: Float = 0.1
+    @Published var minGapDelta: Float = 0.6
     /// CLIP 向量萃取器是否已載入並完成預熱
     /// - View 可能依此狀態切換 UI（例如 loading / ready）
     @Published var didLoadExtractor = false
@@ -38,15 +36,12 @@ class CameraStreamVM: ObservableObject {
     
     /// 讀取資料庫：目前是直接讀取 json 資料作為資料庫
     func loadDatabaseIfNeeded() {
-        guard database.isEmpty else { return }
         Task(priority: .utility) {
             do {
                 // 依你的模型維度設定（例如 512 或 768）。這裡先用 512，你可視實際模型調整。
                 let index = try await EmbeddingStore.shared.getIndex(dim: 512)
                 await MainActor.run {
                     self.vectorIndex = index
-                    // 舊的 database 陣列可以不再使用；若 UI 其他處仍依賴可留著
-                    self.database = []
                 }
             } catch {
                 print("❌ 建立/取得 InMemoryVectorIndex 失敗:", error)
@@ -70,20 +65,6 @@ class CameraStreamVM: ObservableObject {
             self.imageSearchResult = []
             print("沒有符合的結果")
             return
-        }
-
-        // Fallback：尚未建立索引時，用舊的陣列方式
-        guard !database.isEmpty else { self.imageSearchResult = []; return }
-        let scored = database.map { entry in
-            (id: entry.id, score: cosineSimilarity(query, entry.vector))
-        }.sorted { $0.score > $1.score }
-        let top = Array(scored.prefix(max(1, topK)))
-        if let best = top.first {
-            let gapOK: Bool = top.count >= 2 ? (best.score - top[1].score) >= minGapDelta : true
-            if best.score >= acceptThreshold && gapOK {
-                self.imageSearchResult = top.map { SearchResult(id: $0.id, score: $0.score) }
-                return
-            }
         }
         self.imageSearchResult = []
         print("沒有符合的結果（舊邏輯）")
