@@ -198,7 +198,7 @@ struct SkeletonWeatherInfoView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("時間範圍")
                 .font(.headline)
-                .skeletonize(shapeType: .rectangle, isActive: true)
+                .skeletonize(shapeType: .rectangle(cornerRadius: 0), isActive: true)
             Text("天氣描述")
                 .font(.subheadline)
             HStack {
