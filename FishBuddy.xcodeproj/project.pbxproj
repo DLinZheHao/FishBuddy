@@ -11,6 +11,7 @@
 		051B88302E6E8A7400209CDB /* SkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B882D2E6E8A7400209CDB /* SkeletonView.swift */; };
 		051B88322E6E8A9600209CDB /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B88312E6E8A9600209CDB /* ViewExtension.swift */; };
 		051B88382E6E8AE600209CDB /* CustomRounded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B88362E6E8AE600209CDB /* CustomRounded.swift */; };
+		051B883D2E73B66900209CDB /* LoadingCircleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B883C2E73B66900209CDB /* LoadingCircleView.swift */; };
 		0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0546FBB52DCB30F1001695D8 /* custom-icons.ttf */; };
 		054C84432CD9B994005595EF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84422CD9B994005595EF /* AppDelegate.swift */; };
 		054C84452CD9B994005595EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84442CD9B994005595EF /* SceneDelegate.swift */; };
@@ -83,6 +84,7 @@
 		051B882D2E6E8A7400209CDB /* SkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonView.swift; sourceTree = "<group>"; };
 		051B88312E6E8A9600209CDB /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
 		051B88362E6E8AE600209CDB /* CustomRounded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRounded.swift; sourceTree = "<group>"; };
+		051B883C2E73B66900209CDB /* LoadingCircleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingCircleView.swift; sourceTree = "<group>"; };
 		0546FBB52DCB30F1001695D8 /* custom-icons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "custom-icons.ttf"; sourceTree = "<group>"; };
 		054C843F2CD9B994005595EF /* FishBuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FishBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		054C84422CD9B994005595EF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -202,6 +204,30 @@
 				051B88362E6E8AE600209CDB /* CustomRounded.swift */,
 			);
 			path = CustomRounded;
+			sourceTree = "<group>";
+		};
+		051B88392E73B3AF00209CDB /* LoddingCircle */ = {
+			isa = PBXGroup;
+			children = (
+				051B883B2E73B3D400209CDB /* ViewModel */,
+				051B883A2E73B3CD00209CDB /* Model */,
+				051B883C2E73B66900209CDB /* LoadingCircleView.swift */,
+			);
+			path = LoddingCircle;
+			sourceTree = "<group>";
+		};
+		051B883A2E73B3CD00209CDB /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		051B883B2E73B3D400209CDB /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		054C84362CD9B994005595EF = {
@@ -471,6 +497,7 @@
 		05D266AF2DDABBE400F140D3 /* Pratice */ = {
 			isa = PBXGroup;
 			children = (
+				051B88392E73B3AF00209CDB /* LoddingCircle */,
 				05623FCE2E12296C00B33D2D /* SearchBar */,
 				05FAEF2A2E00F3CE00E9BD08 /* CardSlider */,
 				05FAEF192DF2C1ED00E9BD08 /* GestureAnimation */,
@@ -695,6 +722,7 @@
 				05FAEF1C2DF2C22A00E9BD08 /* TripModel.swift in Sources */,
 				054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */,
 				05FAEF322E00F52500E9BD08 /* CardSliderView.swift in Sources */,
+				051B883D2E73B66900209CDB /* LoadingCircleView.swift in Sources */,
 				05F3BED42D92824C00DDAC72 /* TideDataModel.swift in Sources */,
 				054C84432CD9B994005595EF /* AppDelegate.swift in Sources */,
 				05589EE72CE6ED93003881AA /* WeatherLobbyViewController.swift in Sources */,
@@ -881,7 +909,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z64LB69QMK;
+				DEVELOPMENT_TEAM = Z4U4RWP3LA;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FishBuddy/Info.plist;
@@ -911,7 +939,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z64LB69QMK;
+				DEVELOPMENT_TEAM = Z4U4RWP3LA;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FishBuddy/Info.plist;
