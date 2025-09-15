@@ -18,6 +18,10 @@ actor EmbeddingStore {
     var taxonItemCache: [TaxonItem] = []
     /// In-memory 向量索引快取（只建一次，除非資料有變動）
     private var indexCache: InMemoryVectorIndex?
+    /// 相似度最低接受門檻（cosine），依你的資料集可微調，預設 0.5
+    var acceptThreshold: Float = 0.5
+    /// 與次高分的最小差距（動態門檻），預設 0.1；可設為 0 表示不啟用
+    var minGapDelta: Float = 0.6
     /// 當前索引的維度；避免用錯模型維度
     private var indexDim: Int = 0
     
@@ -47,9 +51,9 @@ actor EmbeddingStore {
     /// 取得（或建立）InMemoryVectorIndex：會從 SQLite 載入全部向量，打包成 N×D 矩陣，只做一次
     /// - Parameter dim: 向量維度（例如 512 或 768）
     /// - Returns: 可重用的 InMemoryVectorIndex 實例
-    func getIndex(dim: Int) async throws -> InMemoryVectorIndex {
+    func getIndex(dim: Int) async throws {
         if let idx = indexCache, indexDim == dim {
-            return idx
+            return
         }
         guard let fishDB else { throw NSError(domain: "EmbeddingStore", code: 1, userInfo: [NSLocalizedDescriptionKey: "FishDB 未初始化"]) }
         
@@ -72,7 +76,27 @@ actor EmbeddingStore {
         let idx = InMemoryVectorIndex(items: items, dim: dim)
         indexCache = idx
         indexDim = dim
-        return idx
+    }
+    
+    func searchWithItems(query: [Float], topK: Int) async throws -> [(TaxonItem, Float)] {
+        if let idx = indexCache {
+            let results = idx.search(query: query, topK: topK)
+            
+            // 門檻 + 與次高分差距規則
+            if let best = results.first {
+                let gapOK = results.count < 2 || (best.score - results[1].score) >= minGapDelta
+                if best.score >= acceptThreshold && gapOK {
+                    return results.compactMap { r in
+                        if let item = taxonItemCache.first(where: { String($0.taxonId) == r.id }) {
+                            return (item, r.score)
+                        }
+                        return nil
+                    }
+                }
+            }
+            
+        }
+        return []
     }
 }
 
