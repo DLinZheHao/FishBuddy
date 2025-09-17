@@ -12,6 +12,7 @@
 		051B88322E6E8A9600209CDB /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B88312E6E8A9600209CDB /* ViewExtension.swift */; };
 		051B88382E6E8AE600209CDB /* CustomRounded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B88362E6E8AE600209CDB /* CustomRounded.swift */; };
 		051B883D2E73B66900209CDB /* LoadingCircleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B883C2E73B66900209CDB /* LoadingCircleView.swift */; };
+		051FB4552E7A58C000A065CC /* TextLineHeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051FB4542E7A589200A065CC /* TextLineHeight.swift */; };
 		0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0546FBB52DCB30F1001695D8 /* custom-icons.ttf */; };
 		054C84432CD9B994005595EF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84422CD9B994005595EF /* AppDelegate.swift */; };
 		054C84452CD9B994005595EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84442CD9B994005595EF /* SceneDelegate.swift */; };
@@ -72,6 +73,7 @@
 		051B88312E6E8A9600209CDB /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
 		051B88362E6E8AE600209CDB /* CustomRounded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRounded.swift; sourceTree = "<group>"; };
 		051B883C2E73B66900209CDB /* LoadingCircleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingCircleView.swift; sourceTree = "<group>"; };
+		051FB4542E7A589200A065CC /* TextLineHeight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLineHeight.swift; sourceTree = "<group>"; };
 		0546FBB52DCB30F1001695D8 /* custom-icons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "custom-icons.ttf"; sourceTree = "<group>"; };
 		054C843F2CD9B994005595EF /* FishBuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FishBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		054C84422CD9B994005595EF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -202,6 +204,14 @@
 			children = (
 			);
 			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		051FB4532E7A588600A065CC /* TextLineHeight */ = {
+			isa = PBXGroup;
+			children = (
+				051FB4542E7A589200A065CC /* TextLineHeight.swift */,
+			);
+			path = TextLineHeight;
 			sourceTree = "<group>";
 		};
 		054C84362CD9B994005595EF = {
@@ -376,6 +386,7 @@
 		05589EF72CE6F7DE003881AA /* Componet */ = {
 			isa = PBXGroup;
 			children = (
+				051FB4532E7A588600A065CC /* TextLineHeight */,
 				051B88372E6E8AE600209CDB /* CustomRounded */,
 				051B882E2E6E8A7400209CDB /* SkeletonView */,
 				05E245ED2D0A7F5100C6C048 /* UILabelPadding */,
@@ -649,6 +660,7 @@
 				05513A432DAE44540021573F /* WeatherView.swift in Sources */,
 				05623FD02E1234D300B33D2D /* SearchBar.swift in Sources */,
 				05589EE52CE6ECD8003881AA /* Display.swift in Sources */,
+				051FB4552E7A58C000A065CC /* TextLineHeight.swift in Sources */,
 				05FAEF232DF2D45700E9BD08 /* GestureAnimationViewModel.swift in Sources */,
 				05FAEF2E2E00F41800E9BD08 /* CardDM.swift in Sources */,
 				05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */,
