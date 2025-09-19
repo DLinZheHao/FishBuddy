@@ -42,11 +42,13 @@ class CameraStreamVM: ObservableObject {
     
     /// 搜尋結果：目前自己計算，並產出結果
     func search(query: [Float], topK: Int = 3) async {
-        do {
-            let results = try await EmbeddingStore.shared.searchWithItems(query: query, topK: topK)
-            self.imageSearchResult = results
-        } catch {
-            print("沒有符合的結果")
+        Task { @MainActor in
+            do {
+                let results = try await EmbeddingStore.shared.searchWithItems(query: query, topK: topK)
+                self.imageSearchResult = results
+            } catch {
+                print("沒有符合的結果")
+            }
         }
     }
     

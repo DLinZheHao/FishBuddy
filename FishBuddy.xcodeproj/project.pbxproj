@@ -38,7 +38,7 @@
 		05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */; };
 		05623FD02E1234D300B33D2D /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05623FCF2E1234D300B33D2D /* SearchBar.swift */; };
 		058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058877022DC1BE4D00B1D13E /* WeatherView2.swift */; };
-		058F58A32E764D3A009913C5 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 058F58A22E764D3A009913C5 /* catalog.sqlite */; };
+		058F58A72E7BA42C009913C5 /* BackgroundRemoverVK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */; };
 		0595566F2E14D5BA0050147C /* TideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0595566E2E14D5B90050147C /* TideView.swift */; };
 		059556712E150AF10050147C /* TideLobbyVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059556702E150AF10050147C /* TideLobbyVM.swift */; };
 		05C94D7E2E6ABE460051B078 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D7D2E6ABE460051B078 /* CombineMoya */; };
@@ -65,6 +65,7 @@
 		05E245F12D0A801000C6C048 /* UILabelExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245F02D0A801000C6C048 /* UILabelExtension.swift */; };
 		05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E672DF2CDB0C78006CF3BF /* APILoggerPlugin.swift */; };
 		05E672E42CDB0CB3006CF3BF /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */; };
+		05E8A0AA2E7D00180038E594 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 05E8A0A92E7D00180038E594 /* catalog.sqlite */; };
 		05F3BED42D92824C00DDAC72 /* TideDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F3BED32D92824C00DDAC72 /* TideDataModel.swift */; };
 		05FAEF132DF2743900E9BD08 /* bottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF122DF2743900E9BD08 /* bottomSheetView.swift */; };
 		05FAEF162DF2782400E9BD08 /* RestaurantModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF152DF2782400E9BD08 /* RestaurantModel.swift */; };
@@ -114,7 +115,7 @@
 		05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FeatureTitleBar.xib; sourceTree = "<group>"; };
 		05623FCF2E1234D300B33D2D /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		058877022DC1BE4D00B1D13E /* WeatherView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView2.swift; sourceTree = "<group>"; };
-		058F58A22E764D3A009913C5 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
+		058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRemoverVK.swift; sourceTree = "<group>"; };
 		0595566E2E14D5B90050147C /* TideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideView.swift; sourceTree = "<group>"; };
 		059556702E150AF10050147C /* TideLobbyVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideLobbyVM.swift; sourceTree = "<group>"; };
 		05C94D852E6ABF7C0051B078 /* embeddings_test_Img.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = embeddings_test_Img.json; sourceTree = "<group>"; };
@@ -135,6 +136,7 @@
 		05E245F02D0A801000C6C048 /* UILabelExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelExtension.swift; sourceTree = "<group>"; };
 		05E672DF2CDB0C78006CF3BF /* APILoggerPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APILoggerPlugin.swift; sourceTree = "<group>"; };
 		05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
+		05E8A0A92E7D00180038E594 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
 		05F3BED32D92824C00DDAC72 /* TideDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideDataModel.swift; sourceTree = "<group>"; };
 		05FAEF122DF2743900E9BD08 /* bottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = bottomSheetView.swift; sourceTree = "<group>"; };
 		05FAEF152DF2782400E9BD08 /* RestaurantModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantModel.swift; sourceTree = "<group>"; };
@@ -420,7 +422,7 @@
 		058F58A12E764C79009913C5 /* Database */ = {
 			isa = PBXGroup;
 			children = (
-				058F58A22E764D3A009913C5 /* catalog.sqlite */,
+				05E8A0A92E7D00180038E594 /* catalog.sqlite */,
 			);
 			path = Database;
 			sourceTree = "<group>";
@@ -443,6 +445,7 @@
 		05C94D8A2E6ABF7C0051B078 /* ImageUtils */ = {
 			isa = PBXGroup;
 			children = (
+				058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */,
 				05C94D872E6ABF7C0051B078 /* CLIPFeatureExtractor.swift */,
 				05C94D882E6ABF7C0051B078 /* ImageUtils.swift */,
 				05C94D892E6ABF7C0051B078 /* JsonUtils.swift */,
@@ -679,7 +682,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				058F58A32E764D3A009913C5 /* catalog.sqlite in Resources */,
+				05E8A0AA2E7D00180038E594 /* catalog.sqlite in Resources */,
 				054C844C2CD9B995005595EF /* Assets.xcassets in Resources */,
 				0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */,
 				05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */,
@@ -709,6 +712,7 @@
 				05FAEF302E00F4F200E9BD08 /* TransactionsDM.swift in Sources */,
 				054C84652CD9C144005595EF /* WeatherService.swift in Sources */,
 				05589EEF2CE6EFF3003881AA /* LobbyVM.swift in Sources */,
+				058F58A72E7BA42C009913C5 /* BackgroundRemoverVK.swift in Sources */,
 				054C84472CD9B994005595EF /* LobbyViewController.swift in Sources */,
 				0595566F2E14D5BA0050147C /* TideView.swift in Sources */,
 				05FAEF182DF279A700E9BD08 /* BottomSheetSubViews.swift in Sources */,

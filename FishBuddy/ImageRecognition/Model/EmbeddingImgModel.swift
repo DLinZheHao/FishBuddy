@@ -27,6 +27,9 @@ struct TaxonItem: Codable {
     let meta: Meta?
     // 預先處理的圖片向量資料
     @Default var embedding: [Float]
+    // 預處理的文字向量資料
+    @Default var textEmbedding: [Float]
+    
     let embeddingMeta: EmbeddingMeta?
 
     enum CodingKeys: String, CodingKey {
@@ -38,6 +41,7 @@ struct TaxonItem: Codable {
         case meta
         case embedding
         case embeddingMeta = "embedding_meta"
+        case textEmbedding = "text_embedding"
     }
 }
 

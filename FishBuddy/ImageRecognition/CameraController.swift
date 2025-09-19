@@ -18,6 +18,8 @@ protocol CameraControllerOutputs {
 // CameraController 負責管理相機的存取、權限、相機切換、相機資料流的取得與釋放等功能
 final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
 
+    // 背景去除用物件
+    var backgroundRemoverVK: BackgroundRemoverVK?
     // 由外部注入或稍後設定的 CLIP 特徵擷取器
     var clipExtractor: CLIPFeatureExtractor?
     // 重用 CIContext（優先用 Metal）避免每幀建立花費
@@ -43,6 +45,11 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
 
     // Still-photo output（拍照輸出）
     private var photoOutput: AVCapturePhotoOutput?
+
+    /// 相機/照片畫質設定（可在執行中調整）
+    public var videoPreset: AVCaptureSession.Preset = .hd1280x720   // 影像串流解析度
+    public var enableHighResolutionPhoto: Bool = true               // 是否啟用高解析度拍照
+    public var photoQualityPrioritization: AVCapturePhotoOutput.QualityPrioritization = .quality // 以品質優先
 
     // 相機的 session 實體，負責管理輸入與輸出
     var captureSession: AVCaptureSession? {
@@ -72,6 +79,9 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
     
     /// 當拍完照後的回傳 -> 回傳處理過的 embeeding
     var onPhotoReady: ((([Float], UIImage)) -> Void)?
+    
+    /// 測試拍照完後，背景的切割結果
+    var backgroundRemove: ((UIImage) -> Void)?
     
 //    •    你在 CameraController 裡面用了 AsyncStream<CMSampleBuffer> 來建立一個非同步的影格（frame）資料流。
 //    •    Swift 在建立 AsyncStream 時，會給你一個 Continuation 物件。
@@ -118,32 +128,14 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
         }
     }
 
-    /// 觸發單張拍照（不破壞原本即時串流邏輯）
-    /// - Parameters:
-    ///   - flashMode: 閃光燈模式，預設 .auto
-    ///   - highResolution: 是否要求高解析照片（若裝置支援）
-    public func capturePhoto(flashMode: AVCaptureDevice.FlashMode = .auto,
-                             highResolution: Bool = true) {
+    /// 動態切換串流畫質（解析度）。若裝置不支援則維持原本設定。
+    public func setVideoPreset(_ preset: AVCaptureSession.Preset) {
         sessionQueue.async { [weak self] in
-            guard let self, let photoOutput = self.photoOutput else { return }
-
-            let settings = AVCapturePhotoSettings()
-
-            // 高解析度
-            if highResolution {
-                // 例如確認裝置支援的最大尺寸比預設大
-                let maxDimensions = photoOutput.maxPhotoDimensions
-                if maxDimensions.width > 1920 || maxDimensions.height > 1080 {
-                    settings.maxPhotoDimensions = maxDimensions
-                }
-            }
-
-            // 閃光燈（若支援）
-            if photoOutput.supportedFlashModes.contains(flashMode) {
-                settings.flashMode = flashMode
-            }
-
-            photoOutput.capturePhoto(with: settings, delegate: self)
+            guard let self, let session = self.captureSession, session.canSetSessionPreset(preset) else { return }
+            session.beginConfiguration()
+            session.sessionPreset = preset
+            session.commitConfiguration()
+            self.videoPreset = preset
         }
     }
 
@@ -257,10 +249,16 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
         videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "sampleBufferQueue"))
         captureSession.addOutput(videoOutput)
         // 設定畫質（解析度）
-        captureSession.sessionPreset = AVCaptureSession.Preset.vga640x480
+        if captureSession.canSetSessionPreset(self.videoPreset) {
+            captureSession.sessionPreset = self.videoPreset
+        } else {
+            // 裝置不支援所選畫質時，退回到較低解析度以確保穩定
+            captureSession.sessionPreset = .vga640x480
+        }
 
         // 新增拍照輸出（不影響既有串流流程）
         let photoOutput = AVCapturePhotoOutput()
+        photoOutput.isHighResolutionCaptureEnabled = self.enableHighResolutionPhoto
         if captureSession.canAddOutput(photoOutput) {
             captureSession.addOutput(photoOutput)
             self.photoOutput = photoOutput
@@ -312,6 +310,40 @@ extension CameraController: AVCaptureVideoDataOutputSampleBufferDelegate {
 }
 
 extension CameraController: AVCapturePhotoCaptureDelegate {
+    func capturePhoto(flashMode: AVCaptureDevice.FlashMode = .auto,
+                             highResolution: Bool = true) {
+        sessionQueue.async { [weak self] in
+            guard let self, let photoOutput = self.photoOutput else { return }
+
+            let settings = AVCapturePhotoSettings()
+
+            // 以裝置支援上限為準，避免「高於 maxPhotoQualityPrioritization」造成崩潰
+            let desired = self.photoQualityPrioritization
+            let maxSupported = photoOutput.maxPhotoQualityPrioritization
+            let clamped = AVCapturePhotoOutput.QualityPrioritization(rawValue: min(desired.rawValue, maxSupported.rawValue)) ?? maxSupported
+            settings.photoQualityPrioritization = clamped
+
+            // 若支援，顯式要求高解析度照片
+            settings.isHighResolutionPhotoEnabled = highResolution && (self.photoOutput?.isHighResolutionCaptureEnabled == true)
+
+            // 高解析度
+            if highResolution {
+                // 例如確認裝置支援的最大尺寸比預設大
+                let maxDimensions = photoOutput.maxPhotoDimensions
+                if maxDimensions.width > 1920 || maxDimensions.height > 1080 {
+                    settings.maxPhotoDimensions = maxDimensions
+                }
+            }
+
+            // 閃光燈（若支援）
+            if photoOutput.supportedFlashModes.contains(flashMode) {
+                settings.flashMode = flashMode
+            }
+
+            photoOutput.capturePhoto(with: settings, delegate: self)
+        }
+    }
+
     func photoOutput(_ output: AVCapturePhotoOutput,
                      didFinishProcessingPhoto photo: AVCapturePhoto,
                      error: Error?) {
@@ -321,12 +353,29 @@ extension CameraController: AVCapturePhotoCaptureDelegate {
         }
         guard let data = photo.fileDataRepresentation(),
               let image = UIImage(data: data) else { return }
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
             guard let clip = clipExtractor else { return }
+        
             if let embedding = clip.multiCropAverageEmbedding(for: image, cropScale: 0.85) {
-                self.onPhotoReady?((embedding, image))
+                Task { @MainActor in
+                    self.onPhotoReady?((embedding, image))
+                }
             }
-        }
+            
+//        Task {
+//            let exImage = UIImage(named: "測試")
+//            if let resultImg = try await backgroundRemoverVK?.removeBackground(from: exImage!) {
+//                self.backgroundRemove?(resultImg)
+//            }
+//        }
+        
+//        Task.detached(priority: .userInitiated) { [weak self] in
+//            guard let self, let remover = self.backgroundRemoverVK else { return }
+//            do {
+//                let resultImg = try await remover.removeBackground(from: image)
+//                await MainActor.run { self.backgroundRemove?(resultImg) }
+//            } catch {
+//                print("去背失敗: \(error)")
+//            }
+//        }
     }
 }

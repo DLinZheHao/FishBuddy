@@ -16,6 +16,8 @@ struct CameraStreamView: View {
     @ObservedObject private var vm = CameraStreamVM()
     /// 最後一次拍攝照片
     @State private var lastPhoto: UIImage?
+    /// 測試切割後的照片結果
+    @State private var resultImage: UIImage?
     /// 拍攝運作模式
     typealias CaptureMode = CameraStreamVM.CaptureMode
     
@@ -94,7 +96,18 @@ struct CameraStreamView: View {
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
                     .padding(.horizontal, 16)
                 }
+                
+                if let resultImage {
+                    Image(uiImage: resultImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxHeight: 200)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .padding()
+                }
             }
+            
+            
         }
         // 在 safeArea 撰寫工具
         .safeAreaInset(edge: .bottom) {
@@ -143,9 +156,10 @@ struct CameraStreamView: View {
             vm.embeddings = stream
             vm.streamID = UUID()
 
-            // 只在第一次載入時建立與預熱 CLIP 模型
+            // 只在第一次載入時建立與預熱 CLIP 模型、 visionKit 也在這裡預載
             if !vm.didLoadExtractor {
                 Task.detached(priority: .userInitiated) {
+                    let remover = await BackgroundRemoverVK()
                     let extractor = CLIPFeatureExtractor()
                     // 預熱：讓第一次推論不卡
                     let renderer = UIGraphicsImageRenderer(size: CGSize(width: 224, height: 224))
@@ -155,6 +169,7 @@ struct CameraStreamView: View {
                     }
                     _ = extractor.embedding(for: warmup)
                     await MainActor.run {
+                        camera.backgroundRemoverVK = remover
                         camera.clipExtractor = extractor
                         vm.didLoadExtractor = true
                     }
@@ -171,6 +186,10 @@ struct CameraStreamView: View {
                 Task {
                     await self.vm.search(query: data.0)
                 }
+            }
+            
+            camera.backgroundRemove = { image in
+                self.resultImage = image
             }
         }
         .onDisappear {

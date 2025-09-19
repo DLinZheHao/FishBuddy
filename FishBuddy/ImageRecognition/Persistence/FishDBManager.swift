@@ -130,11 +130,20 @@ final class FishDB {
           dim INTEGER NOT NULL,
           vec BLOB NOT NULL
         );
+        CREATE TABLE text_embeddings (
+          taxon_id INTEGER PRIMARY KEY,
+          dim INTEGER NOT NULL,
+          vec BLOB NOT NULL
+        );
         CREATE TABLE species_meta (
           taxon_id INTEGER PRIMARY KEY,
           meta_json TEXT
         );
         CREATE TABLE embedding_meta (
+          taxon_id INTEGER PRIMARY KEY,
+          meta_json TEXT
+        );
+        CREATE TABLE text_embedding_meta (
           taxon_id INTEGER PRIMARY KEY,
           meta_json TEXT
         );
@@ -146,7 +155,7 @@ final class FishDB {
 
     /// 若資料庫是新建且沒有任何預期的表，執行 DDL 建立 schema
     private func bootstrapIfEmpty() throws {
-        let count = try db.scalar("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('species','photos','embeddings','species_meta','embedding_meta');") as! Int64
+        let count = try db.scalar("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('species','photos','embeddings','text_embeddings','species_meta','embedding_meta','text_embedding_meta');") as! Int64
         if count == 0 {
             // SQLite.swift 的 db.run 不支援一次執行多條語句；需要逐條執行
             let statements = FishDB.schemaDDL
@@ -158,7 +167,7 @@ final class FishDB {
                 try db.run(sql)
             }
 
-            let newCount = try db.scalar("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('species','photos','embeddings','species_meta','embedding_meta');") as! Int64
+            let newCount = try db.scalar("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('species','photos','embeddings','text_embeddings','species_meta','embedding_meta','text_embedding_meta');") as! Int64
             print("✅ 已執行 bootstrap DDL，建表完成（表數=\(newCount)）")
         }
     }
@@ -210,6 +219,12 @@ final class FishDB {
         let e_dim    = SQLite.Expression<Int>("dim")
         let e_vec    = SQLite.Expression<SQLite.Blob>("vec")
 
+        // === 關聯表（text_embeddings） ===
+        let textEmbedsT = Table("text_embeddings")
+        let te_taxon  = SQLite.Expression<Int>("taxon_id")
+        let te_dim    = SQLite.Expression<Int>("dim")
+        let te_vec    = SQLite.Expression<SQLite.Blob>("vec")
+
         // === 關聯表（meta JSON） ===
         let sMetaT   = Table("species_meta")
         let sm_taxon = SQLite.Expression<Int>("taxon_id")
@@ -218,6 +233,11 @@ final class FishDB {
         let eMetaT   = Table("embedding_meta")
         let em_taxon = SQLite.Expression<Int>("taxon_id")
         let em_json  = SQLite.Expression<String?>("meta_json")
+
+        // === 關聯表（text_embedding_meta） ===
+        let tEMetaT   = Table("text_embedding_meta")
+        let tem_taxon = SQLite.Expression<Int>("taxon_id")
+        let tem_json  = SQLite.Expression<String?>("meta_json")
 
         // 1) 撈全部 species
         let speciesRows = try Array(db.prepare(speciesT.select(s_taxon, s_sci, s_common, s_slug)))
@@ -261,6 +281,22 @@ final class FishDB {
                 embedMetaMap[r[em_taxon]] = meta
             }
         }
+        var textEmbedMetaMap: [Int: EmbeddingMeta] = [:]
+        for r in try db.prepare(tEMetaT.select(tem_taxon, tem_json)) {
+            if let js = r[tem_json],
+               let data = js.data(using: .utf8),
+               let meta = try? decoder.decode(EmbeddingMeta.self, from: data) {
+                textEmbedMetaMap[r[tem_taxon]] = meta
+            }
+        }
+        
+        // 4) 撈 text_embeddings（BLOB → [Float]）
+        var textEmbedMap: [Int: [Float]] = [:]
+        for r in try db.prepare(textEmbedsT.select(te_taxon, te_dim, te_vec)) {
+            let tid = r[te_taxon]
+            let vec32: [Float32] = blobToFloats(r[te_vec])
+            textEmbedMap[tid] = vec32.map { Float($0) }
+        }
 
         // 5) 組裝 TaxonItem
         return speciesRows.map { r in
@@ -273,6 +309,7 @@ final class FishDB {
                 photos: photosMap[tid],
                 meta: speciesMetaMap[tid],
                 embedding: embedMap[tid] ?? [],
+                textEmbedding: textEmbedMap[tid] ?? [],
                 embeddingMeta: embedMetaMap[tid]
             )
         }
@@ -295,7 +332,9 @@ final class InMemoryVectorIndex {
     /// - row-major：第 i 列從 index `i*dim` 開始連續擺 D 個元素，適合做「矩陣×向量」的掃描。
     /// - 對比 [[Float]]：雙層陣列會有多個非連續的 buffer，逐列 dot product 會有大量間接存取、較難吃到向量化加速。
     private(set) var matrix: [Float] = []
-
+    private(set) var textMatrix: [Float] = []
+    
+    
     /// 建構子：把輸入的多筆向量（每筆長度 = dim）pack 成連續的 row-major 矩陣
     /// - rows: 原始資料，假設每個 `vector` 都已經 L2 normalize（若要用 cosine 分數）
     /// - dim: 向量維度 D
@@ -306,6 +345,8 @@ final class InMemoryVectorIndex {
 
         // 建出 N×D 的連續 buffer，初始化為 0
         self.matrix = [Float](repeating: 0, count: items.count * dim)
+        self.textMatrix = [Float](repeating: 0, count: items.count * dim)
+        
 
         // 將每一筆向量按列（row）塞進 matrix：
         // 第 i 列的區間是 [i*dim, (i+1)*dim)
@@ -313,6 +354,7 @@ final class InMemoryVectorIndex {
             precondition(item.embedding.count == dim, "維度不一致")
             // 這裡使用 replaceSubrange 會將 item.embedding 的內容複製到對應區段，形成連續的 row-major 版面
             matrix.replaceSubrange(i*dim..<(i+1)*dim, with: item.embedding)
+            textMatrix.replaceSubrange(i*dim..<(i+1)*dim, with: item.textEmbedding)
         }
     }
 
@@ -324,25 +366,23 @@ final class InMemoryVectorIndex {
         precondition(query.count == dim)
         let n = ids.count
 
-        // scores = matrix (N×D) * query (D×1) = (N×1)
-        var scores = [Float](repeating: 0, count: n)
-
-        // vDSP_mmul 需要可變參考做為輸入指標，因此把 query 複製到 var q
-        // （Array 在記憶體中本來就是連續的，這裡只是為了取得 &q 的指標）
+        // 計算圖片分數：scoresImg = matrix(N×D) × query(D×1)
+        var scoresImg = [Float](repeating: 0, count: n)
         var q = query
+        vDSP_mmul(matrix, 1, &q, 1, &scoresImg, 1, vDSP_Length(n), 1, vDSP_Length(dim))
 
-        // vDSP_mmul 參數對照：
-        // C = A × B
-        // A: matrix (形狀 m×p) 這裡 m=n(筆數)、p=dim
-        // B: q      (形狀 p×n) 這裡 n=1（單一查詢向量）
-        // C: scores (形狀 m×n) -> n=1 所以是 m×1 向量
-        // stride 都是 1（連續記憶體）
-        // 註：`vDSP_Length` 是 UInt 型別，需轉型
-        vDSP_mmul(matrix, 1, &q, 1, &scores, 1, vDSP_Length(n), 1, vDSP_Length(dim))
+        // 預設只用圖片；若有文字矩陣，做晚期融合：score = 0.6*img + 0.4*text
+        var scores = scoresImg
+        if !textMatrix.isEmpty {
+            var scoresText = [Float](repeating: 0, count: n)
+            vDSP_mmul(textMatrix, 1, &q, 1, &scoresText, 1, vDSP_Length(n), 1, vDSP_Length(dim))
+            var wImg: Float = 0.8
+            var wTxt: Float = 0.2
+            // scores = wImg * scoresImg + wTxt * scoresText
+            vDSP_vsmsa(scoresImg, 1, &wImg, [0], &scores, 1, vDSP_Length(n))
+            vDSP_vsma(scoresText, 1, &wTxt, scores, 1, &scores, 1, vDSP_Length(n))
+        }
 
-        // 取 Top-K：
-        // - 小型資料集：直接全排序（O(N log N)）簡單明瞭
-        // - 大型資料集：可改用最小堆（min-heap）或 partial sort / selection 演算法降到 O(N log K)
         let idx = (0..<n).sorted { scores[$0] > scores[$1] }.prefix(topK)
         return idx.map { (ids[$0], names[$0], scores[$0]) }
     }
