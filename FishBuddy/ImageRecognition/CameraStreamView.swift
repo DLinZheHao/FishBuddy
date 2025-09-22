@@ -26,8 +26,13 @@ struct CameraStreamView: View {
             // Full-screen camera preview (edge-to-edge)
             ZStack {
                 CameraPreview(session: vm.captureSession)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .ignoresSafeArea()
+                // 裁切框疊在 CameraPreview 正中央（可拖動/縮放）
+                FramingGuide(aspect: .square) { norm in
+                    camera.setCropRectNormalized(norm) // 將 0..1 相對座標傳回 CameraController
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity) // 充滿與預覽同大小
+                .ignoresSafeArea()
+                .zIndex(1) // 確保在預覽上層
 
                 if camera.captureSession == nil {
                     // 首次啟動尚未有 session 時顯示 loading
@@ -60,9 +65,24 @@ struct CameraStreamView: View {
                 // 搜尋結果顯示（上方左側浮出）
                 if let results = vm.imageSearchResult, !results.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("📷 搜尋結果")
-                            .font(.headline)
-                            .padding(.bottom, 4)
+                        HStack {
+                            Text("📷 搜尋結果")
+                                .font(.headline)
+                                .padding(.bottom, 4)
+
+                            Spacer()
+                            
+                            // 關閉按鈕（叉叉）
+                            Button {
+                                vm.imageSearchResult = nil
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.title3)
+                                    .foregroundStyle(.secondary)
+                                    .accessibilityLabel("關閉搜尋結果")
+                            }
+                            .buttonStyle(.plain)
+                        }
 
                         ForEach(Array(results.prefix(3)), id: \.0.taxonId) { (item, score) in
                             HStack {
@@ -96,15 +116,7 @@ struct CameraStreamView: View {
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
                     .padding(.horizontal, 16)
                 }
-                
-                if let resultImage {
-                    Image(uiImage: resultImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxHeight: 200)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .padding()
-                }
+
             }
             
             
@@ -238,3 +250,4 @@ struct EmbeddingConsumer: View {
             }
     }
 }
+

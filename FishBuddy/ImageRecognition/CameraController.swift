@@ -15,7 +15,7 @@ protocol CameraControllerOutputs {
     var onPhoto: ((UIImage) -> Void)? { get set }   // 拍照完成回呼（新）
 }
 
-// CameraController 負責管理相機的存取、權限、相機切換、相機資料流的取得與釋放等功能
+// CameraController 負責管理相機的存取、權限、相機切換、相機資料流的取得與釋放等功能ㄓㄡ
 final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
 
     // 背景去除用物件
@@ -83,11 +83,25 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
     /// 測試拍照完後，背景的切割結果
     var backgroundRemove: ((UIImage) -> Void)?
     
+    // 使用者設定的裁切框（相對座標；原點左上；x,y,w,h ∈ 0...1）。nil 代表不裁切。
+    @Published var cropRectNormalized: CGRect? = nil
+    
+    /// 全域校正偏移：以相對座標（0..1）為單位；x 正值＝向右、y 正值＝向下
+    @Published public var cropCalibrationOffset: CGPoint = .zero
+    
+    /// 由 UI 設定 / 清除裁切框（在主執行緒呼叫）
+    public func setCropRectNormalized(_ rect: CGRect?) {
+        Task { @MainActor in
+            self.cropRectNormalized = rect
+        }
+    }
+    
 //    •    你在 CameraController 裡面用了 AsyncStream<CMSampleBuffer> 來建立一個非同步的影格（frame）資料流。
 //    •    Swift 在建立 AsyncStream 時，會給你一個 Continuation 物件。
 //    •    這個 Continuation 就像一個「入口」，你可以用它來 往外部正在監聽的 AsyncStream 送資料。
     // 外部附加接收嵌入向量的 continuation（而非直接暴露 CMSampleBuffer）
     public func attachEmbedding(continuation: AsyncStream<[Float]>.Continuation) {
+        cropCalibrationOffset.y = 0.075
         sessionQueue.async { [weak self] in
             guard let self else { return }
             self.embeddingContinuation = continuation
@@ -258,7 +272,8 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
 
         // 新增拍照輸出（不影響既有串流流程）
         let photoOutput = AVCapturePhotoOutput()
-        photoOutput.isHighResolutionCaptureEnabled = self.enableHighResolutionPhoto
+        // iOS 16+：不再使用 isHighResolutionCaptureEnabled。高解析度由每次拍照的
+        // AVCapturePhotoSettings.maxPhotoDimensions 控制（見 capturePhoto(...)）。
         if captureSession.canAddOutput(photoOutput) {
             captureSession.addOutput(photoOutput)
             self.photoOutput = photoOutput
@@ -277,10 +292,73 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
             start()
         }
     }
+    
+    /// 將全域校正量應用到使用者選框，並夾限於 0..1 範圍內（避免出界）
+    private func applyCalibration(_ rect: CGRect) -> CGRect {
+        var r = rect
+        let dx = cropCalibrationOffset.x
+        let dy = cropCalibrationOffset.y
+        // 先套用偏移ㄓㄡ
+        r.origin.x += dx
+        r.origin.y += dy
+        // 夾限：原點不得小於 0，也不得超過 (1 - 尺寸)
+        r.origin.x = min(max(0, r.origin.x), 1 - r.width)
+        r.origin.y = min(max(0, r.origin.y), 1 - r.height)
+        // 尺寸維持不變；若原本就越界，寬高在下游的像素換算仍會被再次夾限
+        return r
+    }
+
+    /// 將 UIImage 轉為「已套用方向」的位圖（.up），避免裁切時座標錯亂
+    private func imageByFixingOrientation(_ image: UIImage) -> UIImage {
+        // 若圖片本身的方向就是 .up（代表位圖像素已符合直立方向），直接回傳，避免不必要的重繪成本
+        if image.imageOrientation == .up { return image }
+        // 取得目前圖片的邏輯尺寸（point 為單位，會搭配 scale 轉為像素繪製）
+        let size = image.size
+        // 建立一個新的位圖繪圖環境：
+        // - size: 以圖片原始尺寸繪製
+        // - opaque: false（保留透明通道）
+        // - scale: 使用原圖的 scale，確保輸出解析度一致（例如 @2x/@3x）
+        UIGraphicsBeginImageContextWithOptions(size, false, image.scale)
+        // 將原圖以「忽略 EXIF 方向」的方式，直接繪製到新的畫布。
+        // UIKit 會把像素內容依當前繪圖座標系重排，輸出得到的影像方向即為 .up
+        image.draw(in: CGRect(origin: .zero, size: size))
+        // 從目前的繪圖內容取出 UIImage；若意外失敗（理論上少見），就回傳原圖以保底
+        let normalized = UIGraphicsGetImageFromCurrentImageContext() ?? image
+        // 結束繪圖環境，釋放資源
+        UIGraphicsEndImageContext()
+        // 回傳「方向已被固定為 .up」的新圖，後續做裁切/像素座標換算時就不會因方向而錯位
+        return normalized
+    }
+
+    /// 將相對座標的裁切框（0..1；原點左上）轉為像素座標
+    private func pixelRect(for normalized: CGRect, width: Int, height: Int) -> CGRect {
+        let nx = max(0, min(1, normalized.origin.x))
+        let ny = max(0, min(1, normalized.origin.y))
+        let nw = max(0, min(1 - nx, normalized.size.width))
+        let nh = max(0, min(1 - ny, normalized.size.height))
+        let x = CGFloat(width) * nx
+        let y = CGFloat(height) * ny
+        let w = CGFloat(width) * nw
+        let h = CGFloat(height) * nh
+        return CGRect(x: x.rounded(.towardZero), y: y.rounded(.towardZero),
+                      width: w.rounded(.towardZero), height: h.rounded(.towardZero))
+    }
+
+    /// 依照 normalized rect 裁切 UIImage（若 rect 無效或超界會自動夾限）
+    private func crop(_ image: UIImage, by normalizedRect: CGRect) -> UIImage? {
+        // 先將使用者的相對選框套用全域數值校正（0..1）
+        let adjustedRect = applyCalibration(normalizedRect)
+
+        let fixed = imageByFixingOrientation(image)
+        guard let cg = fixed.cgImage else { return nil }
+        // 將「校正後的相對選框」換算到照片像素座標
+        let pr = pixelRect(for: adjustedRect, width: cg.width, height: cg.height)
+        guard pr.width > 0, pr.height > 0 else { return nil }
+        guard let cgCropped = cg.cropping(to: pr) else { return nil }
+        return UIImage(cgImage: cgCropped, scale: fixed.scale, orientation: .up)
+    }
 }
 
-// 擴充 CameraController 支援 AVCaptureVideoDataOutputSampleBufferDelegate
-// 用於取得每一幀的相機畫面資料
 extension CameraController: AVCaptureVideoDataOutputSampleBufferDelegate {
     // 當有新影格輸出時會呼叫此方法
     func captureOutput(
@@ -323,16 +401,12 @@ extension CameraController: AVCapturePhotoCaptureDelegate {
             let clamped = AVCapturePhotoOutput.QualityPrioritization(rawValue: min(desired.rawValue, maxSupported.rawValue)) ?? maxSupported
             settings.photoQualityPrioritization = clamped
 
-            // 若支援，顯式要求高解析度照片
-            settings.isHighResolutionPhotoEnabled = highResolution && (self.photoOutput?.isHighResolutionCaptureEnabled == true)
-
-            // 高解析度
+            // iOS 16+ 不再使用 isHighResolutionPhotoEnabled / isHighResolutionCaptureEnabled。
+            // 以 maxPhotoDimensions 控制解析度。
             if highResolution {
-                // 例如確認裝置支援的最大尺寸比預設大
+                // 使用裝置支援的最大尺寸；如需限制，可在此與自訂上限做最小化處理。
                 let maxDimensions = photoOutput.maxPhotoDimensions
-                if maxDimensions.width > 1920 || maxDimensions.height > 1080 {
-                    settings.maxPhotoDimensions = maxDimensions
-                }
+                settings.maxPhotoDimensions = maxDimensions
             }
 
             // 閃光燈（若支援）
@@ -352,15 +426,24 @@ extension CameraController: AVCapturePhotoCaptureDelegate {
             return
         }
         guard let data = photo.fileDataRepresentation(),
-              let image = UIImage(data: data) else { return }
-            guard let clip = clipExtractor else { return }
-        
-            if let embedding = clip.multiCropAverageEmbedding(for: image, cropScale: 0.85) {
-                Task { @MainActor in
-                    self.onPhotoReady?((embedding, image))
-                }
+              let rawImage = UIImage(data: data) else { return }
+        guard let clip = clipExtractor else { return }
+
+        // 先固定方向，再依使用者的裁切框（若有）裁出 ROI
+        let base = imageByFixingOrientation(rawImage)
+        let finalImage: UIImage
+        if let roi = self.cropRectNormalized {
+            finalImage = crop(base, by: roi) ?? base
+        } else {
+            finalImage = base
+        }
+
+        if let embedding = clip.multiCropAverageEmbedding(for: finalImage, cropScale: 0.85) {
+            Task { @MainActor in
+                self.onPhotoReady?((embedding, finalImage))
             }
-            
+        }
+        
 //        Task {
 //            let exImage = UIImage(named: "測試")
 //            if let resultImg = try await backgroundRemoverVK?.removeBackground(from: exImage!) {

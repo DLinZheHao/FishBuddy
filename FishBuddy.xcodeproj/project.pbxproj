@@ -59,6 +59,7 @@
 		05C94DA82E6ACA4C0051B078 /* FishDBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C94DA72E6ACA4C0051B078 /* FishDBManager.swift */; };
 		05C94DB62E6BDA160051B078 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94DB52E6BDA160051B078 /* SQLite */; };
 		05D266B42DDABC1600F140D3 /* gestureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D266B32DDABC1600F140D3 /* gestureView.swift */; };
+		05D418A92E7D47F500B1BEF5 /* FramingGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D418A82E7D47F500B1BEF5 /* FramingGuide.swift */; };
 		05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245E92D0A7EB800C6C048 /* TagLineView.swift */; };
 		05E245EC2D0A7EB800C6C048 /* TagLineView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05E245EA2D0A7EB800C6C048 /* TagLineView.xib */; };
 		05E245EF2D0A7F9B00C6C048 /* UILabelPadding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245EE2D0A7F9B00C6C048 /* UILabelPadding.swift */; };
@@ -130,6 +131,7 @@
 		05C94DA42E6AC4E80051B078 /* UIViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewExtension.swift; sourceTree = "<group>"; };
 		05C94DA72E6ACA4C0051B078 /* FishDBManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FishDBManager.swift; sourceTree = "<group>"; };
 		05D266B32DDABC1600F140D3 /* gestureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gestureView.swift; sourceTree = "<group>"; };
+		05D418A82E7D47F500B1BEF5 /* FramingGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FramingGuide.swift; sourceTree = "<group>"; };
 		05E245E92D0A7EB800C6C048 /* TagLineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TagLineView.swift; sourceTree = "<group>"; };
 		05E245EA2D0A7EB800C6C048 /* TagLineView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TagLineView.xib; sourceTree = "<group>"; };
 		05E245EE2D0A7F9B00C6C048 /* UILabelPadding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelPadding.swift; sourceTree = "<group>"; };
@@ -478,6 +480,7 @@
 				05C94D8E2E6ABF7C0051B078 /* ViewModel */,
 				05C94D8F2E6ABF7C0051B078 /* CameraController.swift */,
 				05C94D902E6ABF7C0051B078 /* CameraStreamView.swift */,
+				05D418A82E7D47F500B1BEF5 /* FramingGuide.swift */,
 			);
 			path = ImageRecognition;
 			sourceTree = "<group>";
@@ -754,6 +757,7 @@
 				05589EE92CE6EDBF003881AA /* WeatherLobbyVM.swift in Sources */,
 				058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */,
 				05FAEF132DF2743900E9BD08 /* bottomSheetView.swift in Sources */,
+				05D418A92E7D47F500B1BEF5 /* FramingGuide.swift in Sources */,
 				05E245EF2D0A7F9B00C6C048 /* UILabelPadding.swift in Sources */,
 				054C845A2CD9BDE5005595EF /* APIConfig.swift in Sources */,
 				05E245F12D0A801000C6C048 /* UILabelExtension.swift in Sources */,
