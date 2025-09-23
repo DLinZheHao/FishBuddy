@@ -8,6 +8,7 @@
 import SwiftUI
 import AVFoundation
 import CoreML
+import Kingfisher
 
 struct CameraStreamView: View {
     /// 相機鏡頭物件
@@ -18,13 +19,15 @@ struct CameraStreamView: View {
     @State private var lastPhoto: UIImage?
     /// 測試切割後的照片結果
     @State private var resultImage: UIImage?
+    /// 顯示使用教學
+    @State private var showHelp = false
     /// 拍攝運作模式
     typealias CaptureMode = CameraStreamVM.CaptureMode
     
     var body: some View {
         ZStack {
             // Full-screen camera preview (edge-to-edge)
-            ZStack {
+            ZStack(alignment: .topLeading) {
                 CameraPreview(session: vm.captureSession)
                 // 裁切框疊在 CameraPreview 正中央（可拖動/縮放）
                 FramingGuide(aspect: .square) { norm in
@@ -34,15 +37,48 @@ struct CameraStreamView: View {
                 .ignoresSafeArea()
                 .zIndex(1) // 確保在預覽上層
 
-                if camera.captureSession == nil {
-                    // 首次啟動尚未有 session 時顯示 loading
-                    ProgressView("啟動相機中…")
-                        .padding()
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                // 左上角：功能說明（tooltip/popover）
+                Button {
+                    let _ = print("show help")
+                    showHelp.toggle()
+                } label: {
+                    Image(systemName: "questionmark.circle.fill")
+                        .font(.system(size: 22))
+                        .foregroundStyle(.white)
+                        .padding(10)
                 }
+                .zIndex(2) // 讓按鈕在 FramingGuide 之上，避免被攔截手勢
+                .popover(isPresented: $showHelp, arrowEdge: .bottom) {
+                    let _ = print("show help")
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("📌 功能說明")
+                            .font(.headline)
+                        Text("1. 對準要辨識的物體\n2. 點擊『拍照』開始辨識\n3. 下方可切換模式")
+                            .font(.subheadline)
+                    }
+                    .padding()
+                    .frame(width: 220)
+                }
+                .presentationCompactAdaptation(.popover)
             }
             // 當換成「新的」AVCaptureSession 實例時，強制 SwiftUI 重新建構預覽（每次切換都會開啟新的 session）
             .id(camera.captureSession.map { ObjectIdentifier($0) }) // ObjectIdentifier 是一種「以物件記憶體身份作為唯一值」的東西
+
+            // 進度指示：以「相機/模型就緒」為條件顯示
+            .overlay(alignment: .center) {
+                if vm.captureSession == nil || !vm.didLoadExtractor {
+                    ProgressView("啟動相機中…")
+                        .padding()
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                        .transition(.opacity)
+                }
+            }
+            // 嵌入向量消費者：當 stream 建立後開始消費（不顯示 UI）
+            .overlay(alignment: .center) {
+                if let embeddings = vm.embeddings {
+                    EmbeddingConsumer(stream: embeddings, id: vm.streamID)
+                }
+            }
 
             // Overlay UI
             VStack {
@@ -85,30 +121,12 @@ struct CameraStreamView: View {
                         }
 
                         ForEach(Array(results.prefix(3)), id: \.0.taxonId) { (item, score) in
-                            HStack {
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(.blue.opacity(0.1))
-                                    .frame(width: 40, height: 40)
-                                    .overlay(
-                                        Text(String(item.taxonId))
-                                            .font(.caption)
-                                            .foregroundStyle(.blue)
-                                    )
-
-                                VStack(alignment: .leading) {
-                                    Text("ID: \(item.taxonId)")
-                                        .font(.subheadline)
-                                        .foregroundColor(.primary)
-                                    Text(String(format: "相似度: %.2f", score))
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-
-                                Spacer()
-                            }
-                            .padding(.vertical, 4)
-                            .padding(.horizontal, 8)
-                            .background(RoundedRectangle(cornerRadius: 8).fill(.secondary.opacity(0.1)))
+                            SearchResultRow(
+                                imageURL: URL(string: item.photos?.first?.url ?? ""),
+                                title: item.commonName ?? "",
+                                idText: "ID: \(item.taxonId)",
+                                scoreText: String(format: "相似度: %.2f", score)
+                            )
                         }
                     }
                     .padding(12)
@@ -116,43 +134,14 @@ struct CameraStreamView: View {
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
                     .padding(.horizontal, 16)
                 }
-
             }
-            
-            
         }
         // 在 safeArea 撰寫工具
         .safeAreaInset(edge: .bottom) {
-            HStack(spacing: 16) {
-                if let _ = lastPhoto {
-                    Color.clear
-                        .frame(width: 56, height: 56)
-                }
-                Spacer()
-
-                Button {
-                    camera.capturePhoto()
-                } label: {
-                    Label("拍照", systemImage: "camera.circle")
-                        .font(.title2)
-                }
-                .buttonStyle(.borderedProminent)
-
-                Spacer(minLength: 0)
-
-                if let image = lastPhoto {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 56, height: 56)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(.secondary.opacity(0.4), lineWidth: 1))
-                        .accessibilityLabel("最新拍攝縮圖")
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(.ultraThinMaterial)
+            CaptureToolbar(
+                lastPhoto: lastPhoto,
+                onCapture: { camera.capturePhoto() }
+            )
         }
         .onAppear {
             // 讀取 database
@@ -211,6 +200,103 @@ struct CameraStreamView: View {
     }
 }
 
+// MARK: - 底部工具列（拍照 + 最新縮圖）
+private struct CaptureToolbar: View {
+    let lastPhoto: UIImage?
+    let onCapture: () -> Void
+
+    var body: some View {
+        HStack(spacing: 16) {
+            if let _ = lastPhoto {
+                Color.clear
+                    .frame(width: 56, height: 56)
+            }
+            Spacer()
+
+            Button(action: onCapture) {
+                Label("拍照", systemImage: "camera.circle")
+                    .font(.title2)
+            }
+            .buttonStyle(.borderedProminent)
+
+            Spacer(minLength: 0)
+
+            if let image = lastPhoto {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 56, height: 56)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(.secondary.opacity(0.4), lineWidth: 1))
+                    .accessibilityLabel("最新拍攝縮圖")
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(.ultraThinMaterial)
+    }
+}
+
+// MARK: - 搜尋結果單列：圖片邊長 = 文字區塊高度
+private struct SearchResultRow: View {
+    let imageURL: URL?
+    let title: String
+    let idText: String
+    let scoreText: String
+
+    @State private var textHeight: CGFloat = 0
+
+    var body: some View {
+        HStack(spacing: 8) {
+            KFImage(imageURL)
+                .placeholder { ProgressView() }
+                .cancelOnDisappear(true)
+                .resizable()
+                .scaledToFill()
+                .frame(width: max(textHeight, 1), height: max(textHeight, 1)) // 正方形，避免初始 0 尺吋
+                .clipped()
+                .cornerRadius(8)
+
+            VStack(alignment: .leading) {
+                Text(title)
+                    .font(.title3)
+                    .foregroundColor(.primary)
+                
+                Text(idText)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
+                Text(scoreText)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            // 量測 VStack 的實際高度
+            .background(
+                GeometryReader { proxy in
+                    Color.clear
+                        .preference(key: TextHeightPreferenceKey.self, value: proxy.size.height)
+                }
+            )
+
+            Spacer()
+        }
+        .onPreferenceChange(TextHeightPreferenceKey.self) { h in
+            // 更新圖片邊長
+            textHeight = h
+        }
+        .padding(.vertical, 4)
+        .padding(.horizontal, 8)
+        .background(RoundedRectangle(cornerRadius: 8).fill(.secondary.opacity(0.1)))
+    }
+}
+
+private struct TextHeightPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 // MARK: - UIKit bridge for live camera preview (best for low-latency display)
 final class PreviewView: UIView {
     override class var layerClass: AnyClass { AVCaptureVideoPreviewLayer.self }
@@ -240,12 +326,14 @@ struct EmbeddingConsumer: View {
     let id: UUID
 
     var body: some View {
-        Text("攝影機已啟動")
+        // 不顯示任何內容，只負責消費 stream
+        EmptyView()
             .task(id: id) {
                 var idx = 0
                 for await vec in stream {
                     idx += 1
-//                    print("[UI] got embedding #\(idx), dim=\(vec.count)")
+                    print("[UI] got embedding #\(idx), dim=\(vec.count)")
+                    // 在這裡處理 vec
                 }
             }
     }

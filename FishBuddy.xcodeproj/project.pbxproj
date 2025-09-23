@@ -27,7 +27,7 @@
 		054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C846B2CDB0548005595EF /* CodableExtension.swift */; };
 		054C846E2CDB06AA005595EF /* WeatherAllModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C846D2CDB06AA005595EF /* WeatherAllModel.swift */; };
 		05513A432DAE44540021573F /* WeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05513A422DAE44540021573F /* WeatherView.swift */; };
-		055446F82E82378500BF51AC /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 055446F72E82378400BF51AC /* catalog.sqlite */; };
+		055446FB2E8241D000BF51AC /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 055446FA2E8241D000BF51AC /* Kingfisher */; };
 		05589EE52CE6ECD8003881AA /* Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05589EE42CE6ECD8003881AA /* Display.swift */; };
 		05589EE72CE6ED93003881AA /* WeatherLobbyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05589EE62CE6ED93003881AA /* WeatherLobbyViewController.swift */; };
 		05589EE92CE6EDBF003881AA /* WeatherLobbyVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05589EE82CE6EDBF003881AA /* WeatherLobbyVM.swift */; };
@@ -38,6 +38,7 @@
 		05589EF92CE6F808003881AA /* FeatrueTitleBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05589EF82CE6F808003881AA /* FeatrueTitleBar.swift */; };
 		05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */; };
 		05623FD02E1234D300B33D2D /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05623FCF2E1234D300B33D2D /* SearchBar.swift */; };
+		0571B4252E82A124005CBFF8 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 0571B4242E82A124005CBFF8 /* catalog.sqlite */; };
 		058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058877022DC1BE4D00B1D13E /* WeatherView2.swift */; };
 		058F58A72E7BA42C009913C5 /* BackgroundRemoverVK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */; };
 		0595566F2E14D5BA0050147C /* TideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0595566E2E14D5B90050147C /* TideView.swift */; };
@@ -105,7 +106,6 @@
 		054C846B2CDB0548005595EF /* CodableExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableExtension.swift; sourceTree = "<group>"; };
 		054C846D2CDB06AA005595EF /* WeatherAllModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAllModel.swift; sourceTree = "<group>"; };
 		05513A422DAE44540021573F /* WeatherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView.swift; sourceTree = "<group>"; };
-		055446F72E82378400BF51AC /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
 		05589EE42CE6ECD8003881AA /* Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Display.swift; sourceTree = "<group>"; };
 		05589EE62CE6ED93003881AA /* WeatherLobbyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherLobbyViewController.swift; sourceTree = "<group>"; };
 		05589EE82CE6EDBF003881AA /* WeatherLobbyVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherLobbyVM.swift; sourceTree = "<group>"; };
@@ -116,6 +116,7 @@
 		05589EF82CE6F808003881AA /* FeatrueTitleBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatrueTitleBar.swift; sourceTree = "<group>"; };
 		05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FeatureTitleBar.xib; sourceTree = "<group>"; };
 		05623FCF2E1234D300B33D2D /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
+		0571B4242E82A124005CBFF8 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
 		058877022DC1BE4D00B1D13E /* WeatherView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView2.swift; sourceTree = "<group>"; };
 		058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRemoverVK.swift; sourceTree = "<group>"; };
 		0595566E2E14D5B90050147C /* TideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideView.swift; sourceTree = "<group>"; };
@@ -161,6 +162,7 @@
 			files = (
 				05C94DB62E6BDA160051B078 /* SQLite in Frameworks */,
 				05C94D802E6ABE460051B078 /* Moya in Frameworks */,
+				055446FB2E8241D000BF51AC /* Kingfisher in Frameworks */,
 				05C94D7E2E6ABE460051B078 /* CombineMoya in Frameworks */,
 				05C94D842E6ABE460051B078 /* RxMoya in Frameworks */,
 				05C94DA32E6AC4070051B078 /* Toast in Frameworks */,
@@ -424,7 +426,7 @@
 		058F58A12E764C79009913C5 /* Database */ = {
 			isa = PBXGroup;
 			children = (
-				055446F72E82378400BF51AC /* catalog.sqlite */,
+				0571B4242E82A124005CBFF8 /* catalog.sqlite */,
 			);
 			path = Database;
 			sourceTree = "<group>";
@@ -670,6 +672,7 @@
 				05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */,
 				05C94DA12E6AC4070051B078 /* XCRemoteSwiftPackageReference "Toast-Swift" */,
 				05C94DB42E6BDA160051B078 /* XCRemoteSwiftPackageReference "SQLite" */,
+				055446F92E8241D000BF51AC /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			productRefGroup = 054C84402CD9B994005595EF /* Products */;
 			projectDirPath = "";
@@ -685,7 +688,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				055446F82E82378500BF51AC /* catalog.sqlite in Resources */,
+				0571B4252E82A124005CBFF8 /* catalog.sqlite in Resources */,
 				054C844C2CD9B995005595EF /* Assets.xcassets in Resources */,
 				0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */,
 				05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */,
@@ -990,6 +993,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		055446F92E8241D000BF51AC /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.5.0;
+			};
+		};
 		05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Moya/Moya.git";
@@ -1017,6 +1028,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		055446FA2E8241D000BF51AC /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 055446F92E8241D000BF51AC /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
 		05C94D7D2E6ABE460051B078 /* CombineMoya */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 05C94D7B2E6ABD0C0051B078 /* XCRemoteSwiftPackageReference "Moya" */;
