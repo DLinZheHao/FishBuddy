@@ -24,6 +24,98 @@ extension UIFont {
 }
 
 extension UIFont {
+    // MARK: 一般細體
+    static func iOS_font26() -> UIFont {
+        return UIFont.systemFont(ofSize: 26.0)
+    }
+    static func iOS_font25() -> UIFont {
+        return UIFont.systemFont(ofSize: 25.0)
+    }
+    static func iOS_font22() -> UIFont {
+        return UIFont.systemFont(ofSize: 22.0)
+    }
+    static func iOS_font20() -> UIFont {
+        return UIFont.systemFont(ofSize: 20.0)
+    }
+    static func iOS_font19() -> UIFont {
+        return UIFont.systemFont(ofSize: 19.0)
+    }
+    static func iOS_font18() -> UIFont {
+        return UIFont.systemFont(ofSize: 18.0)
+    }
+    @objc static func iOS_font17() -> UIFont {
+        return UIFont.systemFont(ofSize: 17.0)
+    }
+    static func iOS_font16() -> UIFont {
+        return UIFont.systemFont(ofSize: 16.0)
+    }
+    static func iOS_font14() -> UIFont {
+        return UIFont.systemFont(ofSize: 14.0)
+    }
+    static func iOS_font13() -> UIFont {
+        return UIFont.systemFont(ofSize: 13.0)
+    }
+    @objc static func iOS_font12() -> UIFont {
+        return UIFont.systemFont(ofSize: 12.0)
+    }
+    static func iOS_font10() -> UIFont {
+        return UIFont.systemFont(ofSize: 10.0)
+    }
+    static func iOS_font9() -> UIFont {
+        return UIFont.systemFont(ofSize: 9.0)
+    }
+
+    // MARK: 中體
+    static func iOS_mediumFont13() -> UIFont {
+        return UIFont.systemFont(ofSize: 13.0, weight: .medium)
+    }
+    static func iOS_mediumFont16() -> UIFont {
+        return UIFont.systemFont(ofSize: 16.0, weight: .medium)
+    }
+    
+    // MARK: 粗體
+    static func iOS_boldFont26() -> UIFont {
+        return UIFont.systemFont(ofSize: 26.0, weight: .semibold)
+    }
+    static func iOS_boldFont25() -> UIFont {
+        return UIFont.systemFont(ofSize: 25.0, weight: .semibold)
+    }
+    static func iOS_boldFont22() -> UIFont {
+        return UIFont.systemFont(ofSize: 22.0, weight: .semibold)
+    }
+    static func iOS_boldFont20() -> UIFont {
+        return UIFont.systemFont(ofSize: 20.0, weight: .semibold)
+    }
+    static func iOS_boldFont19() -> UIFont {
+        return UIFont.systemFont(ofSize: 19.0, weight: .semibold)
+    }
+    static func iOS_boldFont18() -> UIFont {
+        return UIFont.systemFont(ofSize: 18.0, weight: .semibold)
+    }
+    static func iOS_boldFont17() -> UIFont {
+        return UIFont.systemFont(ofSize: 17.0, weight: .semibold)
+    }
+    static func iOS_boldFont16() -> UIFont {
+        return UIFont.systemFont(ofSize: 16.0, weight: .semibold)
+    }
+    static func iOS_boldFont14() -> UIFont {
+        return UIFont.systemFont(ofSize: 14.0, weight: .semibold)
+    }
+    static func iOS_boldFont13() -> UIFont {
+        return UIFont.systemFont(ofSize: 13.0, weight: .semibold)
+    }
+    static func iOS_boldFont12() -> UIFont {
+        return UIFont.systemFont(ofSize: 12.0, weight: .semibold)
+    }
+    static func iOS_boldFont10() -> UIFont {
+        return UIFont.systemFont(ofSize: 10.0, weight: .semibold)
+    }
+    static func iOS_boldFont9() -> UIFont {
+        return UIFont.systemFont(ofSize: 9.0, weight: .semibold)
+    }
+}
+
+extension UIFont {
     static func getLineHeight(for font: UIFont) -> CGFloat {
         var lineHeight = font.lineHeight
         if font.lineHeightMultiple > 0 {
@@ -62,6 +154,99 @@ extension UIFont {
         return lineHeight
     }
 }
+
+extension Font {
+    // MARK: 一般細體
+    static func iOS_font26() -> Font {
+        return Font(UIFont.systemFont(ofSize: 26.0))
+    }
+    static func iOS_font25() -> Font {
+        return Font(UIFont.systemFont(ofSize: 25.0))
+    }
+    static func iOS_font22() -> Font {
+        return Font(UIFont.systemFont(ofSize: 22.0))
+    }
+    static func iOS_font20() -> Font {
+        return Font(UIFont.systemFont(ofSize: 20.0))
+    }
+    static func iOS_font19() -> Font {
+        return Font(UIFont.systemFont(ofSize: 19.0))
+    }
+    static func iOS_font18() -> Font {
+        return Font(UIFont.systemFont(ofSize: 18.0))
+    }
+    static func iOS_font17() -> Font {
+        return Font(UIFont.systemFont(ofSize: 17.0))
+    }
+    static func iOS_font16() -> Font {
+        return Font(UIFont.systemFont(ofSize: 16.0))
+    }
+    static func iOS_font14() -> Font {
+        return Font(UIFont.systemFont(ofSize: 14.0))
+    }
+    static func iOS_font13() -> Font {
+        return Font(UIFont.systemFont(ofSize: 13.0))
+    }
+    static func iOS_font12() -> Font {
+        return Font(UIFont.systemFont(ofSize: 12.0))
+    }
+    static func iOS_font10() -> Font {
+        return Font(UIFont.systemFont(ofSize: 10.0))
+    }
+    static func iOS_font9() -> Font {
+        return Font(UIFont.systemFont(ofSize: 9.0))
+    }
+
+    // MARK: 中體
+    static func iOS_mediumFont13() -> Font {
+        return Font(UIFont.systemFont(ofSize: 13.0, weight: .medium))
+    }
+    static func iOS_mediumFont16() -> Font {
+        return Font(UIFont.systemFont(ofSize: 16.0, weight: .medium))
+    }
+    
+    // MARK: 粗體
+    static func iOS_boldFont26() -> Font {
+        return Font(UIFont.systemFont(ofSize: 26.0, weight: .semibold))
+    }
+    static func iOS_boldFont25() -> Font {
+        return Font(UIFont.systemFont(ofSize: 25.0, weight: .semibold))
+    }
+    static func iOS_boldFont22() -> Font {
+        return Font(UIFont.systemFont(ofSize: 22.0, weight: .semibold))
+    }
+    static func iOS_boldFont20() -> Font {
+        return Font(UIFont.systemFont(ofSize: 20.0, weight: .semibold))
+    }
+    static func iOS_boldFont19() -> Font {
+        return Font(UIFont.systemFont(ofSize: 19.0, weight: .semibold))
+    }
+    static func iOS_boldFont18() -> Font {
+        return Font(UIFont.systemFont(ofSize: 18.0, weight: .semibold))
+    }
+    static func iOS_boldFont17() -> Font {
+        return Font(UIFont.systemFont(ofSize: 17.0, weight: .semibold))
+    }
+    static func iOS_boldFont16() -> Font {
+        return Font(UIFont.systemFont(ofSize: 16.0, weight: .semibold))
+    }
+    static func iOS_boldFont14() -> Font {
+        return Font(UIFont.systemFont(ofSize: 14.0, weight: .semibold))
+    }
+    static func iOS_boldFont13() -> Font {
+        return Font(UIFont.systemFont(ofSize: 13.0, weight: .semibold))
+    }
+    static func iOS_boldFont12() -> Font {
+        return Font(UIFont.systemFont(ofSize: 12.0, weight: .semibold))
+    }
+    static func iOS_boldFont10() -> Font {
+        return Font(UIFont.systemFont(ofSize: 10.0, weight: .semibold))
+    }
+    static func iOS_boldFont9() -> Font {
+        return Font(UIFont.systemFont(ofSize: 9.0, weight: .semibold))
+    }
+}
+
 
 // 如果有自訂的 getLineHeight(for:)，沿用；否則 fallback 用 font.lineHeight
 private func designLineHeight(for font: UIFont) -> CGFloat {
@@ -164,9 +349,28 @@ public struct FixedLineHeightText: View {
     }
 }
 
+// MARK: - Environment bridge for UIFont
+private struct _UIFontEnvironmentKey: EnvironmentKey {
+    static let defaultValue: UIFont? = nil
+}
+
+extension EnvironmentValues {
+    var uiFont: UIFont? {
+        get { self[_UIFontEnvironmentKey.self] }
+        set { self[_UIFontEnvironmentKey.self] = newValue }
+    }
+}
+
+extension View {
+    /// 提供對應的 `UIFont` 到環境，讓僅能拿到 `Font` 的地方也能解析到精確字型
+    func uiFont(_ font: UIFont) -> some View {
+        environment(\.uiFont, font)
+    }
+}
+
 struct FixedLineHeightModifier: ViewModifier {
     /// 環境字型
-    @Environment(\.font) private var envFont
+    @Environment(\.uiFont) private var envUIFont
     /// 環境對齊
     @Environment(\.multilineTextAlignment) private var envAlign
     /// 環境行數限制
@@ -176,26 +380,31 @@ struct FixedLineHeightModifier: ViewModifier {
 
     /// 設置文字
     let text: String
-    /// 設置字型
-    let uiFont: UIFont
     /// 設置顏色
     let color: UIColor
 
     func body(content: Content) -> some View {
-        let targetLineHeight = designLineHeight(for: uiFont) // 你已經有算出來了
-        // 用你的 getLineHeight + paragraphStyle + baselineOffset 產生 attributed
+        let resolvedUIFont = envUIFont ?? UIFont.iOS_font14()
+        let targetLineHeight = designLineHeight(for: resolvedUIFont)
         let attributed = text.fixedLineHeightAttributedString(
-            font: uiFont,
+            font: resolvedUIFont,
             color: color,
             alignment: map(envAlign),
             lineBreak: map(envTruncation)
         )
         // 直接用我們組好的 Text 取代 content
-        Text(attributed)
+        let base = Text(attributed)
             .multilineTextAlignment(envAlign)
             .lineLimit(envLineLimit)
             .truncationMode(envTruncation)
-            .frame(height: targetLineHeight)
+
+        return Group {
+            if let limit = envLineLimit {
+                base.frame(height: targetLineHeight * CGFloat(limit))
+            } else {
+                base
+            }
+        }
     }
 
     
@@ -217,8 +426,8 @@ struct FixedLineHeightModifier: ViewModifier {
 }
 
 extension View {
-    func fixedLineHeightText(_ text: String, font: UIFont, color: UIColor) -> some View {
-        modifier(FixedLineHeightModifier(text: text, uiFont: font, color: color))
+    func fixedLineHeightText(_ text: String, color: UIColor) -> some View {
+        modifier(FixedLineHeightModifier(text: text, color: color))
     }
 }
 
@@ -285,15 +494,13 @@ private extension View {
         
         
         Text("") // content 會被替換，不重要
-            .font(.subheadline)               // 這些會影響環境，modifier 內可讀取
-            .multilineTextAlignment(.leading)
-            .lineLimit(2)
-            .truncationMode(.tail)
-            .fixedLineHeightText("台北 → 東京 來回 $12,345",
-                                 font: .systemFont(ofSize: 16, weight: .semibold),
+            .fixedLineHeightText("台北 → 東京 來回 $12,345ㄌ 台北 → 東京 來回 $12,345 台北 → 東京 來回 $12,345 台北 → 東京 來回 $12,345 台北 → 東京 來回 $12,345",
                                  color: .label)
+            .lineLimit(1)
+            .multilineTextAlignment(.leading)
             .background(.blue.opacity(0.6))
-            .debugPrintSize("FixedLineHeightText 3")
+            .uiFont(.iOS_font16()) // 統一丟進環境
+            .debugPrintSize("FixedLineHeightText main")
         
     }
     .padding()
