@@ -44,6 +44,8 @@
 		0595566F2E14D5BA0050147C /* TideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0595566E2E14D5B90050147C /* TideView.swift */; };
 		059556712E150AF10050147C /* TideLobbyVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059556702E150AF10050147C /* TideLobbyVM.swift */; };
 		05C13B742E9896E400BE9FA0 /* TaxonDetailModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C13B732E9896E400BE9FA0 /* TaxonDetailModel.swift */; };
+		05C13B862E98E25F00BE9FA0 /* ImageInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C13B852E98E25F00BE9FA0 /* ImageInspectorView.swift */; };
+		05C13B892E98E2FA00BE9FA0 /* ImageInspectorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C13B882E98E2FA00BE9FA0 /* ImageInspectorModel.swift */; };
 		05C94D7E2E6ABE460051B078 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D7D2E6ABE460051B078 /* CombineMoya */; };
 		05C94D802E6ABE460051B078 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D7F2E6ABE460051B078 /* Moya */; };
 		05C94D822E6ABE460051B078 /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D812E6ABE460051B078 /* ReactiveMoya */; };
@@ -124,6 +126,8 @@
 		0595566E2E14D5B90050147C /* TideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideView.swift; sourceTree = "<group>"; };
 		059556702E150AF10050147C /* TideLobbyVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideLobbyVM.swift; sourceTree = "<group>"; };
 		05C13B732E9896E400BE9FA0 /* TaxonDetailModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaxonDetailModel.swift; sourceTree = "<group>"; };
+		05C13B852E98E25F00BE9FA0 /* ImageInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageInspectorView.swift; sourceTree = "<group>"; };
+		05C13B882E98E2FA00BE9FA0 /* ImageInspectorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageInspectorModel.swift; sourceTree = "<group>"; };
 		05C94D872E6ABF7C0051B078 /* CLIPFeatureExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIPFeatureExtractor.swift; sourceTree = "<group>"; };
 		05C94D882E6ABF7C0051B078 /* ImageUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUtils.swift; sourceTree = "<group>"; };
 		05C94D892E6ABF7C0051B078 /* JsonUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonUtils.swift; sourceTree = "<group>"; };
@@ -402,6 +406,7 @@
 		05589EF72CE6F7DE003881AA /* Componet */ = {
 			isa = PBXGroup;
 			children = (
+				05C13B842E98E25200BE9FA0 /* ImageInspectorView  */,
 				051B88372E6E8AE600209CDB /* CustomRounded */,
 				051B882E2E6E8A7400209CDB /* SkeletonView */,
 				05E245ED2D0A7F5100C6C048 /* UILabelPadding */,
@@ -442,6 +447,23 @@
 				05FC90E52E9688940053A1C2 /* catalog.sqlite */,
 			);
 			path = Database;
+			sourceTree = "<group>";
+		};
+		05C13B842E98E25200BE9FA0 /* ImageInspectorView  */ = {
+			isa = PBXGroup;
+			children = (
+				05C13B872E98E2E100BE9FA0 /* Model */,
+				05C13B852E98E25F00BE9FA0 /* ImageInspectorView.swift */,
+			);
+			path = "ImageInspectorView ";
+			sourceTree = "<group>";
+		};
+		05C13B872E98E2E100BE9FA0 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				05C13B882E98E2FA00BE9FA0 /* ImageInspectorModel.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		05C94D7C2E6ABE3E0051B078 /* Frameworks */ = {
@@ -774,10 +796,12 @@
 				054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */,
 				05FC90ED2E9894210053A1C2 /* TaxonDetailView.swift in Sources */,
 				05FAEF322E00F52500E9BD08 /* CardSliderView.swift in Sources */,
+				05C13B892E98E2FA00BE9FA0 /* ImageInspectorModel.swift in Sources */,
 				051B883D2E73B66900209CDB /* LoadingCircleView.swift in Sources */,
 				05F3BED42D92824C00DDAC72 /* TideDataModel.swift in Sources */,
 				054C84432CD9B994005595EF /* AppDelegate.swift in Sources */,
 				05589EE72CE6ED93003881AA /* WeatherLobbyViewController.swift in Sources */,
+				05C13B862E98E25F00BE9FA0 /* ImageInspectorView.swift in Sources */,
 				05D266B42DDABC1600F140D3 /* gestureView.swift in Sources */,
 				054C84602CD9C0AF005595EF /* UIControlPublisher.swift in Sources */,
 				05C94DA52E6AC4E80051B078 /* UIViewExtension.swift in Sources */,

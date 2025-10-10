@@ -9,7 +9,7 @@ import SwiftUI
 
 // MARK: - View
 struct TaxonDetailView: View {
-    let taxon: Taxon
+    let taxon: TaxonItem
 
     var body: some View {
         ScrollView {
@@ -17,14 +17,28 @@ struct TaxonDetailView: View {
                 hero
                 Group {
                     titleBlock
-                    section(title: "Overview", text: taxon.overview)
-                    if let eco = taxon.ecology, !eco.isEmpty {
-                        section(title: "Habitat & Ecology", text: eco)
+                    if let wikipedia = taxon.meta?.wikipedia {
+                        if let extract = wikipedia.extract {
+                            section(title: "概述", text: extract)
+                        }
+                        
+                        if let description = wikipedia.sections?.description, !description.isEmpty {
+                            section(title: "敘述", text: description)
+                        }
+                        
+                        if let ecology = wikipedia.sections?.ecology, !ecology.isEmpty {
+                            section(title: "生態", text: ecology)
+                        }
+                        
+                        if let economicUse = wikipedia.sections?.economicUse, !economicUse.isEmpty {
+                            section(title: "經濟利用", text: economicUse)
+                        }
+//                        if let dist = taxon.distribution {
+//                            DistributionCardView(distribution: dist)
+//                                .padding(.top, 4)
+//                        }
                     }
-                    if let dist = taxon.distribution {
-                        DistributionCardView(distribution: dist)
-                            .padding(.top, 4)
-                    }
+                   
                 }
                 
                 footerButtons
@@ -32,6 +46,7 @@ struct TaxonDetailView: View {
             }
             .padding(.bottom, 24)
         }
+        .scrollIndicators(.hidden)
         .contentMargins(.horizontal, 16)
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -43,25 +58,12 @@ struct TaxonDetailView: View {
                 .fill(Color(.secondarySystemBackground))
                 .frame(maxWidth: .infinity, maxHeight: 300)
             
-            if let url = taxon.heroImageURL {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .success(let img):
-                        img
-                            .resizable()
-                            .scaledToFill()
-                    case .failure(_):
-                        Image(systemName: "fish")
-                            .resizable()
-                            .scaledToFit()
-                            .padding(40)
-                            .foregroundStyle(.secondary)
-                    case .empty:
-                        ProgressView()
-                    @unknown default:
-                        EmptyView()
-                    }
+            if let photos = taxon.photos, !photos.isEmpty  {
+                let images: [ImageData] = photos.compactMap { photo in
+                    guard let url = URL(string: photo.url) else { return nil }
+                    return ImageData(image: url, description: photo.attribution)
                 }
+                ImageInspectorView(images: images)
                 .frame(height: 300)
                 .clipShape(RoundedRectangle(cornerRadius: 0))
             } else {
@@ -78,18 +80,18 @@ struct TaxonDetailView: View {
     private var titleBlock: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(taxon.commonName)
+                Text(taxon.commonName ?? "")
                     .font(.system(size: 32, weight: .bold))
-                if let badge = taxon.conservationBadge {
-                    Text(badge)
-                        .font(.caption)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color(.systemGray6))
-                        .clipShape(Capsule())
-                }
+//                if let badge = taxon.conservationBadge {
+//                    Text(badge)
+//                        .font(.caption)
+//                        .padding(.horizontal, 8)
+//                        .padding(.vertical, 4)
+//                        .background(Color(.systemGray6))
+//                        .clipShape(Capsule())
+//                }
             }
-            Text(taxon.scientificName)
+            Text(taxon.scientificName ?? "")
                 .italic()
                 .foregroundStyle(.secondary)
         }
@@ -166,13 +168,13 @@ struct DistributionCardView: View {
 }
 
 // MARK: - Preview
-#Preview {
-    NavigationStack {
-        TaxonDetailView(taxon: .demo)
-            .padding(.top, 8)
-            .navigationTitle("FishBuddy")
-    }
-}
+//#Preview {
+//    NavigationStack {
+//        TaxonDetailView(taxon: .demo)
+//            .padding(.top, 8)
+//            .navigationTitle("FishBuddy")
+//    }
+//}
 
 // MARK: - Demo Data
 extension Taxon {
@@ -195,3 +197,5 @@ extension Taxon {
         )
     }()
 }
+
+

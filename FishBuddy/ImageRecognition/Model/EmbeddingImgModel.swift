@@ -18,22 +18,26 @@ struct EmbeddingImgModel: Codable {
 
 /// 完整對應 JSON `items[]` 的資料結構（保持原樣 + 可選 embedding 欄位）
 struct TaxonItem: Codable {
-    // 從 iNaturalist + Wiki 抓下來的資料
+    /// 物種的唯一識別碼
     @Default var taxonId: Int
+    /// 物種的學名
     let scientificName: String?
+    /// 物種的中文名或通用名
     let commonName: String?
+    /// 物種的 URL 友好名稱
     let slug: String?
+    /// 物種相關圖片（資料表 photos）
     let photos: [Photo]?
+    /// 物種詳細資料
     let meta: Meta?
-    // 預先處理的圖片向量資料
+    /// 預先處理的圖片向量資料
     @Default var embedding: [Float]
-    // 預處理的文字向量資料
+    /// 預處理的文字向量資料
     @Default var textEmbedding: [Float]
-    
     let embeddingMeta: EmbeddingMeta?
-    
-    // 物種分布（資料表 distribution 與 distribution_layers）
+    /// 物種分布（資料表 distribution 與 distribution_layers）
     let distribution: Distribution?
+    /// 物種分布圖層
     let distributionLayers: [DistributionLayer]?
 
     enum CodingKeys: String, CodingKey {
