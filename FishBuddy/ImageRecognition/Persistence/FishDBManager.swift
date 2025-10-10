@@ -107,50 +107,71 @@ final class FishDB {
     // 以預處理時相同的 DDL 作為後援（僅在找不到任何表時才執行）
     private static let schemaDDL: String = {
         return """
-        PRAGMA journal_mode=OFF;
-        PRAGMA synchronous=OFF;
-        BEGIN IMMEDIATE;
-        CREATE TABLE species (
-          taxon_id INTEGER PRIMARY KEY,
-          scientific_name TEXT,
-          common_name TEXT,
-          rank TEXT,
-          slug TEXT
-        );
-        CREATE TABLE photos (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          taxon_id INTEGER NOT NULL,
-          url TEXT NOT NULL,
-          license_code TEXT,
-          attribution TEXT,
-          source TEXT
-        );
-        CREATE TABLE embeddings (
-          taxon_id INTEGER PRIMARY KEY,
-          dim INTEGER NOT NULL,
-          vec BLOB NOT NULL
-        );
-        CREATE TABLE text_embeddings (
-          taxon_id INTEGER PRIMARY KEY,
-          dim INTEGER NOT NULL,
-          vec BLOB NOT NULL
-        );
-        CREATE TABLE species_meta (
-          taxon_id INTEGER PRIMARY KEY,
-          meta_json TEXT
-        );
-        CREATE TABLE embedding_meta (
-          taxon_id INTEGER PRIMARY KEY,
-          meta_json TEXT
-        );
-        CREATE TABLE text_embedding_meta (
-          taxon_id INTEGER PRIMARY KEY,
-          meta_json TEXT
-        );
-        CREATE INDEX idx_species_sci ON species(scientific_name);
-        CREATE INDEX idx_photos_taxon ON photos(taxon_id);
-        COMMIT;
-        """
+PRAGMA journal_mode=OFF;
+PRAGMA synchronous=OFF;
+BEGIN IMMEDIATE;
+CREATE TABLE species (
+  taxon_id INTEGER PRIMARY KEY,
+  scientific_name TEXT,
+  common_name TEXT,
+  rank TEXT,
+  slug TEXT
+);
+CREATE TABLE photos (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  taxon_id INTEGER NOT NULL,
+  url TEXT NOT NULL,
+  license_code TEXT,
+  attribution TEXT,
+  source TEXT
+);
+
+CREATE TABLE distribution (
+  taxon_id INTEGER PRIMARY KEY,
+  type TEXT,              -- e.g., 'tiles' | 'places' | 'range' | 'observations'
+  kml_url TEXT
+);
+
+CREATE TABLE distribution_layers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  taxon_id INTEGER NOT NULL,
+  layer_key TEXT NOT NULL,
+  type TEXT NOT NULL,
+  url TEXT NOT NULL,
+  minzoom INTEGER NOT NULL,
+  maxzoom INTEGER NOT NULL
+);
+
+CREATE TABLE embeddings (
+  taxon_id INTEGER PRIMARY KEY,
+  dim INTEGER NOT NULL,
+  vec BLOB NOT NULL
+);
+
+CREATE TABLE text_embeddings (
+  taxon_id INTEGER PRIMARY KEY,
+  dim INTEGER NOT NULL,
+  vec BLOB NOT NULL
+);
+
+CREATE TABLE species_meta (
+  taxon_id INTEGER PRIMARY KEY,
+  meta_json TEXT
+);
+CREATE TABLE embedding_meta (
+  taxon_id INTEGER PRIMARY KEY,
+  meta_json TEXT
+);
+
+CREATE TABLE text_embedding_meta (
+  taxon_id INTEGER PRIMARY KEY,
+  meta_json TEXT
+);
+
+CREATE INDEX idx_species_sci ON species(scientific_name);
+CREATE INDEX idx_photos_taxon ON photos(taxon_id);
+CREATE INDEX idx_distribution_layers_taxon ON distribution_layers(taxon_id);
+"""
     }()
 
     /// 若資料庫是新建且沒有任何預期的表，執行 DDL 建立 schema
@@ -239,6 +260,21 @@ final class FishDB {
         let tem_taxon = SQLite.Expression<Int>("taxon_id")
         let tem_json  = SQLite.Expression<String?>("meta_json")
 
+        // === 關聯表（distribution） ===
+        let distributionT = Table("distribution")
+        let d_taxon       = SQLite.Expression<Int>("taxon_id")
+        let d_type        = SQLite.Expression<String?>("type")
+        let d_kmlUrl      = SQLite.Expression<String?>("kml_url")
+
+        // === 關聯表（distribution_layers） ===
+        let distributionLT = Table("distribution_layers")
+        let dl_taxon     = SQLite.Expression<Int>("taxon_id")
+        let dl_layer_key = SQLite.Expression<String>("layer_key")
+        let dl_type      = SQLite.Expression<String>("type")
+        let dl_url       = SQLite.Expression<String>("url")
+        let dl_minzoom   = SQLite.Expression<Int>("minzoom")
+        let dl_maxzoom   = SQLite.Expression<Int>("maxzoom")
+        
         // 1) 撈全部 species
         let speciesRows = try Array(db.prepare(speciesT.select(s_taxon, s_sci, s_common, s_slug)))
 
@@ -273,6 +309,7 @@ final class FishDB {
                 speciesMetaMap[r[sm_taxon]] = meta
             }
         }
+        
         var embedMetaMap: [Int: EmbeddingMeta] = [:]
         for r in try db.prepare(eMetaT.select(em_taxon, em_json)) {
             if let js = r[em_json],
@@ -281,6 +318,7 @@ final class FishDB {
                 embedMetaMap[r[em_taxon]] = meta
             }
         }
+        
         var textEmbedMetaMap: [Int: EmbeddingMeta] = [:]
         for r in try db.prepare(tEMetaT.select(tem_taxon, tem_json)) {
             if let js = r[tem_json],
@@ -290,15 +328,36 @@ final class FishDB {
             }
         }
         
-        // 4) 撈 text_embeddings（BLOB → [Float]）
         var textEmbedMap: [Int: [Float]] = [:]
         for r in try db.prepare(textEmbedsT.select(te_taxon, te_dim, te_vec)) {
             let tid = r[te_taxon]
             let vec32: [Float32] = blobToFloats(r[te_vec])
             textEmbedMap[tid] = vec32.map { Float($0) }
         }
+        
+        // 5) 撈 distribution（每個 taxon 一筆）
+        var distMap: [Int: Distribution] = [:]
+        for r in try db.prepare(distributionT.select(d_taxon, d_type, d_kmlUrl)) {
+            let tid = r[d_taxon]
+            let dist = Distribution(type: r[d_type], kmlURL: r[d_kmlUrl])
+            distMap[tid] = dist
+        }
 
-        // 5) 組裝 TaxonItem
+        // 6) 撈 distribution_layers（每個 taxon 多筆）並分組
+        var distLayersMap: [Int: [DistributionLayer]] = [:]
+        for r in try db.prepare(distributionLT.select(dl_taxon, dl_layer_key, dl_type, dl_url, dl_minzoom, dl_maxzoom)) {
+            let tid = r[dl_taxon]
+            let layer = DistributionLayer(
+                layerKey: r[dl_layer_key],
+                type: r[dl_type],
+                url: r[dl_url],
+                minzoom: r[dl_minzoom],
+                maxzoom: r[dl_maxzoom]
+            )
+            distLayersMap[tid, default: []].append(layer)
+        }
+
+        // 7) 組裝 TaxonItem
         return speciesRows.map { r in
             let tid = r[s_taxon]
             return TaxonItem(
@@ -310,7 +369,9 @@ final class FishDB {
                 meta: speciesMetaMap[tid],
                 embedding: embedMap[tid] ?? [],
                 textEmbedding: textEmbedMap[tid] ?? [],
-                embeddingMeta: embedMetaMap[tid]
+                embeddingMeta: embedMetaMap[tid],
+                distribution: distMap[tid],
+                distributionLayers: distLayersMap[tid]
             )
         }
     }
@@ -351,10 +412,25 @@ final class InMemoryVectorIndex {
         // 將每一筆向量按列（row）塞進 matrix：
         // 第 i 列的區間是 [i*dim, (i+1)*dim)
         for (i, item) in items.enumerated() {
-            precondition(item.embedding.count == dim, "維度不一致")
-            // 這裡使用 replaceSubrange 會將 item.embedding 的內容複製到對應區段，形成連續的 row-major 版面
+            // 圖片向量長度必須等於 dim，否則直接中止（比起靜默錯誤更好偵錯）
+            precondition(item.embedding.count == dim, "維度不一致：image embedding=")
+
+            // 將 image embedding 複製進 matrix 的對應區段（固定長度 dim）
             matrix.replaceSubrange(i*dim..<(i+1)*dim, with: item.embedding)
-            textMatrix.replaceSubrange(i*dim..<(i+1)*dim, with: item.textEmbedding)
+
+            // 對文字向量做安全處理：
+            // 1) 若長度==dim → 直接寫入
+            // 2) 若為空（沒有文字向量）→ 以 0 向量填充，維持固定長度 dim
+            // 3) 其他長度 → 屬於資料異常，主動失敗便於追查
+            let te: [Float]
+            if item.textEmbedding.count == dim {
+                te = item.textEmbedding
+            } else if item.textEmbedding.isEmpty {
+                te = [Float](repeating: 0, count: dim)
+            } else {
+                preconditionFailure("textEmbedding 維度不一致：expected=\(dim), actual=\(item.textEmbedding.count), taxonId=\(item.taxonId)")
+            }
+            textMatrix.replaceSubrange(i*dim..<(i+1)*dim, with: te)
         }
     }
 
@@ -411,3 +487,4 @@ final class InMemoryVectorIndex {
  - 一次算完：用 vDSP_mmul（底層 BLAS/SIMD/可能多核心）做 GEMV，比逐筆 for 迴圈做 dot product 快很多。
  - L2 normalize 後：cosine(v,q) == v·q（內積），所以直接用「矩陣×向量」就能拿到所有 cosine 分數。
  */
+

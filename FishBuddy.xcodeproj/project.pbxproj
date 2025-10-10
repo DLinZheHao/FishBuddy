@@ -38,7 +38,7 @@
 		05589EF92CE6F808003881AA /* FeatrueTitleBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05589EF82CE6F808003881AA /* FeatrueTitleBar.swift */; };
 		05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */; };
 		05623FD02E1234D300B33D2D /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05623FCF2E1234D300B33D2D /* SearchBar.swift */; };
-		0571B4252E82A124005CBFF8 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 0571B4242E82A124005CBFF8 /* catalog.sqlite */; };
+		0571B4282E861A7E005CBFF8 /* TestMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0571B4272E861A7E005CBFF8 /* TestMapView.swift */; };
 		058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058877022DC1BE4D00B1D13E /* WeatherView2.swift */; };
 		058F58A72E7BA42C009913C5 /* BackgroundRemoverVK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */; };
 		0595566F2E14D5BA0050147C /* TideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0595566E2E14D5B90050147C /* TideView.swift */; };
@@ -55,7 +55,6 @@
 		05C94D982E6ABF7C0051B078 /* ImageUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C94D882E6ABF7C0051B078 /* ImageUtils.swift */; };
 		05C94D992E6ABF7C0051B078 /* CameraStreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C94D902E6ABF7C0051B078 /* CameraStreamView.swift */; };
 		05C94D9A2E6ABF7C0051B078 /* EmbeddingImgModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C94D8B2E6ABF7C0051B078 /* EmbeddingImgModel.swift */; };
-		05C94D9B2E6ABF7C0051B078 /* embeddings_test_Img.json in Resources */ = {isa = PBXBuildFile; fileRef = 05C94D852E6ABF7C0051B078 /* embeddings_test_Img.json */; };
 		05C94DA32E6AC4070051B078 /* Toast in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94DA22E6AC4070051B078 /* Toast */; };
 		05C94DA52E6AC4E80051B078 /* UIViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C94DA42E6AC4E80051B078 /* UIViewExtension.swift */; };
 		05C94DA82E6ACA4C0051B078 /* FishDBManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C94DA72E6ACA4C0051B078 /* FishDBManager.swift */; };
@@ -81,6 +80,7 @@
 		05FAEF322E00F52500E9BD08 /* CardSliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF312E00F52500E9BD08 /* CardSliderView.swift */; };
 		05FAEF342E00F53D00E9BD08 /* CardSliderSubViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF332E00F52F00E9BD08 /* CardSliderSubViews.swift */; };
 		05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF382E013B6B00E9BD08 /* CardSliderVM.swift */; };
+		05FC90E62E9688950053A1C2 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 05FC90E52E9688940053A1C2 /* catalog.sqlite */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -116,12 +116,11 @@
 		05589EF82CE6F808003881AA /* FeatrueTitleBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatrueTitleBar.swift; sourceTree = "<group>"; };
 		05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FeatureTitleBar.xib; sourceTree = "<group>"; };
 		05623FCF2E1234D300B33D2D /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
-		0571B4242E82A124005CBFF8 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
+		0571B4272E861A7E005CBFF8 /* TestMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestMapView.swift; sourceTree = "<group>"; };
 		058877022DC1BE4D00B1D13E /* WeatherView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView2.swift; sourceTree = "<group>"; };
 		058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRemoverVK.swift; sourceTree = "<group>"; };
 		0595566E2E14D5B90050147C /* TideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideView.swift; sourceTree = "<group>"; };
 		059556702E150AF10050147C /* TideLobbyVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideLobbyVM.swift; sourceTree = "<group>"; };
-		05C94D852E6ABF7C0051B078 /* embeddings_test_Img.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = embeddings_test_Img.json; sourceTree = "<group>"; };
 		05C94D872E6ABF7C0051B078 /* CLIPFeatureExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIPFeatureExtractor.swift; sourceTree = "<group>"; };
 		05C94D882E6ABF7C0051B078 /* ImageUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUtils.swift; sourceTree = "<group>"; };
 		05C94D892E6ABF7C0051B078 /* JsonUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonUtils.swift; sourceTree = "<group>"; };
@@ -153,6 +152,7 @@
 		05FAEF312E00F52500E9BD08 /* CardSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderView.swift; sourceTree = "<group>"; };
 		05FAEF332E00F52F00E9BD08 /* CardSliderSubViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderSubViews.swift; sourceTree = "<group>"; };
 		05FAEF382E013B6B00E9BD08 /* CardSliderVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderVM.swift; sourceTree = "<group>"; };
+		05FC90E52E9688940053A1C2 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -423,10 +423,18 @@
 			path = SearchBar;
 			sourceTree = "<group>";
 		};
+		0571B4262E86172C005CBFF8 /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				0571B4272E861A7E005CBFF8 /* TestMapView.swift */,
+			);
+			path = Map;
+			sourceTree = "<group>";
+		};
 		058F58A12E764C79009913C5 /* Database */ = {
 			isa = PBXGroup;
 			children = (
-				0571B4242E82A124005CBFF8 /* catalog.sqlite */,
+				05FC90E52E9688940053A1C2 /* catalog.sqlite */,
 			);
 			path = Database;
 			sourceTree = "<group>";
@@ -436,14 +444,6 @@
 			children = (
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		05C94D862E6ABF7C0051B078 /* DatabaseJson */ = {
-			isa = PBXGroup;
-			children = (
-				05C94D852E6ABF7C0051B078 /* embeddings_test_Img.json */,
-			);
-			path = DatabaseJson;
 			sourceTree = "<group>";
 		};
 		05C94D8A2E6ABF7C0051B078 /* ImageUtils */ = {
@@ -491,7 +491,6 @@
 			isa = PBXGroup;
 			children = (
 				058F58A12E764C79009913C5 /* Database */,
-				05C94D862E6ABF7C0051B078 /* DatabaseJson */,
 				05C94DA72E6ACA4C0051B078 /* FishDBManager.swift */,
 			);
 			path = Persistence;
@@ -500,6 +499,7 @@
 		05D266AF2DDABBE400F140D3 /* Pratice */ = {
 			isa = PBXGroup;
 			children = (
+				0571B4262E86172C005CBFF8 /* Map */,
 				051B88392E73B3AF00209CDB /* LoddingCircle */,
 				05623FCE2E12296C00B33D2D /* SearchBar */,
 				05FAEF2A2E00F3CE00E9BD08 /* CardSlider */,
@@ -652,7 +652,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 1540;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					054C843E2CD9B994005595EF = {
 						CreatedOnToolsVersion = 15.4;
@@ -688,13 +688,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0571B4252E82A124005CBFF8 /* catalog.sqlite in Resources */,
+				05FC90E62E9688950053A1C2 /* catalog.sqlite in Resources */,
 				054C844C2CD9B995005595EF /* Assets.xcassets in Resources */,
 				0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */,
 				05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */,
 				05589EF62CE6F5C5003881AA /* Weather.storyboard in Resources */,
 				05E245EC2D0A7EB800C6C048 /* TagLineView.xib in Resources */,
-				05C94D9B2E6ABF7C0051B078 /* embeddings_test_Img.json in Resources */,
 				054C844F2CD9B995005595EF /* Base in Resources */,
 				054C844A2CD9B994005595EF /* Base in Resources */,
 			);
@@ -735,6 +734,7 @@
 				05D266B42DDABC1600F140D3 /* gestureView.swift in Sources */,
 				054C84602CD9C0AF005595EF /* UIControlPublisher.swift in Sources */,
 				05C94DA52E6AC4E80051B078 /* UIViewExtension.swift in Sources */,
+				0571B4282E861A7E005CBFF8 /* TestMapView.swift in Sources */,
 				05589EF92CE6F808003881AA /* FeatrueTitleBar.swift in Sources */,
 				05FAEF202DF2C2AD00E9BD08 /* GestureAnimationSubViews.swift in Sources */,
 				05589EF22CE6F0A7003881AA /* UIStoryboardExtension.swift in Sources */,
@@ -825,6 +825,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = Z4U4RWP3LA;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -848,6 +849,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -888,6 +890,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = Z4U4RWP3LA;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -904,6 +907,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -916,7 +920,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z4U4RWP3LA;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FishBuddy/Info.plist;
@@ -946,7 +949,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z4U4RWP3LA;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FishBuddy/Info.plist;

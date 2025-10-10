@@ -25,177 +25,193 @@ struct CameraStreamView: View {
     typealias CaptureMode = CameraStreamVM.CaptureMode
     
     var body: some View {
-        ZStack {
-            // Full-screen camera preview (edge-to-edge)
-            ZStack(alignment: .topLeading) {
-                CameraPreview(session: vm.captureSession)
-                // 裁切框疊在 CameraPreview 正中央（可拖動/縮放）
-                FramingGuide(aspect: .square) { norm in
-                    camera.setCropRectNormalized(norm) // 將 0..1 相對座標傳回 CameraController
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity) // 充滿與預覽同大小
-                .ignoresSafeArea()
-                .zIndex(1) // 確保在預覽上層
-
-                // 左上角：功能說明（tooltip/popover）
-                Button {
-                    let _ = print("show help")
-                    showHelp.toggle()
-                } label: {
-                    Image(systemName: "questionmark.circle.fill")
-                        .font(.system(size: 22))
-                        .foregroundStyle(.white)
-                        .padding(10)
-                }
-                .zIndex(2) // 讓按鈕在 FramingGuide 之上，避免被攔截手勢
-                .popover(isPresented: $showHelp, arrowEdge: .bottom) {
-                    let _ = print("show help")
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("📌 功能說明")
-                            .font(.headline)
-                        Text("1. 對準要辨識的物體\n2. 點擊『拍照』開始辨識\n3. 下方可切換模式")
-                            .font(.subheadline)
+        NavigationStack {
+            ZStack {
+                // Full-screen camera preview (edge-to-edge)
+                ZStack(alignment: .topLeading) {
+                    CameraPreview(session: vm.captureSession)
+                    // 裁切框疊在 CameraPreview 正中央（可拖動/縮放）
+                    FramingGuide(aspect: .square) { norm in
+                        camera.setCropRectNormalized(norm) // 將 0..1 相對座標傳回 CameraController
                     }
-                    .padding()
-                    .frame(width: 220)
-                }
-                .presentationCompactAdaptation(.popover)
-            }
-            // 當換成「新的」AVCaptureSession 實例時，強制 SwiftUI 重新建構預覽（每次切換都會開啟新的 session）
-            .id(camera.captureSession.map { ObjectIdentifier($0) }) // ObjectIdentifier 是一種「以物件記憶體身份作為唯一值」的東西
+                    .frame(maxWidth: .infinity, maxHeight: .infinity) // 充滿與預覽同大小
+                    .ignoresSafeArea()
+                    .zIndex(1) // 確保在預覽上層
 
-            // 進度指示：以「相機/模型就緒」為條件顯示
-            .overlay(alignment: .center) {
-                if vm.captureSession == nil || !vm.didLoadExtractor {
-                    ProgressView("啟動相機中…")
-                        .padding()
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
-                        .transition(.opacity)
-                }
-            }
-            // 嵌入向量消費者：當 stream 建立後開始消費（不顯示 UI）
-            .overlay(alignment: .center) {
-                if let embeddings = vm.embeddings {
-                    EmbeddingConsumer(stream: embeddings, id: vm.streamID)
-                }
-            }
-
-            // Overlay UI
-            VStack {
-                HStack {
-                    Spacer()
-                    // 切換前/後鏡頭
-                    Toggle("後鏡頭", isOn: Binding(
-                        get: { camera.backCamera },
-                        set: { camera.backCamera = $0 }
-                    ))
-                    .labelsHidden()
-                    .padding(10)
-                    .background(.ultraThinMaterial, in: Capsule())
-                }
-                .padding(.top, 12)
-                .padding(.horizontal, 16)
-
-                Spacer()
-
-                // 搜尋結果顯示（上方左側浮出）
-                if let results = vm.imageSearchResult, !results.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("📷 搜尋結果")
+                    // 左上角：功能說明（tooltip/popover）
+                    Button {
+                        let _ = print("show help")
+                        showHelp.toggle()
+                    } label: {
+                        Image(systemName: "questionmark.circle.fill")
+                            .font(.system(size: 22))
+                            .foregroundStyle(.white)
+                            .padding(10)
+                    }
+                    .zIndex(2) // 讓按鈕在 FramingGuide 之上，避免被攔截手勢
+                    .popover(isPresented: $showHelp, arrowEdge: .bottom) {
+                        let _ = print("show help")
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("📌 功能說明")
                                 .font(.headline)
-                                .padding(.bottom, 4)
-
-                            Spacer()
-                            
-                            // 關閉按鈕（叉叉）
-                            Button {
-                                vm.imageSearchResult = nil
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .font(.title3)
-                                    .foregroundStyle(.secondary)
-                                    .accessibilityLabel("關閉搜尋結果")
-                            }
-                            .buttonStyle(.plain)
+                            Text("1. 對準要辨識的物體\n2. 點擊『拍照』開始辨識\n3. 下方可切換模式")
+                                .font(.subheadline)
                         }
-
-                        ForEach(Array(results.prefix(3)), id: \.0.taxonId) { (item, score) in
-                            SearchResultRow(
-                                imageURL: URL(string: item.photos?.first?.url ?? ""),
-                                title: item.commonName ?? "",
-                                idText: "ID: \(item.taxonId)",
-                                scoreText: String(format: "相似度: %.2f", score)
-                            )
-                        }
+                        .padding()
+                        .frame(width: 220)
                     }
-                    .padding(12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                    .presentationCompactAdaptation(.popover)
+                }
+                // 當換成「新的」AVCaptureSession 實例時，強制 SwiftUI 重新建構預覽（每次切換都會開啟新的 session）
+                .id(camera.captureSession.map { ObjectIdentifier($0) }) // ObjectIdentifier 是一種「以物件記憶體身份作為唯一值」的東西
+
+                // 進度指示：以「相機/模型就緒」為條件顯示
+                .overlay(alignment: .center) {
+                    if vm.captureSession == nil || !vm.didLoadExtractor {
+                        ProgressView("啟動相機中…")
+                            .padding()
+                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                            .transition(.opacity)
+                    }
+                }
+                // 嵌入向量消費者：當 stream 建立後開始消費（不顯示 UI）
+                .overlay(alignment: .center) {
+                    if let embeddings = vm.embeddings {
+                        EmbeddingConsumer(stream: embeddings, id: vm.streamID)
+                    }
+                }
+
+                // Overlay UI
+                VStack {
+                    HStack(spacing: 8) {
+                        Spacer()
+                        
+                        // 右上角：地圖（push 到 MapView）
+                        NavigationLink {
+                            MapView()
+                                .navigationTitle("地圖")
+                                .navigationBarTitleDisplayMode(.inline)
+                        } label: {
+                            Image(systemName: "map.fill")
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .padding(10)
+                        }
+                        .background(.ultraThinMaterial, in: Capsule())
+                        
+                        // 切換前/後鏡頭
+                        Toggle("後鏡頭", isOn: Binding(
+                            get: { camera.backCamera },
+                            set: { camera.backCamera = $0 }
+                        ))
+                        .labelsHidden()
+                        .padding(10)
+                        .background(.ultraThinMaterial, in: Capsule())
+                    }
+                    .padding(.top, 12)
                     .padding(.horizontal, 16)
-                }
-            }
-        }
-        // 在 safeArea 撰寫工具
-        .safeAreaInset(edge: .bottom) {
-            CaptureToolbar(
-                lastPhoto: lastPhoto,
-                onCapture: { camera.capturePhoto() }
-            )
-        }
-        .onAppear {
-            // 讀取 database
-            vm.loadDatabaseIfNeeded()
 
-            // 每次回到此頁都重新建立一條新的 embeddings stream，
-            // 讓消費端的 for-await 能可靠重啟；Camera 本身不會重開。
-            let stream = AsyncStream<[Float32]> { continuation in
-                camera.attachEmbedding(continuation: continuation)
-                // 僅在尚未啟動時才會真正啟動相機
-                camera.startIfNeeded()
-            }
-            vm.embeddings = stream
-            vm.streamID = UUID()
+                    Spacer()
 
-            // 只在第一次載入時建立與預熱 CLIP 模型、 visionKit 也在這裡預載
-            if !vm.didLoadExtractor {
-                Task.detached(priority: .userInitiated) {
-                    let remover = await BackgroundRemoverVK()
-                    let extractor = CLIPFeatureExtractor()
-                    // 預熱：讓第一次推論不卡
-                    let renderer = UIGraphicsImageRenderer(size: CGSize(width: 224, height: 224))
-                    let warmup = renderer.image { _ in
-                        UIColor.black.setFill()
-                        UIBezierPath(rect: CGRect(x: 0, y: 0, width: 224, height: 224)).fill()
-                    }
-                    _ = extractor.embedding(for: warmup)
-                    await MainActor.run {
-                        camera.backgroundRemoverVK = remover
-                        camera.clipExtractor = extractor
-                        vm.didLoadExtractor = true
+                    // 搜尋結果顯示（上方左側浮出）
+                    if let results = vm.imageSearchResult, !results.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("📷 搜尋結果")
+                                    .font(.headline)
+                                    .padding(.bottom, 4)
+
+                                Spacer()
+                                
+                                // 關閉按鈕（叉叉）
+                                Button {
+                                    vm.imageSearchResult = nil
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.title3)
+                                        .foregroundStyle(.secondary)
+                                        .accessibilityLabel("關閉搜尋結果")
+                                }
+                                .buttonStyle(.plain)
+                            }
+
+                            ForEach(Array(results.prefix(3)), id: \.0.taxonId) { (item, score) in
+                                SearchResultRow(
+                                    imageURL: URL(string: item.photos?.first?.url ?? ""),
+                                    title: item.commonName ?? "",
+                                    idText: "ID: \(item.taxonId)",
+                                    scoreText: String(format: "相似度: %.2f", score)
+                                )
+                            }
+                        }
+                        .padding(12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                        .padding(.horizontal, 16)
                     }
                 }
             }
+            // 在 safeArea 撰寫工具
+            .safeAreaInset(edge: .bottom) {
+                CaptureToolbar(
+                    lastPhoto: lastPhoto,
+                    onCapture: { camera.capturePhoto() }
+                )
+            }
+            .onAppear {
+                // 讀取 database
+                vm.loadDatabaseIfNeeded()
 
-            camera.onSessionReady = { session in
-                DispatchQueue.main.async {
-                    self.vm.captureSession = session
+                // 每次回到此頁都重新建立一條新的 embeddings stream，
+                // 讓消費端的 for-await 能可靠重啟；Camera 本身不會重開。
+                let stream = AsyncStream<[Float32]> { continuation in
+                    camera.attachEmbedding(continuation: continuation)
+                    // 僅在尚未啟動時才會真正啟動相機
+                    camera.startIfNeeded()
+                }
+                vm.embeddings = stream
+                vm.streamID = UUID()
+
+                // 只在第一次載入時建立與預熱 CLIP 模型、 visionKit 也在這裡預載
+                if !vm.didLoadExtractor {
+                    Task.detached(priority: .userInitiated) {
+                        let remover = await BackgroundRemoverVK()
+                        let extractor = CLIPFeatureExtractor()
+                        // 預熱：讓第一次推論不卡
+                        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 224, height: 224))
+                        let warmup = renderer.image { _ in
+                            UIColor.black.setFill()
+                            UIBezierPath(rect: CGRect(x: 0, y: 0, width: 224, height: 224)).fill()
+                        }
+                        _ = extractor.embedding(for: warmup)
+                        await MainActor.run {
+                            camera.backgroundRemoverVK = remover
+                            camera.clipExtractor = extractor
+                            vm.didLoadExtractor = true
+                        }
+                    }
+                }
+
+                camera.onSessionReady = { session in
+                    DispatchQueue.main.async {
+                        self.vm.captureSession = session
+                    }
+                }
+                camera.onPhotoReady = { data in
+                    self.lastPhoto = data.1
+                    Task {
+                        await self.vm.search(query: data.0)
+                    }
+                }
+                
+                camera.backgroundRemove = { image in
+                    self.resultImage = image
                 }
             }
-            camera.onPhotoReady = { data in
-                self.lastPhoto = data.1
-                Task {
-                    await self.vm.search(query: data.0)
-                }
+            .onDisappear {
+                // 在 Tab 切換時不要停止相機與釋放資源，避免重建成本
+                // 若需要在真正離開功能頁時釋放，請在上層做集中管理再呼叫 stop/detatch。
             }
-            
-            camera.backgroundRemove = { image in
-                self.resultImage = image
-            }
-        }
-        .onDisappear {
-            // 在 Tab 切換時不要停止相機與釋放資源，避免重建成本
-            // 若需要在真正離開功能頁時釋放，請在上層做集中管理再呼叫 stop/detatch。
         }
     }
 }
@@ -338,4 +354,3 @@ struct EmbeddingConsumer: View {
             }
     }
 }
-

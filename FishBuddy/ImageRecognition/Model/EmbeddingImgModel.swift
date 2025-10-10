@@ -31,6 +31,10 @@ struct TaxonItem: Codable {
     @Default var textEmbedding: [Float]
     
     let embeddingMeta: EmbeddingMeta?
+    
+    // 物種分布（資料表 distribution 與 distribution_layers）
+    let distribution: Distribution?
+    let distributionLayers: [DistributionLayer]?
 
     enum CodingKeys: String, CodingKey {
         case taxonId = "taxon_id"
@@ -42,6 +46,8 @@ struct TaxonItem: Codable {
         case embedding
         case embeddingMeta = "embedding_meta"
         case textEmbedding = "text_embedding"
+        case distribution
+        case distributionLayers = "distribution_layers"
     }
 }
 
@@ -122,6 +128,33 @@ struct EmbeddingMeta: Codable {
     }
 }
 
+/// 物種分布（distribution）
+struct Distribution: Codable {
+    let type: String?
+    let kmlURL: String?
+
+    enum CodingKeys: String, CodingKey {
+        case type
+        case kmlURL = "kml_url"
+    }
+}
+
+/// 物種分布圖層（distribution_layers）
+struct DistributionLayer: Codable {
+    let layerKey: String
+    let type: String
+    let url: String
+    let minzoom: Int
+    let maxzoom: Int
+
+    enum CodingKeys: String, CodingKey {
+        case layerKey = "layer_key"
+        case type
+        case url
+        case minzoom
+        case maxzoom
+    }
+}
 
 /// 搜尋結果
 struct SearchResult {
