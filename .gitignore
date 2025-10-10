@@ -2,3 +2,21 @@ xcuserdata/
 **/*.xcuserstate
 *.xcscmblueprint
 DerivedData/
+# Swift Package Manager
+**/Package.resolved
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Xcode
+*.xcworkspace
+!default.xcworkspace
+
+# Build products
+build/
+*.ipa
+*.dSYM
+
+# SwiftPM cache
+.swiftpm/
