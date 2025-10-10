@@ -43,6 +43,7 @@
 		058F58A72E7BA42C009913C5 /* BackgroundRemoverVK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */; };
 		0595566F2E14D5BA0050147C /* TideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0595566E2E14D5B90050147C /* TideView.swift */; };
 		059556712E150AF10050147C /* TideLobbyVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059556702E150AF10050147C /* TideLobbyVM.swift */; };
+		05C13B742E9896E400BE9FA0 /* TaxonDetailModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C13B732E9896E400BE9FA0 /* TaxonDetailModel.swift */; };
 		05C94D7E2E6ABE460051B078 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D7D2E6ABE460051B078 /* CombineMoya */; };
 		05C94D802E6ABE460051B078 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D7F2E6ABE460051B078 /* Moya */; };
 		05C94D822E6ABE460051B078 /* ReactiveMoya in Frameworks */ = {isa = PBXBuildFile; productRef = 05C94D812E6ABE460051B078 /* ReactiveMoya */; };
@@ -81,6 +82,7 @@
 		05FAEF342E00F53D00E9BD08 /* CardSliderSubViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF332E00F52F00E9BD08 /* CardSliderSubViews.swift */; };
 		05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF382E013B6B00E9BD08 /* CardSliderVM.swift */; };
 		05FC90E62E9688950053A1C2 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 05FC90E52E9688940053A1C2 /* catalog.sqlite */; };
+		05FC90ED2E9894210053A1C2 /* TaxonDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FC90EC2E9894210053A1C2 /* TaxonDetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -121,6 +123,7 @@
 		058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRemoverVK.swift; sourceTree = "<group>"; };
 		0595566E2E14D5B90050147C /* TideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideView.swift; sourceTree = "<group>"; };
 		059556702E150AF10050147C /* TideLobbyVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideLobbyVM.swift; sourceTree = "<group>"; };
+		05C13B732E9896E400BE9FA0 /* TaxonDetailModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaxonDetailModel.swift; sourceTree = "<group>"; };
 		05C94D872E6ABF7C0051B078 /* CLIPFeatureExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLIPFeatureExtractor.swift; sourceTree = "<group>"; };
 		05C94D882E6ABF7C0051B078 /* ImageUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUtils.swift; sourceTree = "<group>"; };
 		05C94D892E6ABF7C0051B078 /* JsonUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonUtils.swift; sourceTree = "<group>"; };
@@ -153,6 +156,7 @@
 		05FAEF332E00F52F00E9BD08 /* CardSliderSubViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderSubViews.swift; sourceTree = "<group>"; };
 		05FAEF382E013B6B00E9BD08 /* CardSliderVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderVM.swift; sourceTree = "<group>"; };
 		05FC90E52E9688940053A1C2 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
+		05FC90EC2E9894210053A1C2 /* TaxonDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaxonDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -251,6 +255,7 @@
 				05589EE32CE6ECA4003881AA /* Metohd */,
 				05589EEA2CE6EE19003881AA /* Lobby */,
 				054C84662CDB04D5005595EF /* Weather */,
+				05FC90E72E9893D80053A1C2 /* Taxon */,
 				054C84422CD9B994005595EF /* AppDelegate.swift */,
 				054C84442CD9B994005595EF /* SceneDelegate.swift */,
 				0546FBB52DCB30F1001695D8 /* custom-icons.ttf */,
@@ -624,6 +629,47 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
+		05FC90E72E9893D80053A1C2 /* Taxon */ = {
+			isa = PBXGroup;
+			children = (
+				05FC90E82E9893E80053A1C2 /* TaxonDetail */,
+			);
+			path = Taxon;
+			sourceTree = "<group>";
+		};
+		05FC90E82E9893E80053A1C2 /* TaxonDetail */ = {
+			isa = PBXGroup;
+			children = (
+				05FC90EB2E9894050053A1C2 /* Model */,
+				05FC90EA2E9894020053A1C2 /* View */,
+				05FC90E92E9893FC0053A1C2 /* ViewModel */,
+				05FC90EC2E9894210053A1C2 /* TaxonDetailView.swift */,
+			);
+			path = TaxonDetail;
+			sourceTree = "<group>";
+		};
+		05FC90E92E9893FC0053A1C2 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		05FC90EA2E9894020053A1C2 /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		05FC90EB2E9894050053A1C2 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				05C13B732E9896E400BE9FA0 /* TaxonDetailModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -726,6 +772,7 @@
 				051B88302E6E8A7400209CDB /* SkeletonView.swift in Sources */,
 				05FAEF1C2DF2C22A00E9BD08 /* TripModel.swift in Sources */,
 				054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */,
+				05FC90ED2E9894210053A1C2 /* TaxonDetailView.swift in Sources */,
 				05FAEF322E00F52500E9BD08 /* CardSliderView.swift in Sources */,
 				051B883D2E73B66900209CDB /* LoadingCircleView.swift in Sources */,
 				05F3BED42D92824C00DDAC72 /* TideDataModel.swift in Sources */,
@@ -762,6 +809,7 @@
 				05FAEF132DF2743900E9BD08 /* bottomSheetView.swift in Sources */,
 				05D418A92E7D47F500B1BEF5 /* FramingGuide.swift in Sources */,
 				05E245EF2D0A7F9B00C6C048 /* UILabelPadding.swift in Sources */,
+				05C13B742E9896E400BE9FA0 /* TaxonDetailModel.swift in Sources */,
 				054C845A2CD9BDE5005595EF /* APIConfig.swift in Sources */,
 				05E245F12D0A801000C6C048 /* UILabelExtension.swift in Sources */,
 				054C84622CD9C0E3005595EF /* PublisherExtension.swift in Sources */,
