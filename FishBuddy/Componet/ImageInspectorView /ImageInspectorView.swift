@@ -16,40 +16,43 @@ struct ImageInspectorView: View {
     var images: [ImageData]
     
     var body: some View {
-        ZStack {
-            ScrollView(.horizontal) {
-                LazyHStack(spacing: 0) {
-                    ForEach(images.indices, id: \.self) { i in
-                        ImageCardView(
-                            desc: images[i].description ?? "",
-                            imageURL: images[i].image,
-                            isShowDetails: .constant(false)
-                        )
-                        .frame(width: UIScreen.main.bounds.width)
-                        .containerRelativeFrame(.horizontal)
-                        .id(i)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            viewerState = ViewerState(index: i)
+        GeometryReader { proxy in
+            let pageWidth = proxy.size.width
+            ZStack {
+                ScrollView(.horizontal) {
+                    LazyHStack(spacing: 0) {
+                        ForEach(images.indices, id: \.self) { i in
+                            ImageCardView(
+                                desc: images[i].description ?? "",
+                                imageURL: images[i].image,
+                                isShowDetails: .constant(false)
+                            )
+                            .frame(width: pageWidth, height: proxy.size.height)
+                            .id(i)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                viewerState = ViewerState(index: i)
+                            }
                         }
                     }
+                    .frame(height: proxy.size.height)
+                    .scrollTargetLayout()
                 }
-                .scrollTargetLayout()
-            }
-            .scrollIndicators(.hidden)
-            .scrollTargetBehavior(.paging)
-            .scrollPosition(id: $currentID)
+                .scrollIndicators(.hidden)
+                .scrollTargetBehavior(.paging)
+                .scrollPosition(id: $currentID)
 
-            // 指示點
-            VStack {
-                Spacer()
-                PageDots(count: images.count, current: currentID ?? 0)
-                    .padding(.bottom, 12)
+                // 指示點
+                VStack {
+                    Spacer()
+                    PageDots(count: images.count, current: currentID ?? 0)
+                        .padding(.bottom, 12)
+                }
             }
-        }
-        // 全螢幕圖片檢視器
-        .fullScreenCover(item: $viewerState) { state in
-            ImageViewer(images: images.map { $0.image }, startIndex: state.index)
+            // 全螢幕圖片檢視器
+            .fullScreenCover(item: $viewerState) { state in
+                ImageViewer(images: images.map { $0.image }, startIndex: state.index)
+            }
         }
     }
 }
@@ -156,6 +159,7 @@ struct ImageCardView: View {
                     .resizable()
                     .scaledToFill()
                     .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
             }
         }
     }

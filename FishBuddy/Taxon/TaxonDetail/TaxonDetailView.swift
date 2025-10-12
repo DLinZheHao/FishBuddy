@@ -17,21 +17,30 @@ struct TaxonDetailView: View {
                 hero
                 Group {
                     titleBlock
+                        .padding(.horizontal, 16)
+                    
+                    Divider()
+                        .padding(.horizontal, 16)
+                    
                     if let wikipedia = taxon.meta?.wikipedia {
                         if let extract = wikipedia.extract {
                             section(title: "概述", text: extract)
+                                .padding(.horizontal, 16)
                         }
                         
                         if let description = wikipedia.sections?.description, !description.isEmpty {
                             section(title: "敘述", text: description)
+                                .padding(.horizontal, 16)
                         }
                         
                         if let ecology = wikipedia.sections?.ecology, !ecology.isEmpty {
                             section(title: "生態", text: ecology)
+                                .padding(.horizontal, 16)
                         }
                         
                         if let economicUse = wikipedia.sections?.economicUse, !economicUse.isEmpty {
                             section(title: "經濟利用", text: economicUse)
+                                .padding(.horizontal, 16)
                         }
 //                        if let dist = taxon.distribution {
 //                            DistributionCardView(distribution: dist)
@@ -40,14 +49,13 @@ struct TaxonDetailView: View {
                     }
                    
                 }
-                
                 footerButtons
-                    .padding(.top, 8)
+                    .padding(.horizontal, 16)
             }
             .padding(.bottom, 24)
         }
         .scrollIndicators(.hidden)
-        .contentMargins(.horizontal, 16)
+        
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -56,7 +64,7 @@ struct TaxonDetailView: View {
         ZStack {
             RoundedRectangle(cornerRadius: 0)
                 .fill(Color(.secondarySystemBackground))
-                .frame(maxWidth: .infinity, maxHeight: 300)
+                .frame(maxWidth: .infinity, minHeight: 300, maxHeight: 300)
             
             if let photos = taxon.photos, !photos.isEmpty  {
                 let images: [ImageData] = photos.compactMap { photo in
@@ -64,8 +72,8 @@ struct TaxonDetailView: View {
                     return ImageData(image: url, description: photo.attribution)
                 }
                 ImageInspectorView(images: images)
-                .frame(height: 300)
-                .clipShape(RoundedRectangle(cornerRadius: 0))
+                    .frame(maxWidth: .infinity, minHeight: 300, maxHeight: 300)
+                    .clipped()
             } else {
                 Image(systemName: "fish")
                     .resizable()
@@ -74,7 +82,8 @@ struct TaxonDetailView: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .containerRelativeFrame(.horizontal)
+        .frame(maxWidth: .infinity, minHeight: 300, maxHeight: 300)
+        .contentShape(Rectangle())
     }
 
     private var titleBlock: some View {
@@ -167,35 +176,89 @@ struct DistributionCardView: View {
     }
 }
 
-// MARK: - Preview
-//#Preview {
-//    NavigationStack {
-//        TaxonDetailView(taxon: .demo)
-//            .padding(.top, 8)
-//            .navigationTitle("FishBuddy")
-//    }
-//}
-
-// MARK: - Demo Data
-extension Taxon {
-    static let demo: Taxon = {
-        let layers: [FishDistributionLayer] = [
-            .init(key: "range_tiles", type: "xyz", url: "https://api.inaturalist.org/v1/taxon_ranges/49269/{z}/{x}/{y}.png", minzoom: 0, maxzoom: 19),
-            .init(key: "points_tiles", type: "xyz", url: "https://api.inaturalist.org/v1/points/{z}/{x}/{y}.png?taxon_id=49269&verifiable=true", minzoom: 0, maxzoom: 19),
-            .init(key: "heatmap_tiles", type: "xyz", url: "https://api.inaturalist.org/v1/heatmap/{z}/{x}/{y}.png?taxon_id=49269&verifiable=true", minzoom: 0, maxzoom: 19)
+// MARK: - Preview mock + preview
+#if DEBUG
+private extension TaxonItem {
+    static var previewMock: TaxonItem {
+        let photos: [Photo] = [
+            Photo(url: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?q=80&w=1200",
+                  licenseCode: "CC-BY",
+                  attribution: "Photo by Unsplash",
+                  source: "unsplash"),
+            Photo(url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200",
+                  licenseCode: "CC-BY",
+                  attribution: "Photo by Unsplash",
+                  source: "unsplash"),
+            Photo(url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1200",
+                  licenseCode: "CC-BY",
+                  attribution: "Photo by Unsplash",
+                  source: "unsplash")
         ]
-        let dist = FishDistribution(type: "tiles", layers: layers, kml_url: "https://www.inaturalist.org/taxa/49269/range.kml", placesSummary: "North Atlantic")
-        return Taxon(
-            id: 49269,
-            commonName: "Atlantic Salmon",
-            scientificName: "Salmo salar",
-            conservationBadge: "Least Concern",
-            heroImageURL: URL(string: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?q=80&w=1200"),
-            overview: "The Atlantic salmon is a species of ray-finned fish in the family Salmonidae. It is found in the North Atlantic Ocean and in rivers that flow into the North Atlantic and, due to human introduction, in the Pacific Ocean.",
-            ecology: "Atlantic salmon are anadromous fish, migrating from saltwater to freshwater to spawn. They prefer cold, clear, well-oxygenated rivers and streams with gravel or cobble bottoms.",
-            distribution: dist
+
+        let sections = Sections(
+            distribution: "分布於北大西洋與入海河川，因人為引進亦見於太平洋部分區域。",
+            description: "體型流線，背部呈藍綠色且具黑色斑點，腹部銀白，成魚遷徙回淡水產卵。",
+            ecology: "遷徙性魚類，偏好冷且含氧量高的河川。幼魚在淡水成長，成魚回海洋覓食。",
+            economicUse: "具高經濟價值，為重要食用魚與養殖物種。"
         )
-    }()
+
+        let wiki = WikipediaMeta(
+            title: "Atlantic salmon",
+            canonicalTitle: "Salmo salar",
+            extract: "大西洋鮭是一種鮭科溯河性魚類，原生於北大西洋及其入海河川，部分族群會進行長距離洄游。",
+            url: "https://zh.wikipedia.org/wiki/%E5%A4%A7%E8%A5%BF%E6%B4%8B%E9%AE%AD",
+            lang: "zh",
+            variant: nil,
+            query: nil,
+            strategy: nil,
+            sections: sections
+        )
+
+        let meta = Meta(wikipedia: wiki)
+
+        // Distribution mocks used by DistributionCardView (converted type)
+        let layers: [FishDistributionLayer] = [
+            .init(key: "range_tiles", type: "xyz",
+                  url: "https://api.inaturalist.org/v1/taxon_ranges/49269/{z}/{x}/{y}.png",
+                  minzoom: 0, maxzoom: 19),
+            .init(key: "points_tiles", type: "xyz",
+                  url: "https://api.inaturalist.org/v1/points/{z}/{x}/{y}.png?taxon_id=49269&verifiable=true",
+                  minzoom: 0, maxzoom: 19),
+            .init(key: "heatmap_tiles", type: "xyz",
+                  url: "https://api.inaturalist.org/v1/heatmap/{z}/{x}/{y}.png?taxon_id=49269&verifiable=true",
+                  minzoom: 0, maxzoom: 19)
+        ]
+        let fishDist = FishDistribution(type: "tiles", layers: layers, kml_url: "https://www.inaturalist.org/taxa/49269/range.kml", placesSummary: "North Atlantic")
+
+        // Build TaxonItem mock
+        return TaxonItem(
+            taxonId: 49269,
+            scientificName: "Salmo salar",
+            commonName: "大西洋鮭",
+            slug: "atlantic-salmon",
+            photos: photos,
+            meta: meta,
+            embedding: [],
+            textEmbedding: [],
+            embeddingMeta: nil,
+            distribution: Distribution(type: "tiles", kmlURL: "https://www.inaturalist.org/taxa/49269/range.kml"),
+            distributionLayers: [
+                DistributionLayer(layerKey: "range_tiles", type: "xyz",
+                                  url: "https://api.inaturalist.org/v1/taxon_ranges/49269/{z}/{x}/{y}.png",
+                                  minzoom: 0, maxzoom: 19),
+                DistributionLayer(layerKey: "points_tiles", type: "xyz",
+                                  url: "https://api.inaturalist.org/v1/points/{z}/{x}/{y}.png?taxon_id=49269&verifiable=true",
+                                  minzoom: 0, maxzoom: 19)
+            ]
+        )
+    }
 }
 
+#Preview {
+    NavigationStack {
+        TaxonDetailView(taxon: .previewMock)
+            .navigationTitle("FishBuddy")
+    }
+}
+#endif
 

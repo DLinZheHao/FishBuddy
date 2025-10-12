@@ -74,7 +74,7 @@ struct CameraStreamView: View {
                             .transition(.opacity)
                     }
                 }
-                // 嵌入向量消費者：當 stream 建立後開始消費（不顯示 UI）
+                // 嵌入向量消費者：當 stream 建立後開始消費
                 .overlay(alignment: .center) {
                     if let embeddings = vm.embeddings {
                         EmbeddingConsumer(stream: embeddings, id: vm.streamID)
@@ -117,7 +117,7 @@ struct CameraStreamView: View {
                     if let results = vm.imageSearchResult, !results.isEmpty {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
-                                Text("📷 搜尋結果")
+                                Text("搜尋結果")
                                     .font(.headline)
                                     .padding(.bottom, 4)
 
@@ -154,6 +154,7 @@ struct CameraStreamView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
                         .padding(.horizontal, 16)
+                        .padding(.bottom, 8)
                     }
                 }
             }
@@ -229,12 +230,14 @@ private struct CaptureToolbar: View {
 
     var body: some View {
         HStack(spacing: 16) {
+            // 左側：占位（與右側縮圖對稱）
             if let _ = lastPhoto {
                 Color.clear
                     .frame(width: 56, height: 56)
             }
+            
             Spacer()
-
+            
             Button(action: onCapture) {
                 Label("拍照", systemImage: "camera.circle")
                     .font(.title2)
@@ -255,7 +258,6 @@ private struct CaptureToolbar: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(.ultraThinMaterial)
     }
 }
 
