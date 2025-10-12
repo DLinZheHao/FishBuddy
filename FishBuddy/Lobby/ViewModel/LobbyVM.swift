@@ -25,8 +25,6 @@ extension LobbyVM {
     enum Tab {
         // 天氣狀態首頁
         case weather
-        // 潮汐資料狀態首頁
-        
         // 圖片辨識
         case imageRecognition
         
@@ -38,55 +36,28 @@ extension LobbyVM {
             case .weather:
                 let storyboard = UIStoryboard.weatherLobby
                 controller = storyboard.instantiateViewController(withIdentifier: WeatherLobbyViewController.identifier)
-                controller.tabBarItem = makeTabBarItem("天氣")
-            // 潮汐
-//                
-//                let swiftUIView = WeatherView(vm: vm)
-//                let hostingController = UIHostingController(rootView: swiftUIView)
+                controller.tabBarItem = makeTabBarItem(title: "天氣",
+                                                       imageSystemName: "cloud.sun",
+                                                       selectedSystemName: "cloud.sun.fill")
                 
-            
             case .imageRecognition:
                 controller = CameraStreamVC(rootView: CameraStreamView())
-                controller.tabBarItem = makeTabBarItem("辨識")
+                controller.tabBarItem = makeTabBarItem(title: "辨識",
+                                                       imageSystemName: "camera",
+                                                       selectedSystemName: "camera.fill")
             }
             return controller
         }
         
         /// 製作 tab 物件
-        private func makeTabBarItem(_ title: String) -> UITabBarItem {
-            return UITabBarItem(title: title, image: nil, selectedImage: nil)
+        private func makeTabBarItem(title: String,
+                                    imageSystemName: String,
+                                    selectedSystemName: String? = nil) -> UITabBarItem {
+            let image = UIImage(systemName: imageSystemName)
+            let selectedImage = selectedSystemName.flatMap { UIImage(systemName: $0) }
+            let item = UITabBarItem(title: title, image: image, selectedImage: selectedImage)
+            return item
         }
-        
-//        private var image: UIImage? {
-//            switch self {
-//            case .ingredients:
-//                return UIImage(systemName: "refrigerator")
-//            case .teamLink:
-//                return UIImage(systemName: "person.2.crop.square.stack")
-//            case .join:
-//                return UIImage(systemName: "person.crop.circle.badge.plus")
-//            case .calendarPage:
-//                return UIImage(systemName: "calendar.circle")
-//            case .measure:
-//                return UIImage(systemName: "ruler")
-//            }
-//        }
-//
-//        private var selectedImage: UIImage? {
-//            switch self {
-//            case .ingredients:
-//                return UIImage(systemName: "refrigerator.fill")?.withRenderingMode(.alwaysOriginal)
-//            case .teamLink:
-//                return UIImage(systemName: "person.2.crop.square.stack.fill")?.withRenderingMode(.alwaysOriginal)
-//            case .join:
-//                return UIImage(systemName: "person.crop.circle.fill.badge.plus")?.withRenderingMode(.alwaysOriginal)
-//            case .calendarPage:
-//                return UIImage(systemName: "calendar.circle.fill")
-//            case .measure:
-//                return UIImage(systemName: "ruler.fill")?.withRenderingMode(.alwaysOriginal)
-//            }
-//        }
-        
     }
     
 }
