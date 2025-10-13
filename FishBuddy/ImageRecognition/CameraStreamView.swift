@@ -30,8 +30,8 @@ struct CameraStreamView: View {
                 // Full-screen camera preview (edge-to-edge)
                 ZStack(alignment: .topLeading) {
                     CameraPreview(session: vm.captureSession)
-                    // 裁切框疊在 CameraPreview 正中央（可拖動/縮放）
-                    FramingGuide(aspect: .square) { norm in
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    FramingGuide(aspect: .wide43) { norm in
                         camera.setCropRectNormalized(norm) // 將 0..1 相對座標傳回 CameraController
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity) // 充滿與預覽同大小

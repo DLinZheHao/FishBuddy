@@ -74,6 +74,9 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
     // 紀錄相機是否正在運行，避免重複啟動
     private(set) var isRunning: Bool = false
 
+    /// 與此控制器相連的預覽層（用於把畫面座標換算成相機裝置座標）
+    weak var previewLayer: AVCaptureVideoPreviewLayer?
+
     /// 當 session 準備完成後，回傳
     var onSessionReady: ((AVCaptureSession) -> Void)?
     
@@ -83,8 +86,10 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
     /// 測試拍照完後，背景的切割結果
     var backgroundRemove: ((UIImage) -> Void)?
     
-    // 使用者設定的裁切框（相對座標；原點左上；x,y,w,h ∈ 0...1）。nil 代表不裁切。
+    /// 使用者設定的裁切框（相對座標；原點左上；x,y,w,h ∈ 0...1）。nil 代表不裁切。
     @Published var cropRectNormalized: CGRect? = nil
+    /// 使用者設定的裁切框中心，用來對焦
+    @Published var cropRectCenter: CGPoint? = nil
     
     /// 全域校正偏移：以相對座標（0..1）為單位；x 正值＝向右、y 正值＝向下
     @Published public var cropCalibrationOffset: CGPoint = .zero
@@ -96,12 +101,78 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
         }
     }
     
-//    •    你在 CameraController 裡面用了 AsyncStream<CMSampleBuffer> 來建立一個非同步的影格（frame）資料流。
+    /// 由 UI 設定 / 清除裁切框中心（在主執行緒呼叫）
+    public func setCropRectCenter(_ point: CGPoint?) {
+        Task { @MainActor in
+            self.cropRectCenter = point
+            guard let point, let layer = self.previewLayer else { return }
+            // 以 UI 的正規化點（0..1）換算為預覽層座標，再轉為裝置座標並對焦
+            self.focus(atNormalized: point, previewLayer: layer)
+        }
+    }
+
+    /// 由 UI 傳入正在顯示的預覽層，供座標轉換使用
+    public func attachPreviewLayer(_ layer: AVCaptureVideoPreviewLayer) {
+        Task { @MainActor in
+            self.previewLayer = layer
+        }
+    }
+
+    /// 以「UI 正規化 0..1」座標對焦（會自動考量 videoGravity / 旋轉 / 鏡像）
+    public func focus(atNormalized norm: CGPoint, previewLayer: AVCaptureVideoPreviewLayer) {
+        // 先把 0..1 的點換算成預覽層座標空間的點
+        let layerPoint = CGPoint(x: previewLayer.bounds.width  * norm.x,
+                                 y: previewLayer.bounds.height * norm.y)
+        // 再由預覽層換成裝置座標（0..1；原點與方向由系統處理，包括鏡像與重力）
+        let devicePoint = previewLayer.captureDevicePointConverted(fromLayerPoint: layerPoint)
+        focus(atDevicePoint: devicePoint)
+    }
+
+    /// 直接以裝置座標（0..1）對焦/測光
+    public func focus(atDevicePoint devicePoint: CGPoint) {
+        sessionQueue.async { [weak self] in
+            guard let self,
+                  let session = self.captureSession,
+                  let deviceInput = session.inputs.compactMap({ $0 as? AVCaptureDeviceInput }).first else { return }
+            let device = deviceInput.device
+            do {
+                try device.lockForConfiguration()
+
+                // 對焦
+                if device.isFocusPointOfInterestSupported {
+                    device.focusPointOfInterest = devicePoint
+                    if device.isFocusModeSupported(.continuousAutoFocus) {
+                        device.focusMode = .continuousAutoFocus
+                    } else if device.isFocusModeSupported(.autoFocus) {
+                        device.focusMode = .autoFocus
+                    }
+                }
+                // 測光
+                if device.isExposurePointOfInterestSupported {
+                    device.exposurePointOfInterest = devicePoint
+                    if device.isExposureModeSupported(.continuousAutoExposure) {
+                        device.exposureMode = .continuousAutoExposure
+                    } else if device.isExposureModeSupported(.autoExpose) {
+                        device.exposureMode = .autoExpose
+                    }
+                }
+                // 主體區域變化監聽：場景變化時自動調整
+                device.isSubjectAreaChangeMonitoringEnabled = true
+
+                device.unlockForConfiguration()
+            } catch {
+                print("Focus configuration failed: \(error)")
+            }
+        }
+    }
+    
+//    •    在 CameraController 裡面用了 AsyncStream<CMSampleBuffer> 來建立一個非同步的影格（frame）資料流。
 //    •    Swift 在建立 AsyncStream 時，會給你一個 Continuation 物件。
 //    •    這個 Continuation 就像一個「入口」，你可以用它來 往外部正在監聽的 AsyncStream 送資料。
     // 外部附加接收嵌入向量的 continuation（而非直接暴露 CMSampleBuffer）
     public func attachEmbedding(continuation: AsyncStream<[Float]>.Continuation) {
         cropCalibrationOffset.y = 0.075
+        cropCalibrationOffset.x = -0.075
         sessionQueue.async { [weak self] in
             guard let self else { return }
             self.embeddingContinuation = continuation
@@ -262,6 +333,7 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
         // 設定影像輸出的 delegate 與處理隊列
         videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "sampleBufferQueue"))
         captureSession.addOutput(videoOutput)
+        
         // 設定畫質（解析度）
         if captureSession.canSetSessionPreset(self.videoPreset) {
             captureSession.sessionPreset = self.videoPreset
@@ -286,6 +358,7 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
             setOrientation(UIDevice.current.orientation)
         }
     }
+    
     // 僅在尚未啟動時才會真正啟動相機
     public func startIfNeeded() {
         if !isRunning {
@@ -298,7 +371,7 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
         var r = rect
         let dx = cropCalibrationOffset.x
         let dy = cropCalibrationOffset.y
-        // 先套用偏移ㄓㄡ
+        // 先套用偏移軸
         r.origin.x += dx
         r.origin.y += dy
         // 夾限：原點不得小於 0，也不得超過 (1 - 尺寸)
