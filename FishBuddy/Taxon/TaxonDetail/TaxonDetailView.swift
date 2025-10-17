@@ -14,39 +14,44 @@ struct TaxonDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
+                // 圖片顯示器
                 hero
                 Group {
+                    // 標題區塊
                     titleBlock
                         .padding(.horizontal, 16)
                     
                     Divider()
                         .padding(.horizontal, 16)
                     
+                    // 生物提示詞
                     if let prompts = taxon.userPrompt, !prompts.isEmpty {
                         UserPromptView(prompt: prompts)
                             .padding(.horizontal, 16)
                     }
                     
                     if let wikipedia = taxon.meta?.wikipedia {
+                        // 概述區塊
                         if let extract = wikipedia.extract {
                             section(title: "概述", text: extract)
                                 .padding(.horizontal, 16)
                         }
-                        
+                        // 敘述區塊
                         if let description = wikipedia.sections?.description, !description.isEmpty {
                             section(title: "敘述", text: description)
                                 .padding(.horizontal, 16)
                         }
-                        
+                        // 生態區塊
                         if let ecology = wikipedia.sections?.ecology, !ecology.isEmpty {
                             section(title: "生態", text: ecology)
                                 .padding(.horizontal, 16)
                         }
-                        
+                        // 經濟利用區塊
                         if let economicUse = wikipedia.sections?.economicUse, !economicUse.isEmpty {
                             section(title: "經濟利用", text: economicUse)
                                 .padding(.horizontal, 16)
                         }
+                        // 分布地區區塊
 //                        if let dist = taxon.distribution {
 //                            DistributionCardView(distribution: dist)
 //                                .padding(.top, 4)
@@ -54,40 +59,54 @@ struct TaxonDetailView: View {
                     }
                    
                 }
+                // 功能按鍵
                 footerButtons
                     .padding(.horizontal, 16)
             }
             .padding(.bottom, 24)
         }
+        .coordinateSpace(name: "taxonScroll")
         .scrollIndicators(.hidden)
-        
+        .ignoresSafeArea(.container, edges: .top)
         .navigationBarTitleDisplayMode(.inline)
     }
 
     // MARK: - Subviews
     private var hero: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 0)
-                .fill(Color(.secondarySystemBackground))
-                .frame(maxWidth: .infinity, minHeight: 300, maxHeight: 300)
-            
-            if let photos = taxon.photos, !photos.isEmpty  {
-                let images: [ImageData] = photos.compactMap { photo in
-                    guard let url = URL(string: photo.url) else { return nil }
-                    return ImageData(image: url, description: photo.attribution)
+        GeometryReader { proxy in
+            let minY = proxy.frame(in: .named("taxonScroll")).minY
+            // Base height for the hero image
+            let baseHeight: CGFloat = 300
+            // When pulling down (minY > 0), increase height by minY
+            let dynamicHeight = max(baseHeight, baseHeight + (minY > 0 ? minY : 0))
+
+            ZStack {
+                RoundedRectangle(cornerRadius: 0)
+                    .fill(Color(.secondarySystemBackground))
+                    .frame(maxWidth: .infinity, minHeight: dynamicHeight, maxHeight: dynamicHeight)
+
+                if let photos = taxon.photos, !photos.isEmpty  {
+                    let images: [ImageData] = photos.compactMap { photo in
+                        guard let url = URL(string: photo.url) else { return nil }
+                        return ImageData(image: url, description: photo.attribution)
+                    }
+                    ImageInspectorView(images: images)
+                        .frame(maxWidth: .infinity, minHeight: dynamicHeight, maxHeight: dynamicHeight)
+                        .clipped()
+                } else {
+                    Image(systemName: "fish")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 140)
+                        .foregroundStyle(.secondary)
                 }
-                ImageInspectorView(images: images)
-                    .frame(maxWidth: .infinity, minHeight: 300, maxHeight: 300)
-                    .clipped()
-            } else {
-                Image(systemName: "fish")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 140)
-                    .foregroundStyle(.secondary)
             }
+            .frame(width: proxy.size.width, height: dynamicHeight, alignment: .center)
+            // Pin the top edge so the view expands upward when pulling down
+            .offset(y: minY > 0 ? -minY : 0)
         }
-        .frame(maxWidth: .infinity, minHeight: 300, maxHeight: 300)
+        // Important: the outer GeometryReader needs a fixed baseline height
+        .frame(height: 300)
         .contentShape(Rectangle())
     }
     
