@@ -22,6 +22,11 @@ struct TaxonDetailView: View {
                     Divider()
                         .padding(.horizontal, 16)
                     
+                    if let prompts = taxon.userPrompt, !prompts.isEmpty {
+                        UserPromptView(prompt: prompts)
+                            .padding(.horizontal, 16)
+                    }
+                    
                     if let wikipedia = taxon.meta?.wikipedia {
                         if let extract = wikipedia.extract {
                             section(title: "概述", text: extract)
@@ -85,7 +90,7 @@ struct TaxonDetailView: View {
         .frame(maxWidth: .infinity, minHeight: 300, maxHeight: 300)
         .contentShape(Rectangle())
     }
-
+    
     private var titleBlock: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -115,6 +120,49 @@ struct TaxonDetailView: View {
                 .font(.body)
                 .foregroundStyle(.secondary)
         }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading) // 讓卡片撐滿可用寬度
+        .background(
+            ZStack(alignment: .top) {
+                // Bottom-only "shadow" using a gradient strip (top -> clear)
+                
+                // Card surface
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.white, Color(white: 0.98)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(Color.black.opacity(0.06), lineWidth: 0.5)
+                    )
+                
+                VStack {
+                    Spacer()
+                    LinearGradient(
+                        colors: [
+                            Color.black.opacity(0.00),
+                            Color.black.opacity(0.07)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: 20)
+                    .offset(y: 4)
+                    .mask(
+                        RoundedRectangle(cornerRadius: 0, style: .continuous)
+                            .customRounded(
+                                bottomLeft: 12,
+                                bottomRight: 12,
+                                lineWidth: 0)
+                    )
+                    .allowsHitTesting(false)
+                }
+            }
+        )
     }
 
     private var footerButtons: some View {
@@ -134,44 +182,6 @@ struct TaxonDetailView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)
-        }
-    }
-}
-
-// MARK: - Distribution Card
-struct DistributionCardView: View {
-    let distribution: FishDistribution
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Distribution")
-                .font(.headline)
-            HStack(alignment: .top, spacing: 12) {
-                // Snapshot placeholder (real map snapshot can replace this later)
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemGray5))
-                    .frame(width: 120, height: 90)
-                    .overlay(
-                        Image(systemName: "map")
-                            .imageScale(.large)
-                            .foregroundStyle(.secondary)
-                    )
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Distribution Map")
-                        .font(.subheadline).bold()
-                    if let summary = distribution.placesSummary, !summary.isEmpty {
-                        Text(summary)
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                    }
-                    Text("Tap \"Map\" to view heatmap/points/range layers.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer(minLength: 0)
-            }
-            .padding(12)
-            .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemBackground)))
         }
     }
 }
@@ -249,7 +259,12 @@ private extension TaxonItem {
                 DistributionLayer(layerKey: "points_tiles", type: "xyz",
                                   url: "https://api.inaturalist.org/v1/points/{z}/{x}/{y}.png?taxon_id=49269&verifiable=true",
                                   minzoom: 0, maxzoom: 19)
-            ]
+            ], userPrompt:  UserPrompt(
+                morphology: ["Fusiform", "Compressed", "Elongated"],
+                pattern: ["Striped", "Spotted", "Solid"],
+                traits: ["Large Mouth", "Small Mouth", "Sharp Teeth"],
+                habitat: ["Freshwater", "Saltwater", "Brackish"]
+            )
         )
     }
 }

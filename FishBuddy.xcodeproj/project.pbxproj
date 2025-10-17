@@ -39,6 +39,10 @@
 		05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */; };
 		05623FD02E1234D300B33D2D /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05623FCF2E1234D300B33D2D /* SearchBar.swift */; };
 		0571B4282E861A7E005CBFF8 /* TestMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0571B4272E861A7E005CBFF8 /* TestMapView.swift */; };
+		057F16242E9FE1B400EC7710 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 057F16232E9FE1B400EC7710 /* catalog.sqlite */; };
+		057F16262EA1DF2000EC7710 /* DistributionCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057F16252EA1DF2000EC7710 /* DistributionCardView.swift */; };
+		057F16282EA1E07600EC7710 /* UserPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057F16272EA1E07600EC7710 /* UserPromptView.swift */; };
+		057F167A2EA1E54400EC7710 /* WrapLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057F16792EA1E54400EC7710 /* WrapLayout.swift */; };
 		058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058877022DC1BE4D00B1D13E /* WeatherView2.swift */; };
 		058F58A72E7BA42C009913C5 /* BackgroundRemoverVK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */; };
 		0595566F2E14D5BA0050147C /* TideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0595566E2E14D5B90050147C /* TideView.swift */; };
@@ -83,7 +87,6 @@
 		05FAEF322E00F52500E9BD08 /* CardSliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF312E00F52500E9BD08 /* CardSliderView.swift */; };
 		05FAEF342E00F53D00E9BD08 /* CardSliderSubViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF332E00F52F00E9BD08 /* CardSliderSubViews.swift */; };
 		05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF382E013B6B00E9BD08 /* CardSliderVM.swift */; };
-		05FC90E62E9688950053A1C2 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 05FC90E52E9688940053A1C2 /* catalog.sqlite */; };
 		05FC90ED2E9894210053A1C2 /* TaxonDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FC90EC2E9894210053A1C2 /* TaxonDetailView.swift */; };
 /* End PBXBuildFile section */
 
@@ -121,6 +124,10 @@
 		05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FeatureTitleBar.xib; sourceTree = "<group>"; };
 		05623FCF2E1234D300B33D2D /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		0571B4272E861A7E005CBFF8 /* TestMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestMapView.swift; sourceTree = "<group>"; };
+		057F16232E9FE1B400EC7710 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
+		057F16252EA1DF2000EC7710 /* DistributionCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributionCardView.swift; sourceTree = "<group>"; };
+		057F16272EA1E07600EC7710 /* UserPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPromptView.swift; sourceTree = "<group>"; };
+		057F16792EA1E54400EC7710 /* WrapLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrapLayout.swift; sourceTree = "<group>"; };
 		058877022DC1BE4D00B1D13E /* WeatherView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView2.swift; sourceTree = "<group>"; };
 		058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRemoverVK.swift; sourceTree = "<group>"; };
 		0595566E2E14D5B90050147C /* TideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideView.swift; sourceTree = "<group>"; };
@@ -159,7 +166,6 @@
 		05FAEF312E00F52500E9BD08 /* CardSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderView.swift; sourceTree = "<group>"; };
 		05FAEF332E00F52F00E9BD08 /* CardSliderSubViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderSubViews.swift; sourceTree = "<group>"; };
 		05FAEF382E013B6B00E9BD08 /* CardSliderVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSliderVM.swift; sourceTree = "<group>"; };
-		05FC90E52E9688940053A1C2 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
 		05FC90EC2E9894210053A1C2 /* TaxonDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaxonDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -406,6 +412,7 @@
 		05589EF72CE6F7DE003881AA /* Componet */ = {
 			isa = PBXGroup;
 			children = (
+				057F16782EA1E4D100EC7710 /* WrapLayout */,
 				05C13B842E98E25200BE9FA0 /* ImageInspectorView  */,
 				051B88372E6E8AE600209CDB /* CustomRounded */,
 				051B882E2E6E8A7400209CDB /* SkeletonView */,
@@ -441,10 +448,18 @@
 			path = Map;
 			sourceTree = "<group>";
 		};
+		057F16782EA1E4D100EC7710 /* WrapLayout */ = {
+			isa = PBXGroup;
+			children = (
+				057F16792EA1E54400EC7710 /* WrapLayout.swift */,
+			);
+			path = WrapLayout;
+			sourceTree = "<group>";
+		};
 		058F58A12E764C79009913C5 /* Database */ = {
 			isa = PBXGroup;
 			children = (
-				05FC90E52E9688940053A1C2 /* catalog.sqlite */,
+				057F16232E9FE1B400EC7710 /* catalog.sqlite */,
 			);
 			path = Database;
 			sourceTree = "<group>";
@@ -680,6 +695,8 @@
 		05FC90EA2E9894020053A1C2 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				057F16252EA1DF2000EC7710 /* DistributionCardView.swift */,
+				057F16272EA1E07600EC7710 /* UserPromptView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -756,8 +773,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				05FC90E62E9688950053A1C2 /* catalog.sqlite in Resources */,
 				054C844C2CD9B995005595EF /* Assets.xcassets in Resources */,
+				057F16242E9FE1B400EC7710 /* catalog.sqlite in Resources */,
 				0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */,
 				05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */,
 				05589EF62CE6F5C5003881AA /* Weather.storyboard in Resources */,
@@ -781,9 +798,11 @@
 				05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */,
 				05FAEF162DF2782400E9BD08 /* RestaurantModel.swift in Sources */,
 				05589EF42CE6F2D2003881AA /* UIViewControllerExtension.swift in Sources */,
+				057F16282EA1E07600EC7710 /* UserPromptView.swift in Sources */,
 				051B88322E6E8A9600209CDB /* ViewExtension.swift in Sources */,
 				05FAEF302E00F4F200E9BD08 /* TransactionsDM.swift in Sources */,
 				054C84652CD9C144005595EF /* WeatherService.swift in Sources */,
+				057F16262EA1DF2000EC7710 /* DistributionCardView.swift in Sources */,
 				05589EEF2CE6EFF3003881AA /* LobbyVM.swift in Sources */,
 				058F58A72E7BA42C009913C5 /* BackgroundRemoverVK.swift in Sources */,
 				054C84472CD9B994005595EF /* LobbyViewController.swift in Sources */,
@@ -815,6 +834,7 @@
 				05C94D962E6ABF7C0051B078 /* CLIPFeatureExtractor.swift in Sources */,
 				05C94D972E6ABF7C0051B078 /* mobileclip_s1_image.mlpackage in Sources */,
 				05C94D982E6ABF7C0051B078 /* ImageUtils.swift in Sources */,
+				057F167A2EA1E54400EC7710 /* WrapLayout.swift in Sources */,
 				05C94D992E6ABF7C0051B078 /* CameraStreamView.swift in Sources */,
 				05C94D9A2E6ABF7C0051B078 /* EmbeddingImgModel.swift in Sources */,
 				05E672E42CDB0CB3006CF3BF /* DebugLogger.swift in Sources */,

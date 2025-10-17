@@ -168,6 +168,14 @@ CREATE TABLE text_embedding_meta (
   meta_json TEXT
 );
 
+CREATE TABLE user_prompt_zh (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  taxon_id INTEGER NOT NULL,
+  category TEXT NOT NULL,  -- e.g. morphology / pattern / traits / habitat
+  text TEXT NOT NULL
+);
+
+CREATE INDEX idx_user_prompt_zh_taxon ON user_prompt_zh(taxon_id);
 CREATE INDEX idx_species_sci ON species(scientific_name);
 CREATE INDEX idx_photos_taxon ON photos(taxon_id);
 CREATE INDEX idx_distribution_layers_taxon ON distribution_layers(taxon_id);
@@ -275,6 +283,12 @@ CREATE INDEX idx_distribution_layers_taxon ON distribution_layers(taxon_id);
         let dl_minzoom   = SQLite.Expression<Int>("minzoom")
         let dl_maxzoom   = SQLite.Expression<Int>("maxzoom")
         
+        // === 關聯表（user_prompt_zh） ===
+        let userPromptT = Table("user_prompt_zh")
+        let up_taxon    = SQLite.Expression<Int>("taxon_id")
+        let up_category = SQLite.Expression<String>("category")
+        let up_text     = SQLite.Expression<String>("text")
+        
         // 1) 撈全部 species
         let speciesRows = try Array(db.prepare(speciesT.select(s_taxon, s_sci, s_common, s_slug)))
 
@@ -356,8 +370,41 @@ CREATE INDEX idx_distribution_layers_taxon ON distribution_layers(taxon_id);
             )
             distLayersMap[tid, default: []].append(layer)
         }
+        
+        // 7) 撈 user_prompt_zh（每個 taxon 多筆）→ 依 category 分配到 UserPrompt 的各欄位
+        // Map: taxon_id -> UserPrompt（含 morphology / pattern / traits / habitat 四個欄位陣列）
+        var userPromptMap: [Int: UserPrompt] = [:]
+        for r in try db.prepare(userPromptT.select(up_taxon, up_category, up_text)) {
+            let tid = r[up_taxon]
+            let category = r[up_category]
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .lowercased()
+            let text = r[up_text]
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !text.isEmpty else { continue }
 
-        // 7) 組裝 TaxonItem
+            // 取出或建立預設的 UserPrompt
+            var up = userPromptMap[tid] ?? UserPrompt.defaultValue
+
+            // 依 up_category 放入對應欄位
+            switch category {
+            case "morphology", "morph", "morphologies":
+                up.morphology.append(text)
+            case "pattern", "patterns":
+                up.pattern.append(text)
+            case "traits", "trait", "behavior", "behaviour":
+                up.traits.append(text)
+            case "habitat", "habitats", "env", "environment":
+                up.habitat.append(text)
+            default:
+                // 未知類別：視需求選擇忽略、歸入某一欄位、或另外記錄
+                print("⚠️ 未知的 user_prompt 類別：\(category) (taxon_id=\(tid))")
+            }
+
+            userPromptMap[tid] = up
+        }
+
+        // 8) 組裝 TaxonItem
         return speciesRows.map { r in
             let tid = r[s_taxon]
             return TaxonItem(
@@ -371,7 +418,8 @@ CREATE INDEX idx_distribution_layers_taxon ON distribution_layers(taxon_id);
                 textEmbedding: textEmbedMap[tid] ?? [],
                 embeddingMeta: embedMetaMap[tid],
                 distribution: distMap[tid],
-                distributionLayers: distLayersMap[tid]
+                distributionLayers: distLayersMap[tid],
+                userPrompt: userPromptMap[tid]
             )
         }
     }

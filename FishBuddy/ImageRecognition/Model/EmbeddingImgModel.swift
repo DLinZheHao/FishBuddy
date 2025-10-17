@@ -39,7 +39,9 @@ struct TaxonItem: Codable {
     let distribution: Distribution?
     /// 物種分布圖層
     let distributionLayers: [DistributionLayer]?
-
+    /// 物種提示
+    let userPrompt: UserPrompt?
+    
     enum CodingKeys: String, CodingKey {
         case taxonId = "taxon_id"
         case scientificName = "scientific_name"
@@ -52,7 +54,26 @@ struct TaxonItem: Codable {
         case textEmbedding = "text_embedding"
         case distribution
         case distributionLayers = "distribution_layers"
+        case userPrompt = "user_prompt"
     }
+}
+
+struct UserPrompt: Codable, DefaultValue {
+    static var defaultValue = UserPrompt(morphology: [], pattern: [], traits: [], habitat: [])
+    /// 形態資料
+    @Default var morphology: [String]
+    /// 圖案
+    @Default var pattern: [String]
+    /// 特徵
+    @Default var traits: [String]
+    /// 棲息地
+    @Default var habitat: [String]
+    
+    /// 檢查是不是資料都是空的
+    var isEmpty: Bool {
+        morphology.isEmpty && pattern.isEmpty && traits.isEmpty && habitat.isEmpty
+    }
+    
 }
 
 struct Photo: Codable {
