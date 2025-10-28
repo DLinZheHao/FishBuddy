@@ -88,7 +88,7 @@ struct CameraStreamView: View {
                         
                         // 右上角：地圖（push 到 MapView）
                         NavigationLink {
-                            MapView()
+                            TaxonDistributionView(taxonId: 49269)
                                 .navigationTitle("地圖")
                                 .navigationBarTitleDisplayMode(.inline)
                         } label: {

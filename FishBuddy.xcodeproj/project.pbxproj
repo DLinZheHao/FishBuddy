@@ -43,6 +43,13 @@
 		057F16262EA1DF2000EC7710 /* DistributionCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057F16252EA1DF2000EC7710 /* DistributionCardView.swift */; };
 		057F16282EA1E07600EC7710 /* UserPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057F16272EA1E07600EC7710 /* UserPromptView.swift */; };
 		057F167A2EA1E54400EC7710 /* WrapLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057F16792EA1E54400EC7710 /* WrapLayout.swift */; };
+		057F16802EA5C58600EC7710 /* TaxonDistributionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057F167F2EA5C58600EC7710 /* TaxonDistributionViewController.swift */; };
+		05823E022EB065D200BDC553 /* TileCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05823E012EB065CB00BDC553 /* TileCache.swift */; };
+		05823E052EB0666A00BDC553 /* MKMapRectExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05823E042EB0666500BDC553 /* MKMapRectExtension.swift */; };
+		05823E072EB0673E00BDC553 /* CachedTileOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05823E062EB0673200BDC553 /* CachedTileOverlay.swift */; };
+		05823E092EB0678B00BDC553 /* EphemeralTileOverlay..swift in Sources */ = {isa = PBXBuildFile; fileRef = 05823E082EB0678A00BDC553 /* EphemeralTileOverlay..swift */; };
+		05823E0B2EB0681F00BDC553 /* ObservationDotsOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05823E0A2EB0681E00BDC553 /* ObservationDotsOverlay.swift */; };
+		05823E0D2EB0683D00BDC553 /* ObservationDotsRenderer..swift in Sources */ = {isa = PBXBuildFile; fileRef = 05823E0C2EB0683C00BDC553 /* ObservationDotsRenderer..swift */; };
 		058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058877022DC1BE4D00B1D13E /* WeatherView2.swift */; };
 		058F58A72E7BA42C009913C5 /* BackgroundRemoverVK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */; };
 		0595566F2E14D5BA0050147C /* TideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0595566E2E14D5B90050147C /* TideView.swift */; };
@@ -128,6 +135,13 @@
 		057F16252EA1DF2000EC7710 /* DistributionCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributionCardView.swift; sourceTree = "<group>"; };
 		057F16272EA1E07600EC7710 /* UserPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPromptView.swift; sourceTree = "<group>"; };
 		057F16792EA1E54400EC7710 /* WrapLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrapLayout.swift; sourceTree = "<group>"; };
+		057F167F2EA5C58600EC7710 /* TaxonDistributionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaxonDistributionViewController.swift; sourceTree = "<group>"; };
+		05823E012EB065CB00BDC553 /* TileCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileCache.swift; sourceTree = "<group>"; };
+		05823E042EB0666500BDC553 /* MKMapRectExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MKMapRectExtension.swift; sourceTree = "<group>"; };
+		05823E062EB0673200BDC553 /* CachedTileOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedTileOverlay.swift; sourceTree = "<group>"; };
+		05823E082EB0678A00BDC553 /* EphemeralTileOverlay..swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EphemeralTileOverlay..swift; sourceTree = "<group>"; };
+		05823E0A2EB0681E00BDC553 /* ObservationDotsOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservationDotsOverlay.swift; sourceTree = "<group>"; };
+		05823E0C2EB0683C00BDC553 /* ObservationDotsRenderer..swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservationDotsRenderer..swift; sourceTree = "<group>"; };
 		058877022DC1BE4D00B1D13E /* WeatherView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView2.swift; sourceTree = "<group>"; };
 		058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRemoverVK.swift; sourceTree = "<group>"; };
 		0595566E2E14D5B90050147C /* TideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideView.swift; sourceTree = "<group>"; };
@@ -258,7 +272,7 @@
 			children = (
 				05C94D922E6ABF7C0051B078 /* mobileclip_s1_image.mlpackage */,
 				05C94D912E6ABF7C0051B078 /* ImageRecognition */,
-				05D266AF2DDABBE400F140D3 /* Pratice */,
+				05D266AF2DDABBE400F140D3 /* PraticeDraft */,
 				05589EF72CE6F7DE003881AA /* Componet */,
 				054C845B2CD9C030005595EF /* Common */,
 				054C84562CD9BD37005595EF /* APIService */,
@@ -400,6 +414,7 @@
 		05589EF02CE6F084003881AA /* Extension */ = {
 			isa = PBXGroup;
 			children = (
+				05823E032EB0664D00BDC553 /* Map */,
 				051B88312E6E8A9600209CDB /* ViewExtension.swift */,
 				05589EF12CE6F0A7003881AA /* UIStoryboardExtension.swift */,
 				05589EF32CE6F2D2003881AA /* UIViewControllerExtension.swift */,
@@ -454,6 +469,67 @@
 				057F16792EA1E54400EC7710 /* WrapLayout.swift */,
 			);
 			path = WrapLayout;
+			sourceTree = "<group>";
+		};
+		057F167B2EA5C50B00EC7710 /* TaxonDistribution */ = {
+			isa = PBXGroup;
+			children = (
+				05823DFE2EB0658100BDC553 /* Vectors */,
+				05823DFD2EB0657B00BDC553 /* Tiles */,
+				057F167E2EA5C54D00EC7710 /* Model */,
+				057F167D2EA5C54900EC7710 /* View */,
+				057F167C2EA5C54300EC7710 /* ViewModel */,
+				057F167F2EA5C58600EC7710 /* TaxonDistributionViewController.swift */,
+			);
+			path = TaxonDistribution;
+			sourceTree = "<group>";
+		};
+		057F167C2EA5C54300EC7710 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		057F167D2EA5C54900EC7710 /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		057F167E2EA5C54D00EC7710 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		05823DFD2EB0657B00BDC553 /* Tiles */ = {
+			isa = PBXGroup;
+			children = (
+				05823E082EB0678A00BDC553 /* EphemeralTileOverlay..swift */,
+				05823E062EB0673200BDC553 /* CachedTileOverlay.swift */,
+				05823E012EB065CB00BDC553 /* TileCache.swift */,
+			);
+			path = Tiles;
+			sourceTree = "<group>";
+		};
+		05823DFE2EB0658100BDC553 /* Vectors */ = {
+			isa = PBXGroup;
+			children = (
+				05823E0C2EB0683C00BDC553 /* ObservationDotsRenderer..swift */,
+				05823E0A2EB0681E00BDC553 /* ObservationDotsOverlay.swift */,
+			);
+			path = Vectors;
+			sourceTree = "<group>";
+		};
+		05823E032EB0664D00BDC553 /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				05823E042EB0666500BDC553 /* MKMapRectExtension.swift */,
+			);
+			path = Map;
 			sourceTree = "<group>";
 		};
 		058F58A12E764C79009913C5 /* Database */ = {
@@ -538,7 +614,7 @@
 			path = Persistence;
 			sourceTree = "<group>";
 		};
-		05D266AF2DDABBE400F140D3 /* Pratice */ = {
+		05D266AF2DDABBE400F140D3 /* PraticeDraft */ = {
 			isa = PBXGroup;
 			children = (
 				0571B4262E86172C005CBFF8 /* Map */,
@@ -549,7 +625,7 @@
 				05FAEF112DF2740700E9BD08 /* BottomSheet */,
 				05D266B02DDABBF500F140D3 /* gesture */,
 			);
-			path = Pratice;
+			path = PraticeDraft;
 			sourceTree = "<group>";
 		};
 		05D266B02DDABBF500F140D3 /* gesture */ = {
@@ -669,6 +745,7 @@
 		05FC90E72E9893D80053A1C2 /* Taxon */ = {
 			isa = PBXGroup;
 			children = (
+				057F167B2EA5C50B00EC7710 /* TaxonDistribution */,
 				05FC90E82E9893E80053A1C2 /* TaxonDetail */,
 			);
 			path = Taxon;
@@ -794,16 +871,19 @@
 				05C94DA82E6ACA4C0051B078 /* FishDBManager.swift in Sources */,
 				054C846E2CDB06AA005595EF /* WeatherAllModel.swift in Sources */,
 				05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */,
+				05823E0D2EB0683D00BDC553 /* ObservationDotsRenderer..swift in Sources */,
 				05FAEF342E00F53D00E9BD08 /* CardSliderSubViews.swift in Sources */,
 				05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */,
 				05FAEF162DF2782400E9BD08 /* RestaurantModel.swift in Sources */,
 				05589EF42CE6F2D2003881AA /* UIViewControllerExtension.swift in Sources */,
+				057F16802EA5C58600EC7710 /* TaxonDistributionViewController.swift in Sources */,
 				057F16282EA1E07600EC7710 /* UserPromptView.swift in Sources */,
 				051B88322E6E8A9600209CDB /* ViewExtension.swift in Sources */,
 				05FAEF302E00F4F200E9BD08 /* TransactionsDM.swift in Sources */,
 				054C84652CD9C144005595EF /* WeatherService.swift in Sources */,
 				057F16262EA1DF2000EC7710 /* DistributionCardView.swift in Sources */,
 				05589EEF2CE6EFF3003881AA /* LobbyVM.swift in Sources */,
+				05823E072EB0673E00BDC553 /* CachedTileOverlay.swift in Sources */,
 				058F58A72E7BA42C009913C5 /* BackgroundRemoverVK.swift in Sources */,
 				054C84472CD9B994005595EF /* LobbyViewController.swift in Sources */,
 				0595566F2E14D5BA0050147C /* TideView.swift in Sources */,
@@ -812,6 +892,7 @@
 				051B882F2E6E8A7400209CDB /* SkeletonListView.swift in Sources */,
 				051B88302E6E8A7400209CDB /* SkeletonView.swift in Sources */,
 				05FAEF1C2DF2C22A00E9BD08 /* TripModel.swift in Sources */,
+				05823E052EB0666A00BDC553 /* MKMapRectExtension.swift in Sources */,
 				054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */,
 				05FC90ED2E9894210053A1C2 /* TaxonDetailView.swift in Sources */,
 				05FAEF322E00F52500E9BD08 /* CardSliderView.swift in Sources */,
@@ -827,13 +908,16 @@
 				0571B4282E861A7E005CBFF8 /* TestMapView.swift in Sources */,
 				05589EF92CE6F808003881AA /* FeatrueTitleBar.swift in Sources */,
 				05FAEF202DF2C2AD00E9BD08 /* GestureAnimationSubViews.swift in Sources */,
+				05823E0B2EB0681F00BDC553 /* ObservationDotsOverlay.swift in Sources */,
 				05589EF22CE6F0A7003881AA /* UIStoryboardExtension.swift in Sources */,
 				05C94D932E6ABF7C0051B078 /* JsonUtils.swift in Sources */,
+				05823E092EB0678B00BDC553 /* EphemeralTileOverlay..swift in Sources */,
 				05C94D942E6ABF7C0051B078 /* CameraController.swift in Sources */,
 				05C94D952E6ABF7C0051B078 /* CameraStreamVM.swift in Sources */,
 				05C94D962E6ABF7C0051B078 /* CLIPFeatureExtractor.swift in Sources */,
 				05C94D972E6ABF7C0051B078 /* mobileclip_s1_image.mlpackage in Sources */,
 				05C94D982E6ABF7C0051B078 /* ImageUtils.swift in Sources */,
+				05823E022EB065D200BDC553 /* TileCache.swift in Sources */,
 				057F167A2EA1E54400EC7710 /* WrapLayout.swift in Sources */,
 				05C94D992E6ABF7C0051B078 /* CameraStreamView.swift in Sources */,
 				05C94D9A2E6ABF7C0051B078 /* EmbeddingImgModel.swift in Sources */,
