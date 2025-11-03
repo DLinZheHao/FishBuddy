@@ -9,10 +9,12 @@ import MapKit
 
 /// 快取式圖層：優先用快取，無則抓網路；使用磁碟快取
 class CachedTileOverlay: MKTileOverlay {
-    private let session: URLSession = {
+    private lazy var session: URLSession = {
         let cfg = URLSessionConfiguration.default
         cfg.requestCachePolicy = .returnCacheDataElseLoad
-        cfg.urlCache = TileCache.shared
+        cfg.urlCache = TileCache.shared                // 你自訂的較大快取
+        cfg.waitsForConnectivity = false               // 沒網路立即回錯，不掛起
+        cfg.httpMaximumConnectionsPerHost = 6          // 合理並發
         return URLSession(configuration: cfg)
     }()
 
@@ -23,7 +25,11 @@ class CachedTileOverlay: MKTileOverlay {
             .replacingOccurrences(of: "{x}", with: String(path.x))
             .replacingOccurrences(of: "{y}", with: String(path.y))
         guard let url = URL(string: urlStr) else { result(nil, nil); return }
-        session.dataTask(with: URLRequest(url: url)) { data, _, err in
+
+        var req = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 15)
+        // 如果需要：req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        session.dataTask(with: req) { data, _, err in
             result(data, err)
         }.resume()
     }

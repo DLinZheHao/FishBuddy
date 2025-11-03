@@ -21,7 +21,7 @@ class APIService {
     /// 預設的cache類別
     public static let defaultCacheType: URLRequest.CachePolicy = .useProtocolCachePolicy
     /// taskPool 操作 queue
-    private var taskPoolQueue =  DispatchQueue(label: "APIService.taskPool", attributes: .concurrent)
+    private var taskPoolQueue = DispatchQueue(label: "APIService.taskPool", attributes: .concurrent)
     /// 記錄目前的 request 池
     private var taskPool = [String: Moya.Cancellable]()
     
@@ -108,7 +108,7 @@ class APIService {
             self.taskPool.removeValue(forKey: target.path)
         }
     }
-    
+        
     /// 使用 combine + Moya 進行 API 資料請求
     func requestDataCombine(target: TargetType) -> AnyPublisher<Any?, MoyaError> {
         let target = MultiTarget(target)

@@ -111,7 +111,7 @@ final class TaxonDistributionViewController: UIViewController, MKMapViewDelegate
 
     /// 建立通用 XYZ 瓦片 overlay（使用系統 URLCache 緩存）
     private func makeTileOverlay(_ urlTemplate: String) -> MKTileOverlay {
-        let o = MKTileOverlay(urlTemplate: urlTemplate)
+        let o = CachedTileOverlay(urlTemplate: urlTemplate)
         o.canReplaceMapContent = false // 避免蓋掉原生地圖上面的物件
         o.minimumZ = 0
         o.maximumZ = 19

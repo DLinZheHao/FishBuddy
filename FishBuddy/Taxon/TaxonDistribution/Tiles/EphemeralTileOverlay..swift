@@ -7,7 +7,7 @@
 
 import MapKit
 
-/// 臨時性圖層：只使用記憶體，不佔用磁碟；適合點狀資料
+/// 臨時性圖層：只使用記憶體，不佔用磁碟；適合點狀資料，因為完全不重用網路資料
 class EphemeralTileOverlay: MKTileOverlay {
     private let session: URLSession = {
         let cfg = URLSessionConfiguration.ephemeral
