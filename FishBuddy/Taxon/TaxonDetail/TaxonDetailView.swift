@@ -10,6 +10,7 @@ import SwiftUI
 // MARK: - View
 struct TaxonDetailView: View {
     let taxon: TaxonItem
+    @State private var showDistribution = false
 
     var body: some View {
         ScrollView {
@@ -51,11 +52,6 @@ struct TaxonDetailView: View {
                             section(title: "經濟利用", text: economicUse)
                                 .padding(.horizontal, 16)
                         }
-                        // 分布地區區塊
-//                        if let dist = taxon.distribution {
-//                            DistributionCardView(distribution: dist)
-//                                .padding(.top, 4)
-//                        }
                     }
                    
                 }
@@ -69,6 +65,11 @@ struct TaxonDetailView: View {
         .scrollIndicators(.hidden)
         .ignoresSafeArea(.container, edges: .top)
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $showDistribution) {
+            TaxonDistributionView(taxonId: taxon.taxonId)
+                .navigationTitle("地圖")
+                .navigationBarTitleDisplayMode(.inline)
+        }
     }
 
     // MARK: - Subviews
@@ -191,11 +192,18 @@ struct TaxonDetailView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)
-            Button(action: {}) {
-                Label("Map", systemImage: "map")
-                    .frame(maxWidth: .infinity)
+            
+            // 分布地區區塊
+            if taxon.distributionLayers != nil {
+                Button(action: {
+                    showDistribution = true
+                }) {
+                    Label("Map", systemImage: "map")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
             }
-            .buttonStyle(.borderedProminent)
+
             Button(action: {}) {
                 Label("Share", systemImage: "square.and.arrow.up")
                     .frame(maxWidth: .infinity)
@@ -295,4 +303,3 @@ private extension TaxonItem {
     }
 }
 #endif
-

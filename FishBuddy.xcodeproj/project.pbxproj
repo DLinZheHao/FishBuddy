@@ -40,7 +40,6 @@
 		05623FD02E1234D300B33D2D /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05623FCF2E1234D300B33D2D /* SearchBar.swift */; };
 		0571B4282E861A7E005CBFF8 /* TestMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0571B4272E861A7E005CBFF8 /* TestMapView.swift */; };
 		057F16242E9FE1B400EC7710 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 057F16232E9FE1B400EC7710 /* catalog.sqlite */; };
-		057F16262EA1DF2000EC7710 /* DistributionCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057F16252EA1DF2000EC7710 /* DistributionCardView.swift */; };
 		057F16282EA1E07600EC7710 /* UserPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057F16272EA1E07600EC7710 /* UserPromptView.swift */; };
 		057F167A2EA1E54400EC7710 /* WrapLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057F16792EA1E54400EC7710 /* WrapLayout.swift */; };
 		057F16802EA5C58600EC7710 /* TaxonDistributionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057F167F2EA5C58600EC7710 /* TaxonDistributionViewController.swift */; };
@@ -132,7 +131,6 @@
 		05623FCF2E1234D300B33D2D /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		0571B4272E861A7E005CBFF8 /* TestMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestMapView.swift; sourceTree = "<group>"; };
 		057F16232E9FE1B400EC7710 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
-		057F16252EA1DF2000EC7710 /* DistributionCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributionCardView.swift; sourceTree = "<group>"; };
 		057F16272EA1E07600EC7710 /* UserPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPromptView.swift; sourceTree = "<group>"; };
 		057F16792EA1E54400EC7710 /* WrapLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrapLayout.swift; sourceTree = "<group>"; };
 		057F167F2EA5C58600EC7710 /* TaxonDistributionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaxonDistributionViewController.swift; sourceTree = "<group>"; };
@@ -772,7 +770,6 @@
 		05FC90EA2E9894020053A1C2 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				057F16252EA1DF2000EC7710 /* DistributionCardView.swift */,
 				057F16272EA1E07600EC7710 /* UserPromptView.swift */,
 			);
 			path = View;
@@ -881,7 +878,6 @@
 				051B88322E6E8A9600209CDB /* ViewExtension.swift in Sources */,
 				05FAEF302E00F4F200E9BD08 /* TransactionsDM.swift in Sources */,
 				054C84652CD9C144005595EF /* WeatherService.swift in Sources */,
-				057F16262EA1DF2000EC7710 /* DistributionCardView.swift in Sources */,
 				05589EEF2CE6EFF3003881AA /* LobbyVM.swift in Sources */,
 				05823E072EB0673E00BDC553 /* CachedTileOverlay.swift in Sources */,
 				058F58A72E7BA42C009913C5 /* BackgroundRemoverVK.swift in Sources */,
