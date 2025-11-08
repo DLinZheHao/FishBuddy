@@ -41,7 +41,7 @@ extension LobbyVM {
                                                        selectedSystemName: "cloud.sun.fill")
                 
             case .imageRecognition:
-                controller = CameraStreamVC(rootView: CameraStreamView())
+                controller = CameraStreamVC()
                 controller.tabBarItem = makeTabBarItem(title: "辨識",
                                                        imageSystemName: "camera",
                                                        selectedSystemName: "camera.fill")
@@ -64,9 +64,30 @@ extension LobbyVM {
 
 // MARK: - Hosting Controllers
 class CameraStreamVC: UIHostingController<CameraStreamView> {
+    
+    init() {
+        let view = CameraStreamView()
+        super.init(rootView: view)
+        
+        // 讓 SwiftUI 的 onClose 真的切 tab
+        self.rootView = CameraStreamView(onClose: { [weak self] in
+            self?.tabBarController?.selectedIndex = 0   // 切回天氣 tab
+        })
+    }
+    
+    @MainActor required dynamic init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder, rootView: CameraStreamView())
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        tabBarController?.tabBar.isHidden = true
         self.setNeedsUpdateOfSupportedInterfaceOrientations()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        tabBarController?.tabBar.isHidden = false
     }
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {

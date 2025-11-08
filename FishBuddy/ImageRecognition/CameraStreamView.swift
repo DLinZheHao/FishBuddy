@@ -23,14 +23,19 @@ struct CameraStreamView: View {
     @State private var showHelp = false
     /// 拍攝運作模式
     typealias CaptureMode = CameraStreamVM.CaptureMode
+    /// 回去天氣頁面的閉包
+    var onClose: (() -> Void)?
     
     var body: some View {
         NavigationStack {
             ZStack {
-                // Full-screen camera preview (edge-to-edge)
+                // 整個鏡頭預覽區域
                 ZStack(alignment: .topLeading) {
+                    // 鏡頭畫面
                     CameraPreview(session: vm.captureSession, camera: camera)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .ignoresSafeArea()
+                    // 瞄準框
                     FramingGuide(aspect: .wide43, onCenterTap: { pointInView, rect in
                         camera.startTracking(withNormalizedBox: rect)
                     })
@@ -38,7 +43,7 @@ struct CameraStreamView: View {
                     .ignoresSafeArea()
                     .zIndex(1) // 確保在預覽上層
 
-                    // 如果要畫追蹤框，可以加一層 overlay
+                    // animial tracking box
                     if let box = camera.trackedBoxInView {
                         Rectangle()
                             .stroke(lineWidth: 2)
@@ -48,7 +53,6 @@ struct CameraStreamView: View {
                     
                     // 左上角：功能說明（tooltip/popover）
                     Button {
-                        let _ = print("show help")
                         showHelp.toggle()
                     } label: {
                         Image(systemName: "questionmark.circle.fill")
@@ -58,7 +62,6 @@ struct CameraStreamView: View {
                     }
                     .zIndex(2) // 讓按鈕在 FramingGuide 之上，避免被攔截手勢
                     .popover(isPresented: $showHelp, arrowEdge: .bottom) {
-                        let _ = print("show help")
                         VStack(alignment: .leading, spacing: 8) {
                             Text("📌 功能說明")
                                 .font(.headline)
@@ -67,12 +70,11 @@ struct CameraStreamView: View {
                         }
                         .padding()
                         .frame(width: 220)
+                        .presentationCompactAdaptation(.popover) // 適應動畫模式
                     }
-                    .presentationCompactAdaptation(.popover)
                 }
                 // 當換成「新的」AVCaptureSession 實例時，強制 SwiftUI 重新建構預覽（每次切換都會開啟新的 session）
                 .id(camera.captureSession.map { ObjectIdentifier($0) }) // ObjectIdentifier 是一種「以物件記憶體身份作為唯一值」的東西
-
                 // 進度指示：以「相機/模型就緒」為條件顯示
                 .overlay(alignment: .center) {
                     if vm.captureSession == nil || !vm.didLoadExtractor {
@@ -80,12 +82,6 @@ struct CameraStreamView: View {
                             .padding()
                             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
                             .transition(.opacity)
-                    }
-                }
-                // 嵌入向量消費者：當 stream 建立後開始消費
-                .overlay(alignment: .center) {
-                    if let embeddings = vm.embeddings {
-                        EmbeddingConsumer(stream: embeddings, id: vm.streamID)
                     }
                 }
 
@@ -108,11 +104,11 @@ struct CameraStreamView: View {
                         .background(.ultraThinMaterial, in: Capsule())
                         
                         // 切換前/後鏡頭
-                        Toggle("後鏡頭", isOn: Binding(
+                        Toggle("鏡頭", isOn: Binding(
                             get: { camera.backCamera },
                             set: { camera.backCamera = $0 }
                         ))
-                        .labelsHidden()
+                        .labelsHidden() // 隱藏標籤
                         .padding(10)
                         .background(.ultraThinMaterial, in: Capsule())
                     }
@@ -121,7 +117,7 @@ struct CameraStreamView: View {
 
                     Spacer()
 
-                    // 搜尋結果顯示（上方左側浮出）
+                    // 搜尋結果顯示
                     if let results = vm.imageSearchResult, !results.isEmpty {
                         VStack(alignment: .leading, spacing: 8) {
                             HStack {
@@ -164,14 +160,15 @@ struct CameraStreamView: View {
                         .padding(.horizontal, 16)
                         .padding(.bottom, 8)
                     }
+                    
+                    CaptureToolbar(
+                        lastPhoto: lastPhoto,
+                        onCapture: { camera.capturePhoto() },
+                        onClose: onClose ?? {}
+                    )
+                    .padding(.bottom, 16)
                 }
-            }
-            // 在 safeArea 撰寫工具
-            .safeAreaInset(edge: .bottom) {
-                CaptureToolbar(
-                    lastPhoto: lastPhoto,
-                    onCapture: { camera.capturePhoto() }
-                )
+                .ignoresSafeArea(edges: .bottom)
             }
             .onAppear {
                 // 讀取 database
@@ -235,34 +232,64 @@ struct CameraStreamView: View {
 private struct CaptureToolbar: View {
     let lastPhoto: UIImage?
     let onCapture: () -> Void
+    let onClose: () -> Void
+
+    /// 左右兩側固定寬度，確保快門在幾何正中央
+    private let sideWidth: CGFloat = 88
 
     var body: some View {
-        HStack(spacing: 16) {
-            // 左側：占位（與右側縮圖對稱）
-            if let _ = lastPhoto {
-                Color.clear
-                    .frame(width: 56, height: 56)
+        HStack {
+            // 左邊區塊：固定 sideWidth，按鈕靠左
+            HStack {
+                Button(action: onClose) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(width: 44, height: 44)
+                        .background(Color.black.opacity(0.4))
+                        .clipShape(Circle())
+                }
+                Spacer()
             }
-            
-            Spacer()
-            
-            Button(action: onCapture) {
-                Label("拍照", systemImage: "camera.circle")
-                    .font(.title2)
-            }
-            .buttonStyle(.borderedProminent)
+            .frame(width: sideWidth, alignment: .leading)
 
             Spacer(minLength: 0)
 
-            if let image = lastPhoto {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 56, height: 56)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(.secondary.opacity(0.4), lineWidth: 1))
-                    .accessibilityLabel("最新拍攝縮圖")
+            // 中間快門：幾何正中央
+            Button(action: onCapture) {
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 76, height: 76)
+                    .overlay(
+                        Circle().stroke(Color.black, lineWidth: 2)
+                    )
+                    .padding(4)
+                    .background(
+                        Circle()
+                            .fill(Color.white) // 塗上想要的顏色
+                    )
+                    .overlay(
+                        Circle().stroke(Color.black, lineWidth: 2)
+                    )
             }
+
+            Spacer(minLength: 0)
+
+            // 右邊區塊：固定 sideWidth，縮圖靠右
+            HStack {
+                Spacer()
+                if let image = lastPhoto {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 56, height: 56)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                } else {
+                    Color.clear
+                        .frame(width: 56, height: 56) // 固定 56，避免寬度變來變去
+                }
+            }
+            .frame(width: sideWidth, alignment: .trailing)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
