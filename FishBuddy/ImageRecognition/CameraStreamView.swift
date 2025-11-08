@@ -29,15 +29,23 @@ struct CameraStreamView: View {
             ZStack {
                 // Full-screen camera preview (edge-to-edge)
                 ZStack(alignment: .topLeading) {
-                    CameraPreview(session: vm.captureSession)
+                    CameraPreview(session: vm.captureSession, camera: camera)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    FramingGuide(aspect: .wide43) { norm in
-                        camera.setCropRectNormalized(norm) // 將 0..1 相對座標傳回 CameraController
-                    }
+                    FramingGuide(aspect: .wide43, onCenterTap: { pointInView, rect in
+                        camera.startTracking(withNormalizedBox: rect)
+                    })
                     .frame(maxWidth: .infinity, maxHeight: .infinity) // 充滿與預覽同大小
                     .ignoresSafeArea()
                     .zIndex(1) // 確保在預覽上層
 
+                    // 如果要畫追蹤框，可以加一層 overlay
+                    if let box = camera.trackedBoxInView {
+                        Rectangle()
+                            .stroke(lineWidth: 2)
+                            .frame(width: box.width, height: box.height)
+                            .position(x: box.midX, y: box.midY)
+                    }
+                    
                     // 左上角：功能說明（tooltip/popover）
                     Button {
                         let _ = print("show help")
@@ -329,10 +337,14 @@ final class PreviewView: UIView {
 
 struct CameraPreview: UIViewRepresentable {
     let session: AVCaptureSession?
-
+    weak var camera: CameraController?
+    
     func makeUIView(context: Context) -> PreviewView {
         let v = PreviewView(frame: .zero)
         v.videoPreviewLayer.videoGravity = .resizeAspectFill
+        if let camera = camera {
+            camera.attachPreviewLayer(v.videoPreviewLayer)
+        }
         return v
     }
 

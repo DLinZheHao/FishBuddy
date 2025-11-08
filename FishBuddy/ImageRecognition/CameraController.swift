@@ -15,14 +15,14 @@ protocol CameraControllerOutputs {
     var onPhoto: ((UIImage) -> Void)? { get set }   // 拍照完成回呼（新）
 }
 
-// CameraController 負責管理相機的存取、權限、相機切換、相機資料流的取得與釋放等功能ㄓㄡ
-final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
+// CameraController 負責管理相機的存取、權限、相機切換、相機資料流的取得與釋放等功能
+final class CameraController: NSObject, ObservableObject {
 
     // 背景去除用物件
     var backgroundRemoverVK: BackgroundRemoverVK?
     // 由外部注入或稍後設定的 CLIP 特徵擷取器
     var clipExtractor: CLIPFeatureExtractor?
-    // 重用 CIContext（優先用 Metal）避免每幀建立花費
+    // 重用 CIContext（優先用 Metal）避免每幀建立花費：截取照片用的渲染器
     private var ciContext: CIContext = {
         if let device = MTLCreateSystemDefaultDevice() {
             return CIContext(mtlDevice: device)
@@ -77,6 +77,10 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
     /// 與此控制器相連的預覽層（用於把畫面座標換算成相機裝置座標）
     weak var previewLayer: AVCaptureVideoPreviewLayer?
 
+    /// 追蹤物件
+    let tracker = AnimalTracker()
+    // 如果你要給 SwiftUI 畫框，可以準備一個 published
+    @Published var trackedBoxInView: CGRect?  // 這個是「畫面座標的框」
     /// 當 session 準備完成後，回傳
     var onSessionReady: ((AVCaptureSession) -> Void)?
     
@@ -94,23 +98,58 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
     /// 全域校正偏移：以相對座標（0..1）為單位；x 正值＝向右、y 正值＝向下
     @Published public var cropCalibrationOffset: CGPoint = .zero
     
-    /// 由 UI 設定 / 清除裁切框（在主執行緒呼叫）
-    public func setCropRectNormalized(_ rect: CGRect?) {
-        Task { @MainActor in
-            self.cropRectNormalized = rect
+    
+    override init() {
+        super.init()
+
+        // 設定 tracker 的回呼
+        tracker.onUpdate = { [weak self] visionRect in
+            guard let self, let layer = self.previewLayer else { return }
+
+            // 1️⃣ Vision rect(0~1, 原點左下) → metadata rect(0~1, 原點左上)
+            let metadataRect = CGRect(
+                x: visionRect.origin.x,
+                y: 1.0 - visionRect.origin.y - visionRect.height,
+                width: visionRect.width,
+                height: visionRect.height
+            )
+
+            // 2️⃣ metadata rect → layer 座標（實際畫面上的 CGRect）
+            let rectInLayer = layer.layerRectConverted(fromMetadataOutputRect: metadataRect)
+
+            // 3️⃣ 丟給 SwiftUI（在主執行緒上更新）
+            DispatchQueue.main.async {
+                self.trackedBoxInView = rectInLayer
+            }
         }
     }
     
-    /// 由 UI 設定 / 清除裁切框中心（在主執行緒呼叫）
-    public func setCropRectCenter(_ point: CGPoint?) {
-        Task { @MainActor in
-            self.cropRectCenter = point
-            guard let point, let layer = self.previewLayer else { return }
-            // 以 UI 的正規化點（0..1）換算為預覽層座標，再轉為裝置座標並對焦
-            self.focus(atNormalized: point, previewLayer: layer)
-        }
+    /// 由 UI 設定 / 清除裁切框（在主執行緒呼叫）
+    func startTracking(withNormalizedBox norm: CGRect) {
+        guard let layer = previewLayer else { return }
+        // 1️⃣ normalized (0..1, UI) → layer 座標
+        let layerRect = CGRect(
+            x: norm.origin.x * layer.bounds.width,
+            y: norm.origin.y * layer.bounds.height,
+            width: norm.size.width * layer.bounds.width,
+            height: norm.size.height * layer.bounds.height
+        )
+        
+        // 2️⃣ layer rect → metadata rect (0..1, top-left，含 .resizeAspectFill 的裁切資訊)
+        let metadataRect = layer.metadataOutputRectConverted(fromLayerRect: layerRect)
+        
+        // 3️⃣ metadata rect → Vision rect (0..1, bottom-left)
+        let visionRect = CGRect(
+            x: metadataRect.origin.x,
+            y: 1.0 - metadataRect.origin.y - metadataRect.height,
+            width: metadataRect.width,
+            height: metadataRect.height
+        )
+        
+        // 4️⃣ 丟給你的 AnimalTracker.startTracking(initialBoundingBox:)
+        tracker.startTracking(initialBoundingBox: visionRect)
     }
-
+    
     /// 由 UI 傳入正在顯示的預覽層，供座標轉換使用
     public func attachPreviewLayer(_ layer: AVCaptureVideoPreviewLayer) {
         Task { @MainActor in
@@ -352,11 +391,11 @@ final class CameraController: NSObject, ObservableObject, @unchecked Sendable {
         }
 
         // 根據裝置類型決定方向設定
-        if videoDevice.isContinuityCamera {
-            setOrientation(.portrait)
-        } else {
-            setOrientation(UIDevice.current.orientation)
-        }
+//        if videoDevice.isContinuityCamera {
+//            setOrientation(.portrait)
+//        } else {
+//            setOrientation(UIDevice.current.orientation)
+//        }
     }
     
     // 僅在尚未啟動時才會真正啟動相機
@@ -438,13 +477,14 @@ extension CameraController: AVCaptureVideoDataOutputSampleBufferDelegate {
         _ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer,
         from connection: AVCaptureConnection
     ) {
+        // 🔴 這一行是讓 Vision 持續追蹤的關鍵
         if sampleBuffer.isValid, let pixelBuffer = sampleBuffer.imageBuffer {
+            tracker.processFrame(pixelBuffer: pixelBuffer)
             // 時間節流：每 ≥150ms 才推一次
             let now = DispatchTime.now()
             guard now.uptimeNanoseconds - lastInferenceTime.uptimeNanoseconds >= minInferenceIntervalNS else { return }
             lastInferenceTime = now
             guard let clip = clipExtractor else { return }
-
             inferenceQueue.async { [weak self] in
                 guard let self else { return }
                 // 直接走 CVPixelBuffer → CIImage → CGImage（重用 ciContext）

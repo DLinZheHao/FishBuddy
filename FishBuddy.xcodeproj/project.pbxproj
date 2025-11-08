@@ -26,6 +26,7 @@
 		054C84652CD9C144005595EF /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84642CD9C144005595EF /* WeatherService.swift */; };
 		054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C846B2CDB0548005595EF /* CodableExtension.swift */; };
 		054C846E2CDB06AA005595EF /* WeatherAllModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C846D2CDB06AA005595EF /* WeatherAllModel.swift */; };
+		054D35602EB9F9830051C5C4 /* AnimalTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054D355F2EB9F9720051C5C4 /* AnimalTracker.swift */; };
 		05513A432DAE44540021573F /* WeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05513A422DAE44540021573F /* WeatherView.swift */; };
 		055446FB2E8241D000BF51AC /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 055446FA2E8241D000BF51AC /* Kingfisher */; };
 		05589EE52CE6ECD8003881AA /* Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05589EE42CE6ECD8003881AA /* Display.swift */; };
@@ -119,6 +120,7 @@
 		054C84642CD9C144005595EF /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		054C846B2CDB0548005595EF /* CodableExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableExtension.swift; sourceTree = "<group>"; };
 		054C846D2CDB06AA005595EF /* WeatherAllModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAllModel.swift; sourceTree = "<group>"; };
+		054D355F2EB9F9720051C5C4 /* AnimalTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimalTracker.swift; sourceTree = "<group>"; };
 		05513A422DAE44540021573F /* WeatherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView.swift; sourceTree = "<group>"; };
 		05589EE42CE6ECD8003881AA /* Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Display.swift; sourceTree = "<group>"; };
 		05589EE62CE6ED93003881AA /* WeatherLobbyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherLobbyViewController.swift; sourceTree = "<group>"; };
@@ -567,6 +569,7 @@
 		05C94D8A2E6ABF7C0051B078 /* ImageUtils */ = {
 			isa = PBXGroup;
 			children = (
+				054D355F2EB9F9720051C5C4 /* AnimalTracker.swift */,
 				058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */,
 				05C94D872E6ABF7C0051B078 /* CLIPFeatureExtractor.swift */,
 				05C94D882E6ABF7C0051B078 /* ImageUtils.swift */,
@@ -868,6 +871,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				054D35602EB9F9830051C5C4 /* AnimalTracker.swift in Sources */,
 				05C94DA82E6ACA4C0051B078 /* FishDBManager.swift in Sources */,
 				054C846E2CDB06AA005595EF /* WeatherAllModel.swift in Sources */,
 				05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */,

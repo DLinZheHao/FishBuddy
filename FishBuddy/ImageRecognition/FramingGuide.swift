@@ -54,7 +54,7 @@ struct FramingGuide: View {
     /// 當前裁切框（相對 0...1 座標，原點左上）變更時回呼；可用來同步到 CameraController
     var onRectChange: ((CGRect) -> Void)? = nil
     /// 點擊框時回傳中心點（0...1 正規化；原點左上、相對容器）
-    var onCenterTap: ((CGPoint) -> Void)? = nil
+    var onCenterTap: ((CGPoint, CGRect) -> Void)? = nil
 
     // Crosshair 動畫狀態
     @State private var crossVisible = false
@@ -149,9 +149,15 @@ struct FramingGuide: View {
             // 目前框中心（若尚未初始化則取容器中心）
             let cx = (box.midX == 0 ? container.width  / 2 : box.midX)
             let cy = (box.midY == 0 ? container.height / 2 : box.midY)
-            // 回傳 0...1 正規化座標
-            let norm = CGPoint(x: cx / container.width, y: cy / container.height)
-            onCenterTap?(norm)
+            let pointInView = CGPoint(x: cx, y: cy)
+            // box 是你現在畫白框用的那個 CGRect（在 container 座標系裡）
+            let normRect = CGRect(
+                x: box.minX / container.width,
+                y: box.minY / container.height,
+                width: box.width / container.width,
+                height: box.height / container.height
+            )
+            onCenterTap?(pointInView, normRect)
 
             // 觸發十字準星縮小 + 淡出動畫
             crossVisible = true
@@ -312,9 +318,9 @@ struct DemoView: View {
     }
 }
 
-// 預覽：顯示 FramingGuide 元件，並示範接收中心點回呼
-#Preview {
-    FramingGuide(onCenterTap: { pt in
-        print("Center (normalized):", pt)
-    })
-}
+//// 預覽：顯示 FramingGuide 元件，並示範接收中心點回呼
+//#Preview {
+//    FramingGuide(onCenterTap: { pt in
+//        print("Center (normalized):", pt)
+//    })
+//}
