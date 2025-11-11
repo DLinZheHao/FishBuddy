@@ -40,7 +40,6 @@
 		05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */; };
 		05623FD02E1234D300B33D2D /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05623FCF2E1234D300B33D2D /* SearchBar.swift */; };
 		0571B4282E861A7E005CBFF8 /* TestMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0571B4272E861A7E005CBFF8 /* TestMapView.swift */; };
-		057F16242E9FE1B400EC7710 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 057F16232E9FE1B400EC7710 /* catalog.sqlite */; };
 		057F16262EA1DF2000EC7710 /* DistributionCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057F16252EA1DF2000EC7710 /* DistributionCardView.swift */; };
 		057F16282EA1E07600EC7710 /* UserPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057F16272EA1E07600EC7710 /* UserPromptView.swift */; };
 		057F167A2EA1E54400EC7710 /* WrapLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057F16792EA1E54400EC7710 /* WrapLayout.swift */; };
@@ -82,6 +81,7 @@
 		05E245F12D0A801000C6C048 /* UILabelExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245F02D0A801000C6C048 /* UILabelExtension.swift */; };
 		05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E672DF2CDB0C78006CF3BF /* APILoggerPlugin.swift */; };
 		05E672E42CDB0CB3006CF3BF /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */; };
+		05F025042EC21535009D3531 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 05F025032EC21535009D3531 /* catalog.sqlite */; };
 		05F3BED42D92824C00DDAC72 /* TideDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F3BED32D92824C00DDAC72 /* TideDataModel.swift */; };
 		05FAEF132DF2743900E9BD08 /* bottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF122DF2743900E9BD08 /* bottomSheetView.swift */; };
 		05FAEF162DF2782400E9BD08 /* RestaurantModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF152DF2782400E9BD08 /* RestaurantModel.swift */; };
@@ -133,7 +133,6 @@
 		05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FeatureTitleBar.xib; sourceTree = "<group>"; };
 		05623FCF2E1234D300B33D2D /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		0571B4272E861A7E005CBFF8 /* TestMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestMapView.swift; sourceTree = "<group>"; };
-		057F16232E9FE1B400EC7710 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
 		057F16252EA1DF2000EC7710 /* DistributionCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributionCardView.swift; sourceTree = "<group>"; };
 		057F16272EA1E07600EC7710 /* UserPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPromptView.swift; sourceTree = "<group>"; };
 		057F16792EA1E54400EC7710 /* WrapLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrapLayout.swift; sourceTree = "<group>"; };
@@ -169,6 +168,7 @@
 		05E245F02D0A801000C6C048 /* UILabelExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelExtension.swift; sourceTree = "<group>"; };
 		05E672DF2CDB0C78006CF3BF /* APILoggerPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APILoggerPlugin.swift; sourceTree = "<group>"; };
 		05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
+		05F025032EC21535009D3531 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
 		05F3BED32D92824C00DDAC72 /* TideDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideDataModel.swift; sourceTree = "<group>"; };
 		05FAEF122DF2743900E9BD08 /* bottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = bottomSheetView.swift; sourceTree = "<group>"; };
 		05FAEF152DF2782400E9BD08 /* RestaurantModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantModel.swift; sourceTree = "<group>"; };
@@ -537,7 +537,7 @@
 		058F58A12E764C79009913C5 /* Database */ = {
 			isa = PBXGroup;
 			children = (
-				057F16232E9FE1B400EC7710 /* catalog.sqlite */,
+				05F025032EC21535009D3531 /* catalog.sqlite */,
 			);
 			path = Database;
 			sourceTree = "<group>";
@@ -854,7 +854,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				054C844C2CD9B995005595EF /* Assets.xcassets in Resources */,
-				057F16242E9FE1B400EC7710 /* catalog.sqlite in Resources */,
+				05F025042EC21535009D3531 /* catalog.sqlite in Resources */,
 				0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */,
 				05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */,
 				05589EF62CE6F5C5003881AA /* Weather.storyboard in Resources */,

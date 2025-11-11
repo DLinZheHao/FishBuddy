@@ -493,9 +493,10 @@ final class InMemoryVectorIndex {
         // 計算圖片分數：scoresImg = matrix(N×D) × query(D×1)
         var scoresImg = [Float](repeating: 0, count: n)
         var q = query
+        // 拿到所有魚的 image 相似度分數
         vDSP_mmul(matrix, 1, &q, 1, &scoresImg, 1, vDSP_Length(n), 1, vDSP_Length(dim))
 
-        // 預設只用圖片；若有文字矩陣，做晚期融合：score = 0.6*img + 0.4*text
+        // 預設只用圖片；若有文字矩陣，做晚期融合：score = 0.8 * img + 0.2 * text
         var scores = scoresImg
         if !textMatrix.isEmpty {
             var scoresText = [Float](repeating: 0, count: n)
@@ -503,8 +504,16 @@ final class InMemoryVectorIndex {
             var wImg: Float = 0.8
             var wTxt: Float = 0.2
             // scores = wImg * scoresImg + wTxt * scoresText
+            // scores = 0.8 * scoresImg + 0.2 * scoresText
             vDSP_vsmsa(scoresImg, 1, &wImg, [0], &scores, 1, vDSP_Length(n))
             vDSP_vsma(scoresText, 1, &wTxt, scores, 1, &scores, 1, vDSP_Length(n))
+            // ----------------------------------------------------------------------
+        }
+
+        // 將 cosine 分數轉換為 0~100 的相似度百分比
+        for i in 0..<scores.count {
+            let clamped = max(-1, min(1, scores[i]))
+            scores[i] = (clamped + 1) * 50  // -1→0, 0→50, 1→100
         }
 
         let idx = (0..<n).sorted { scores[$0] > scores[$1] }.prefix(topK)

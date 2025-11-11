@@ -552,6 +552,7 @@ extension CameraController: AVCapturePhotoCaptureDelegate {
         }
 
         if let embedding = clip.multiCropAverageEmbedding(for: finalImage, cropScale: 0.85) {
+//        if let embedding = clip.embedding(for: finalImage) {
             Task { @MainActor in
                 self.onPhotoReady?((embedding, finalImage))
             }

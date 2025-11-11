@@ -36,25 +36,23 @@ final class CLIPFeatureExtractor {
     /// - 視窗位置：center / left / right / top / bottom，視窗邊長為短邊的 `cropScale` 倍（預設 0.85）。
     /// - 輸入：UIImage；輸出：L2-normalized [Float32]
     func multiCropAverageEmbedding(for uiImage: UIImage, cropScale: CGFloat = 0.85) -> [Float32]? {
+        // 確保拍攝的圖片存在
         guard let cg = uiImage.cgImage else { return nil }
+        // 圖片尺寸
         let w = cg.width, h = cg.height
+        // 計算裁切視窗大小與位置
         let shortSide = CGFloat(min(w, h))
+        // 裁切視窗邊長
         let cropSize = max(1, min(shortSide, shortSide * cropScale))
-
-        // 計算 5 個方形視窗（確保不超界）
-        func rect(_ x: CGFloat, _ y: CGFloat) -> CGRect {
-            let ox = max(0, min(CGFloat(w) - cropSize, x))
-            let oy = max(0, min(CGFloat(h) - cropSize, y))
-            return CGRect(x: ox, y: oy, width: cropSize, height: cropSize)
-        }
+        //  中心裁切視窗的左上角座標
         let cx = (CGFloat(w) - cropSize) / 2
         let cy = (CGFloat(h) - cropSize) / 2
         let rects = [
-            rect(cx, cy),                  // center
-            rect(0, cy),                   // left
-            rect(CGFloat(w) - cropSize, cy), // right
-            rect(cx, 0),                   // top
-            rect(cx, CGFloat(h) - cropSize)  // bottom
+            rect(cx, cy, w, h, cropSize),                     // center
+            rect(0, cy, w, h, cropSize),                      // left
+            rect(CGFloat(w) - cropSize, cy, w, h, cropSize),  // right
+            rect(cx, 0, w, h, cropSize),                      // top
+            rect(cx, CGFloat(h) - cropSize, w, h, cropSize)   // bottom
         ]
 
         var acc: [Float32] = []
@@ -63,7 +61,8 @@ final class CLIPFeatureExtractor {
             if let sub = cg.cropping(to: r) {
                 // 重用下方的 embedding 流程：仍採用 centerCrop 以符合模型前處理
                 if let vec = embedding(fromCGImage: sub) {
-                    if acc.isEmpty { acc = vec } else {
+                    if acc.isEmpty { acc = vec }
+                    else {
                         // element-wise 加總
                         vDSP_vadd(acc, 1, vec, 1, &acc, 1, vDSP_Length(acc.count))
                     }
@@ -80,6 +79,15 @@ final class CLIPFeatureExtractor {
         return norm > 0 ? acc.map { $0 / norm } : acc
     }
 
+    // 計算 5 個方形視窗（確保不超界）
+    private func rect(_ x: CGFloat, _ y: CGFloat,
+                      _ width: Int, _ height: Int,
+                      _ cropSize: CGFloat) -> CGRect {
+        let ox = max(0, min(CGFloat(width) - cropSize, x))
+        let oy = max(0, min(CGFloat(height) - cropSize, y))
+        return CGRect(x: ox, y: oy, width: cropSize, height: cropSize)
+    }
+    
     /// 以 CGImage 作為輸入跑一次模型，回傳 L2-normalized 向量
     private func embedding(fromCGImage cg: CGImage) -> [Float32]? {
         let md = coreMLModel.modelDescription
