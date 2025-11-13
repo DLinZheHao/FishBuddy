@@ -56,6 +56,13 @@ struct FramingGuide: View {
     /// 點擊框時回傳中心點（0...1 正規化；原點左上、相對容器）
     var onCenterTap: ((CGPoint, CGRect) -> Void)? = nil
 
+    /// 目標模式
+    @Binding var targetMode: TargetMode
+    /// 畫面才切結果
+    @Binding var cropBoxInView: CGRect?
+    /// 追蹤方框
+    @Binding var trackedBoxInView: CGRect?
+    
     // Crosshair 動畫狀態
     @State private var crossVisible = false
     @State private var crossScale: CGFloat = 1.0
@@ -67,6 +74,8 @@ struct FramingGuide: View {
             let H = geo.size.height  // 容器高度（points）
             let S = min(W, H)        // 取較短邊作為縮放基準，避免初始尺寸超出容器
 
+            let _ = print("UI size:", geo.size)
+            
             // 不同比例的初始視覺佔比（相對短邊的比例），讓兩種模式看起來大小接近
             let base = aspect == .wide43 ? 0.86 : 0.80
             // 依照比例（4:3 / 1:1）計算「初始框大小」。
@@ -99,6 +108,22 @@ struct FramingGuide: View {
                 .position(x: box.midX == 0 ? W/2 : box.midX,
                           y: box.midY == 0 ? H/2 : box.midY)
                 
+                // 追蹤框
+                if let box = trackedBoxInView {
+                    Rectangle()
+                        .stroke(lineWidth: 2)
+                        .frame(width: box.width, height: box.height)
+                        .position(x: box.midX, y: box.midY)
+                }
+                
+                // 只有 Debug Build 才顯示實際裁切框
+                #if DEBUG
+                if let r = cropBoxInView {
+                    Rectangle().path(in: r).stroke(style: .init(lineWidth: 3))
+                        .foregroundStyle(.yellow)
+                }
+                #endif
+                
                 // 中心十字準星（點擊時出現，縮小後淡出）
                 if crossVisible {
                     CrosshairShape()
@@ -115,9 +140,7 @@ struct FramingGuide: View {
                 }
             }
             .contentShape(Rectangle())
-            .gesture(dragGesture(container: geo.size))                // 單指拖動：移動框位置
-            .simultaneousGesture(magnifyGesture(container: geo.size)) // 雙指縮放：等比縮放框尺寸
-            .simultaneousGesture(tapGesture(container: geo.size))
+            .gesture(makeGesture(container: geo.size))
             .onAppear {
                 if !didInit {
                     let size = initialSize // 計算出的初始尺寸
@@ -142,6 +165,44 @@ struct FramingGuide: View {
     }
 
     // MARK: - 手勢
+    // 依 targetMode 回傳對應的組合手勢（型別統一成 AnyGesture<Void>）
+    private func makeGesture(container: CGSize) -> AnyGesture<Void> {
+        let drag    = dragGesture(container: container)
+        let magnify = magnifyGesture(container: container)
+        let tap     = tapGesture(container: container)
+
+        switch targetMode {
+        // 手動瞄準
+        case .manualAim:
+            return AnyGesture(drag.map { _ in ()})
+        // 自動追蹤
+        case .autoTracking(let status):
+            switch status {
+            case .aiming:
+//                return AnyGesture(
+//                    drag
+//                        .simultaneously(with: tap)
+//                        .map { _ in () }
+//                )
+                return AnyGesture(
+                    drag
+                      .simultaneously(with: magnify)
+                      .simultaneously(with: tap)
+                      .map { _ in () }
+                )
+            case .tracking:
+                return AnyGesture(drag.map { _ in ()})
+            }
+        // 調整瞄準框大小
+        case .adjustFrame:
+            return AnyGesture(
+                drag
+                  .simultaneously(with: magnify)
+                  .simultaneously(with: tap)
+                  .map { _ in () }
+            )
+        }
+    }
     
     /// 點擊手勢：回傳目前框的中心點（0...1 正規化）
     private func tapGesture(container: CGSize) -> some Gesture {
@@ -157,6 +218,7 @@ struct FramingGuide: View {
                 width: box.width / container.width,
                 height: box.height / container.height
             )
+            print("瞄準框的資訊：\(box)")
             onCenterTap?(pointInView, normRect)
 
             // 觸發十字準星縮小 + 淡出動畫

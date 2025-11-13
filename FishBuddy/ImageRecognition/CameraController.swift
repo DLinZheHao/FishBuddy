@@ -9,6 +9,26 @@ import AVFoundation
 import CoreImage
 import UIKit
 
+
+/// 相機捕捉模式
+enum TargetMode {
+    /// 自動追蹤
+    case autoTracking(AutoState)
+    /// 手動拍照
+    case manualAim
+    /// 瞄準框調整
+    case adjustFrame
+}
+
+enum AutoState {
+    /// 以瞄準框為主，但持續嘗試取得追蹤
+    case aiming
+    /// 已取得追蹤匡（優先用追蹤匡）
+    case tracking
+//    /// 短暫搜尋中（失鎖緩衝）
+//    case searching
+}
+
 @MainActor
 protocol CameraControllerOutputs {
     var onSessionReady: ((AVCaptureSession) -> Void)? { get set }
@@ -17,8 +37,9 @@ protocol CameraControllerOutputs {
 
 // CameraController 負責管理相機的存取、權限、相機切換、相機資料流的取得與釋放等功能
 final class CameraController: NSObject, ObservableObject {
-
-    // 背景去除用物件
+    /// 設定相機捕捉模式
+//    var targetMode: TargetMode
+    /// 背景去除用物件
     var backgroundRemoverVK: BackgroundRemoverVK?
     // 由外部注入或稍後設定的 CLIP 特徵擷取器
     var clipExtractor: CLIPFeatureExtractor?
@@ -47,7 +68,7 @@ final class CameraController: NSObject, ObservableObject {
     private var photoOutput: AVCapturePhotoOutput?
 
     /// 相機/照片畫質設定（可在執行中調整）
-    public var videoPreset: AVCaptureSession.Preset = .hd1280x720   // 影像串流解析度
+    public var videoPreset: AVCaptureSession.Preset = .photo   // 影像串流解析度
     public var enableHighResolutionPhoto: Bool = true               // 是否啟用高解析度拍照
     public var photoQualityPrioritization: AVCapturePhotoOutput.QualityPrioritization = .quality // 以品質優先
 
@@ -81,6 +102,8 @@ final class CameraController: NSObject, ObservableObject {
     let tracker = AnimalTracker()
     // 如果你要給 SwiftUI 畫框，可以準備一個 published
     @Published var trackedBoxInView: CGRect?  // 這個是「畫面座標的框」
+    /// 將要實際裁切的區塊（以預覽層座標表示，供 SwiftUI 疊畫使用）
+    @Published var cropBoxInView: CGRect? = nil
     /// 當 session 準備完成後，回傳
     var onSessionReady: ((AVCaptureSession) -> Void)?
     
@@ -137,6 +160,27 @@ final class CameraController: NSObject, ObservableObject {
         
         // 2️⃣ layer rect → metadata rect (0..1, top-left，含 .resizeAspectFill 的裁切資訊)
         let metadataRect = layer.metadataOutputRectConverted(fromLayerRect: layerRect)
+        cropRectNormalized = metadataRect // 記錄裁切框
+
+        // 立即把「最後會用來裁切的 ROI（metadata 空間）」回繪到預覽層上，供 UI 疊畫
+        let overlayRect = layer.layerRectConverted(fromMetadataOutputRect: metadataRect)
+        print("要在畫面上的方框：\(overlayRect)")
+        DispatchQueue.main.async { [weak self] in
+            self?.cropBoxInView = overlayRect
+        }
+        
+        // layer -> metadata -> layer：理論上要回到原位
+        let backToLayer = layer.layerRectConverted(fromMetadataOutputRect: metadataRect)
+        let dx = abs(backToLayer.minX - layerRect.minX)
+        let dy = abs(backToLayer.minY - layerRect.minY)
+        let dw = abs(backToLayer.width - layerRect.width)
+        let dh = abs(backToLayer.height - layerRect.height)
+        print("RoundTrip Δ (x:\(dx), y:\(dy), w:\(dw), h:\(dh))")
+
+        // 觀察「有效內容」在 layer 內的實際範圍（可視畫面）
+        let fullMeta = CGRect(x: 0, y: 0, width: 1, height: 1)
+        let contentInLayer = layer.layerRectConverted(fromMetadataOutputRect: fullMeta)
+        print("contentInLayer:", contentInLayer, " layer.bounds:", layer.bounds)
         
         // 3️⃣ metadata rect → Vision rect (0..1, bottom-left)
         let visionRect = CGRect(
@@ -149,11 +193,29 @@ final class CameraController: NSObject, ObservableObject {
         // 4️⃣ 丟給你的 AnimalTracker.startTracking(initialBoundingBox:)
         tracker.startTracking(initialBoundingBox: visionRect)
     }
+
+    /// 將已儲存的 ROI（metadata 空間）回繪成預覽層座標，供 UI 疊畫
+    public func updateCropOverlayFromStoredROI() {
+        guard let layer = previewLayer else {
+            DispatchQueue.main.async { [weak self] in self?.cropBoxInView = nil }
+            return
+        }
+        guard let roi = cropRectNormalized else {
+            DispatchQueue.main.async { [weak self] in self?.cropBoxInView = nil }
+            return
+        }
+        let overlayRect = layer.layerRectConverted(fromMetadataOutputRect: roi)
+        DispatchQueue.main.async { [weak self] in
+            self?.cropBoxInView = overlayRect
+        }
+    }
     
     /// 由 UI 傳入正在顯示的預覽層，供座標轉換使用
     public func attachPreviewLayer(_ layer: AVCaptureVideoPreviewLayer) {
         Task { @MainActor in
+            print("previewLayer.bounds:", layer.bounds)
             self.previewLayer = layer
+            self.updateCropOverlayFromStoredROI()
         }
     }
 
@@ -391,11 +453,11 @@ final class CameraController: NSObject, ObservableObject {
         }
 
         // 根據裝置類型決定方向設定
-//        if videoDevice.isContinuityCamera {
-//            setOrientation(.portrait)
-//        } else {
-//            setOrientation(UIDevice.current.orientation)
-//        }
+        if videoDevice.isContinuityCamera {
+            setOrientation(.portrait)
+        } else {
+            setOrientation(UIDevice.current.orientation)
+        }
     }
     
     // 僅在尚未啟動時才會真正啟動相機
@@ -420,7 +482,8 @@ final class CameraController: NSObject, ObservableObject {
         return r
     }
 
-    /// 將 UIImage 轉為「已套用方向」的位圖（.up），避免裁切時座標錯亂
+    // MARK: - 目前用不到的裁切相關方法
+    /// 將 UIImage 轉為「已套用方向」的位圖（.up），避免裁切時座標錯亂 (目前用不到)
     private func imageByFixingOrientation(_ image: UIImage) -> UIImage {
         // 若圖片本身的方向就是 .up（代表位圖像素已符合直立方向），直接回傳，避免不必要的重繪成本
         if image.imageOrientation == .up { return image }
@@ -459,15 +522,14 @@ final class CameraController: NSObject, ObservableObject {
     /// 依照 normalized rect 裁切 UIImage（若 rect 無效或超界會自動夾限）
     private func crop(_ image: UIImage, by normalizedRect: CGRect) -> UIImage? {
         // 先將使用者的相對選框套用全域數值校正（0..1）
-        let adjustedRect = applyCalibration(normalizedRect)
-
-        let fixed = imageByFixingOrientation(image)
-        guard let cg = fixed.cgImage else { return nil }
+//        let adjustedRect = applyCalibration(normalizedRect)
+//        let fixed = imageByFixingOrientation(image)
+        guard let cg = image.cgImage else { return nil }
         // 將「校正後的相對選框」換算到照片像素座標
-        let pr = pixelRect(for: adjustedRect, width: cg.width, height: cg.height)
+        let pr = pixelRect(for: normalizedRect, width: cg.width, height: cg.height)
         guard pr.width > 0, pr.height > 0 else { return nil }
         guard let cgCropped = cg.cropping(to: pr) else { return nil }
-        return UIImage(cgImage: cgCropped, scale: fixed.scale, orientation: .up)
+        return UIImage(cgImage: cgCropped, scale: image.scale, orientation: .up)
     }
 }
 
@@ -552,7 +614,6 @@ extension CameraController: AVCapturePhotoCaptureDelegate {
         }
 
         if let embedding = clip.multiCropAverageEmbedding(for: finalImage, cropScale: 0.85) {
-//        if let embedding = clip.embedding(for: finalImage) {
             Task { @MainActor in
                 self.onPhotoReady?((embedding, finalImage))
             }
@@ -576,3 +637,4 @@ extension CameraController: AVCapturePhotoCaptureDelegate {
 //        }
     }
 }
+

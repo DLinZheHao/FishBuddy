@@ -28,6 +28,9 @@ class CameraStreamVM: ObservableObject {
     /// 由 CameraController 提供的相片特徵向量串流
     @Published var imageSearchResult: [(TaxonItem, Float)]?
     
+    /// 相機捕捉模式
+    @Published var targetMode: TargetMode = .autoTracking(.aiming)
+    
     /// 讀取資料庫：目前是直接讀取 json 資料作為資料庫
     func loadDatabaseIfNeeded() {
         Task(priority: .utility) {
@@ -58,10 +61,11 @@ class CameraStreamVM: ObservableObject {
 // - 在 ViewModel 中使用 @Published 讓 UI 能夠偵測更新
 
 extension CameraStreamVM {
-    enum CaptureMode {
-        /// 即時串流
-        case stream
-        /// 拍照
-        case photo
-    }
+    /// 捕捉模式
+//    enum CaptureMode {
+//        /// 即時串流
+//        case stream
+//        /// 拍照
+//        case photo
+//    }
 }

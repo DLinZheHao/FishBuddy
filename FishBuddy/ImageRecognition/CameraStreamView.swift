@@ -21,8 +21,6 @@ struct CameraStreamView: View {
     @State private var resultImage: UIImage?
     /// 顯示使用教學
     @State private var showHelp = false
-    /// 拍攝運作模式
-    typealias CaptureMode = CameraStreamVM.CaptureMode
     /// 回去天氣頁面的閉包
     var onClose: (() -> Void)?
     
@@ -38,19 +36,11 @@ struct CameraStreamView: View {
                     // 瞄準框
                     FramingGuide(aspect: .wide43, onCenterTap: { pointInView, rect in
                         camera.startTracking(withNormalizedBox: rect)
-                    })
+                    }, targetMode: $vm.targetMode, cropBoxInView: $camera.cropBoxInView, trackedBoxInView: $camera.trackedBoxInView)
                     .frame(maxWidth: .infinity, maxHeight: .infinity) // 充滿與預覽同大小
                     .ignoresSafeArea()
                     .zIndex(1) // 確保在預覽上層
 
-                    // animial tracking box
-                    if let box = camera.trackedBoxInView {
-                        Rectangle()
-                            .stroke(lineWidth: 2)
-                            .frame(width: box.width, height: box.height)
-                            .position(x: box.midX, y: box.midY)
-                    }
-                    
                     // 左上角：功能說明（tooltip/popover）
                     Button {
                         showHelp.toggle()
@@ -281,7 +271,7 @@ private struct CaptureToolbar: View {
                 if let image = lastPhoto {
                     Image(uiImage: image)
                         .resizable()
-                        .scaledToFill()
+                        .scaledToFit()
                         .frame(width: 56, height: 56)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                 } else {
@@ -401,3 +391,4 @@ struct EmbeddingConsumer: View {
             }
     }
 }
+
