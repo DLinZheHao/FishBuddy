@@ -21,6 +21,11 @@ struct CameraStreamView: View {
     @State private var resultImage: UIImage?
     /// 顯示使用教學
     @State private var showHelp = false
+    /// 顯示 toast
+    @State private var showToast = false
+    /// 顯示 toast 文字
+    @State private var toastMessage = ""
+    
     /// 回去天氣頁面的閉包
     var onClose: (() -> Void)?
     
@@ -34,13 +39,26 @@ struct CameraStreamView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .ignoresSafeArea()
                     // 瞄準框
-                    FramingGuide(aspect: .wide43, onCenterTap: { pointInView, rect in
-                        camera.startTracking(withNormalizedBox: rect)
-                    }, targetMode: $vm.targetMode, cropBoxInView: $camera.cropBoxInView, trackedBoxInView: $camera.trackedBoxInView)
+                    FramingGuide(
+                        aspect: .wide43,
+                        onRectChange: { norm in
+                            // 連續調整時即時同步到 CameraController 的 ROI 與疊畫
+                            camera.cropRectNormalized = norm
+                            camera.updateCropOverlayFromStoredROI()
+                        },
+                        onCenterTap: { pointInView, rect in
+                            // 點中心時開始追蹤（rect 已是 0..1 正規化）
+                            camera.startTracking(withNormalizedBox: rect)
+                        },
+                        targetMode: $vm.targetMode,
+                        cropBoxInView: $camera.cropBoxInView,
+                        trackedBoxInView: $camera.trackedBoxInView,
+                        isAdjusting: $vm.isInAdjustFrameMode
+                    )
                     .frame(maxWidth: .infinity, maxHeight: .infinity) // 充滿與預覽同大小
                     .ignoresSafeArea()
                     .zIndex(1) // 確保在預覽上層
-
+                    
                     // 左上角：功能說明（tooltip/popover）
                     Button {
                         showHelp.toggle()
@@ -75,91 +93,91 @@ struct CameraStreamView: View {
                     }
                 }
 
-                // Overlay UI
+                // Overlay UI - 攝像畫面上的物件都在這裡
                 VStack {
-                    HStack(spacing: 8) {
-                        Spacer()
-                        
-                        // 右上角：地圖（push 到 MapView）
-                        NavigationLink {
-                            TaxonDistributionView(taxonId: 49269)
-                                .navigationTitle("地圖")
-                                .navigationBarTitleDisplayMode(.inline)
-                        } label: {
-                            Image(systemName: "map.fill")
-                                .font(.system(size: 20, weight: .semibold))
-                                .foregroundStyle(.white)
-                                .padding(10)
-                        }
-                        .background(.ultraThinMaterial, in: Capsule())
-                        
-                        // 切換前/後鏡頭
-                        Toggle("鏡頭", isOn: Binding(
-                            get: { camera.backCamera },
-                            set: { camera.backCamera = $0 }
-                        ))
-                        .labelsHidden() // 隱藏標籤
-                        .padding(10)
-                        .background(.ultraThinMaterial, in: Capsule())
-                    }
-                    .padding(.top, 12)
-                    .padding(.horizontal, 16)
-
                     Spacer()
 
                     // 搜尋結果顯示
-                    if let results = vm.imageSearchResult, !results.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Text("搜尋結果")
-                                    .font(.headline)
-                                    .padding(.bottom, 4)
-
-                                Spacer()
+                    ZStack(alignment: .bottom) {
+                        VStack {
+                            Spacer()
+                            VStack(spacing: 16) {
+                                SideButton(icon: "viewfinder", title: "Lock Target", isActive: vm.targetMode.isAutoTracking()) {
+                                    vm.cycleTargetMode()
+                                }
                                 
-                                // 關閉按鈕（叉叉）
-                                Button {
-                                    vm.imageSearchResult = nil
-                                } label: {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .font(.title3)
-                                        .foregroundStyle(.secondary)
-                                        .accessibilityLabel("關閉搜尋結果")
+                                SideButton(icon: "camera.rotate", title: "Switch\nCamera", isActive: !camera.backCamera) {
+                                    camera.backCamera.toggle()
                                 }
-                                .buttonStyle(.plain)
-                            }
-
-                            ForEach(Array(results.prefix(3)), id: \.0.taxonId) { (item, score) in
-                                NavigationLink {
-                                    TaxonDetailView(taxon: item)
-                                        .navigationBarTitleDisplayMode(.inline)
-                                } label: {
-                                    SearchResultRow(
-                                        imageURL: URL(string: item.photos?.first?.url ?? ""),
-                                        title: item.commonName ?? "",
-                                        idText: "ID: \(item.taxonId)",
-                                        scoreText: String(format: "相似度: %.2f", score)
-                                    )
+                                
+                                SideButton(icon: "slider.horizontal.3", title: "Adjust\nMode", isActive: vm.isInAdjustFrameMode) {
+                                    vm.isInAdjustFrameMode.toggle()
                                 }
-                                .buttonStyle(.plain) // 保留自訂列外觀
                             }
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .padding(.trailing, 16)
                         }
-                        .padding(12)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 8)
+                        .frame(maxWidth: .infinity, alignment: .bottom)
+                        
+                        if let results = vm.imageSearchResult, !results.isEmpty {
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Text("搜尋結果")
+                                        .font(.headline)
+                                        .padding(.bottom, 4)
+                                    
+                                    Spacer()
+                                    
+                                    // 關閉按鈕（叉叉）
+                                    Button {
+                                        vm.imageSearchResult = nil
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .font(.title3)
+                                            .foregroundStyle(.secondary)
+                                            .accessibilityLabel("關閉搜尋結果")
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                                
+                                ForEach(Array(results.prefix(3)), id: \.0.taxonId) { (item, score) in
+                                    NavigationLink {
+                                        TaxonDetailView(taxon: item)
+                                            .navigationBarTitleDisplayMode(.inline)
+                                    } label: {
+                                        SearchResultRow(
+                                            imageURL: URL(string: item.photos?.first?.url ?? ""),
+                                            title: item.commonName ?? "",
+                                            idText: "ID: \(item.taxonId)",
+                                            scoreText: String(format: "相似度: %.2f", score)
+                                        )
+                                    }
+                                    .buttonStyle(.plain) // 保留自訂列外觀
+                                }
+                            }
+                            .padding(12)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                            .padding(.horizontal, 16)
+                            .padding(.bottom, 8)
+                        }
+                        
                     }
                     
                     CaptureToolbar(
                         lastPhoto: lastPhoto,
-                        onCapture: { camera.capturePhoto() },
+                        onCapture: { handleCaptureTapped() },
                         onClose: onClose ?? {}
                     )
                     .padding(.bottom, 16)
                 }
                 .ignoresSafeArea(edges: .bottom)
             }
+            .toast(
+                isPresented: $showToast,
+                message: toastMessage,
+                duration: 1.6
+            )
             .onAppear {
                 // 讀取 database
                 vm.loadDatabaseIfNeeded()
@@ -209,10 +227,26 @@ struct CameraStreamView: View {
                 camera.backgroundRemove = { image in
                     self.resultImage = image
                 }
+                
+                camera.bindTargetMode($vm.targetMode)
             }
             .onDisappear {
                 // 在 Tab 切換時不要停止相機與釋放資源，避免重建成本
                 // 若需要在真正離開功能頁時釋放，請在上層做集中管理再呼叫 stop/detatch。
+            }
+        }
+    }
+    
+    /// 管理拍照按鍵點擊
+    private func handleCaptureTapped() {
+        // 這裡可以依照你的 TargetMode 設計來改判斷邏輯
+        switch vm.targetMode {
+        case .manualAim, .autoTracking(.tracking):
+            camera.capturePhoto()
+        case .autoTracking(.losting):
+            toastMessage = "目標已遺失，請重新鎖定再拍照"
+            withAnimation {
+                showToast = true
             }
         }
     }
@@ -271,7 +305,7 @@ private struct CaptureToolbar: View {
                 if let image = lastPhoto {
                     Image(uiImage: image)
                         .resizable()
-                        .scaledToFit()
+                        .scaledToFill()
                         .frame(width: 56, height: 56)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                 } else {
@@ -391,4 +425,41 @@ struct EmbeddingConsumer: View {
             }
     }
 }
+
+#if DEBUG
+//// MARK: - Preview
+//#Preview("CameraStreamView") {
+//    // 用 Preview 專用的 wrapper，避免在預覽時啟動實際相機與模型
+//    CameraStreamPreviewWrapper()
+//}
+//
+///// 一個輕量的 wrapper，提供假資料並關閉相機啟動流程
+//private struct CameraStreamPreviewWrapper: View {
+//    @StateObject private var camera = CameraController()
+//    @StateObject private var vm = CameraStreamVM()
+//
+//    var body: some View {
+//        NavigationStack {
+//            CameraStreamView(onClose: {})
+//                .onAppear {
+//                    // 預覽中：不要啟動相機與模型，僅提供假 UI 狀態
+//                    vm.didLoadExtractor = true
+//                    // 不要真的把 session 丟進去，避免要求權限
+//                    vm.captureSession = nil
+//
+//                    // 準備假搜尋結果讓下方卡片可見
+//                    let mock = TaxonItem.previewMock
+//                    vm.imageSearchResult = [
+//                        (mock, 98.2),
+//                        (mock, 92.7),
+//                        (mock, 88.5)
+//                    ]
+//                }
+//        }
+//        // 將 ViewModel 狀態注入到真正的 CameraStreamView 內部
+//        // 這裡用環境物件注入不適用，因為 CameraStreamView 內部自行持有 @ObservedObject。
+//        // 若要更精準控制，可改為在 CameraStreamView 提供 init(vm:camera:onClose:) 以便預覽注入。
+//    }
+//}
+#endif
 

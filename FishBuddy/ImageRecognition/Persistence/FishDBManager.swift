@@ -19,9 +19,9 @@ actor EmbeddingStore {
     /// In-memory 向量索引快取（只建一次，除非資料有變動）
     private var indexCache: InMemoryVectorIndex?
     /// 相似度最低接受門檻（cosine），依你的資料集可微調，預設 0.5
-    var acceptThreshold: Float = 0.5
+    var acceptThreshold: Float = 0.6
     /// 與次高分的最小差距（動態門檻），預設 0.1；可設為 0 表示不啟用
-    var minGapDelta: Float = 0.6
+    var minGapDelta: Float = 0.1
     /// 當前索引的維度；避免用錯模型維度
     private var indexDim: Int = 0
     
@@ -85,7 +85,7 @@ actor EmbeddingStore {
             // 門檻 + 與次高分差距規則
             if let best = results.first {
                 let gapOK = results.count < 2 || (best.score - results[1].score) >= minGapDelta
-                if best.score >= acceptThreshold && gapOK {
+                if best.score >= (acceptThreshold * 100) && gapOK {
                     return results.compactMap { r in
                         if let item = taxonItemCache.first(where: { String($0.taxonId) == r.id }) {
                             return (item, r.score)

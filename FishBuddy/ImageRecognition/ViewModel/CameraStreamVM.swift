@@ -29,7 +29,10 @@ class CameraStreamVM: ObservableObject {
     @Published var imageSearchResult: [(TaxonItem, Float)]?
     
     /// 相機捕捉模式
-    @Published var targetMode: TargetMode = .autoTracking(.aiming)
+    @Published var targetMode: TargetMode = .manualAim
+    
+    /// 是否在自由調整瞄準框模式
+    @Published var isInAdjustFrameMode: Bool = false
     
     /// 讀取資料庫：目前是直接讀取 json 資料作為資料庫
     func loadDatabaseIfNeeded() {
@@ -55,6 +58,19 @@ class CameraStreamVM: ObservableObject {
         }
     }
     
+    /// 切換相機捕捉模式（循環）
+    /// 預設順序：aiming → tracking → adjustFrame → manualAim → aiming
+    @MainActor
+    func cycleTargetMode() {
+        switch targetMode {
+        // 追蹤模式切換到手動瞄準
+        case .autoTracking(_):
+            targetMode = .manualAim
+        // 手動瞄準切換到追蹤模式
+        case .manualAim:
+            targetMode = .autoTracking(.losting)
+        }
+    }
 }
 
 // @State 只能用在 View 裡面，CameraStreamVM 是 ObservableObject
@@ -69,3 +85,4 @@ extension CameraStreamVM {
 //        case photo
 //    }
 }
+

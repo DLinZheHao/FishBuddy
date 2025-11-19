@@ -32,3 +32,33 @@ public extension View {
         self.modifier(ShimmerModifier())
     }
 }
+
+extension View {
+    func toast(
+        isPresented: Binding<Bool>,
+        message: String,
+        duration: TimeInterval = 2.0
+    ) -> some View {
+        ZStack {
+            self
+            
+            if isPresented.wrappedValue {
+                ToastView(message: message)
+                    .transition(.opacity)
+                    .frame(
+                        maxWidth: .infinity,
+                        maxHeight: .infinity,
+                        alignment: .center      
+                    )
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+                            withAnimation(.easeOut(duration: 0.25)) {
+                                isPresented.wrappedValue = false
+                            }
+                        }
+                    }
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: isPresented.wrappedValue)
+    }
+}

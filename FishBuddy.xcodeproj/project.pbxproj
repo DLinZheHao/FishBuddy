@@ -81,7 +81,9 @@
 		05E245F12D0A801000C6C048 /* UILabelExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E245F02D0A801000C6C048 /* UILabelExtension.swift */; };
 		05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E672DF2CDB0C78006CF3BF /* APILoggerPlugin.swift */; };
 		05E672E42CDB0CB3006CF3BF /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */; };
+		05ED74DE2ECD92AF002E56A7 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05ED74DD2ECD92AF002E56A7 /* ToastView.swift */; };
 		05F025042EC21535009D3531 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 05F025032EC21535009D3531 /* catalog.sqlite */; };
+		05F025072EC9B441009D3531 /* SideButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F025062EC9B441009D3531 /* SideButton.swift */; };
 		05F3BED42D92824C00DDAC72 /* TideDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F3BED32D92824C00DDAC72 /* TideDataModel.swift */; };
 		05FAEF132DF2743900E9BD08 /* bottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF122DF2743900E9BD08 /* bottomSheetView.swift */; };
 		05FAEF162DF2782400E9BD08 /* RestaurantModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF152DF2782400E9BD08 /* RestaurantModel.swift */; };
@@ -168,7 +170,9 @@
 		05E245F02D0A801000C6C048 /* UILabelExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelExtension.swift; sourceTree = "<group>"; };
 		05E672DF2CDB0C78006CF3BF /* APILoggerPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APILoggerPlugin.swift; sourceTree = "<group>"; };
 		05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
+		05ED74DD2ECD92AF002E56A7 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		05F025032EC21535009D3531 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
+		05F025062EC9B441009D3531 /* SideButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideButton.swift; sourceTree = "<group>"; };
 		05F3BED32D92824C00DDAC72 /* TideDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideDataModel.swift; sourceTree = "<group>"; };
 		05FAEF122DF2743900E9BD08 /* bottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = bottomSheetView.swift; sourceTree = "<group>"; };
 		05FAEF152DF2782400E9BD08 /* RestaurantModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantModel.swift; sourceTree = "<group>"; };
@@ -429,6 +433,7 @@
 		05589EF72CE6F7DE003881AA /* Componet */ = {
 			isa = PBXGroup;
 			children = (
+				05ED74DC2ECD929D002E56A7 /* ToastView */,
 				057F16782EA1E4D100EC7710 /* WrapLayout */,
 				05C13B842E98E25200BE9FA0 /* ImageInspectorView  */,
 				051B88372E6E8AE600209CDB /* CustomRounded */,
@@ -597,6 +602,7 @@
 		05C94D912E6ABF7C0051B078 /* ImageRecognition */ = {
 			isa = PBXGroup;
 			children = (
+				05F025052EC9B42B009D3531 /* View */,
 				05C94DA62E6AC9760051B078 /* Persistence */,
 				05C94D8A2E6ABF7C0051B078 /* ImageUtils */,
 				05C94D8C2E6ABF7C0051B078 /* Model */,
@@ -662,6 +668,22 @@
 				05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */,
 			);
 			path = DebugLogger;
+			sourceTree = "<group>";
+		};
+		05ED74DC2ECD929D002E56A7 /* ToastView */ = {
+			isa = PBXGroup;
+			children = (
+				05ED74DD2ECD92AF002E56A7 /* ToastView.swift */,
+			);
+			path = ToastView;
+			sourceTree = "<group>";
+		};
+		05F025052EC9B42B009D3531 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				05F025062EC9B441009D3531 /* SideButton.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		05FAEF112DF2740700E9BD08 /* BottomSheet */ = {
@@ -888,6 +910,7 @@
 				057F16262EA1DF2000EC7710 /* DistributionCardView.swift in Sources */,
 				05589EEF2CE6EFF3003881AA /* LobbyVM.swift in Sources */,
 				05823E072EB0673E00BDC553 /* CachedTileOverlay.swift in Sources */,
+				05F025072EC9B441009D3531 /* SideButton.swift in Sources */,
 				058F58A72E7BA42C009913C5 /* BackgroundRemoverVK.swift in Sources */,
 				054C84472CD9B994005595EF /* LobbyViewController.swift in Sources */,
 				0595566F2E14D5BA0050147C /* TideView.swift in Sources */,
@@ -898,6 +921,7 @@
 				05FAEF1C2DF2C22A00E9BD08 /* TripModel.swift in Sources */,
 				05823E052EB0666A00BDC553 /* MKMapRectExtension.swift in Sources */,
 				054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */,
+				05ED74DE2ECD92AF002E56A7 /* ToastView.swift in Sources */,
 				05FC90ED2E9894210053A1C2 /* TaxonDetailView.swift in Sources */,
 				05FAEF322E00F52500E9BD08 /* CardSliderView.swift in Sources */,
 				05C13B892E98E2FA00BE9FA0 /* ImageInspectorModel.swift in Sources */,

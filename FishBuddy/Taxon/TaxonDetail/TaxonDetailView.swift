@@ -207,7 +207,7 @@ struct TaxonDetailView: View {
 
 // MARK: - Preview mock + preview
 #if DEBUG
-private extension TaxonItem {
+ extension TaxonItem {
     static var previewMock: TaxonItem {
         let photos: [Photo] = [
             Photo(url: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?q=80&w=1200",

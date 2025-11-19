@@ -48,7 +48,9 @@ struct FramingGuide: View {
     @State private var startBox: CGRect = .zero
     /// 標記是否已完成初始設定
     @State private var didInit = false
-
+    /// 是否要顯示 toast
+    @State private var showToast = false
+    
     // 參數
     var minSide: CGFloat = 120
     /// 當前裁切框（相對 0...1 座標，原點左上）變更時回呼；可用來同步到 CameraController
@@ -62,6 +64,8 @@ struct FramingGuide: View {
     @Binding var cropBoxInView: CGRect?
     /// 追蹤方框
     @Binding var trackedBoxInView: CGRect?
+    /// 是否在方框調整模式
+    @Binding var isAdjusting: Bool
     
     // Crosshair 動畫狀態
     @State private var crossVisible = false
@@ -73,8 +77,6 @@ struct FramingGuide: View {
             let W = geo.size.width   // 容器寬度（points）
             let H = geo.size.height  // 容器高度（points）
             let S = min(W, H)        // 取較短邊作為縮放基準，避免初始尺寸超出容器
-
-            let _ = print("UI size:", geo.size)
             
             // 不同比例的初始視覺佔比（相對短邊的比例），讓兩種模式看起來大小接近
             let base = aspect == .wide43 ? 0.86 : 0.80
@@ -108,8 +110,8 @@ struct FramingGuide: View {
                 .position(x: box.midX == 0 ? W/2 : box.midX,
                           y: box.midY == 0 ? H/2 : box.midY)
                 
-                // 追蹤框
-                if let box = trackedBoxInView {
+                // 追蹤框（只在 autoTracking(.tracking) 且有 trackedBoxInView 時顯示）
+                if case .autoTracking(.tracking) = targetMode, let box = trackedBoxInView {
                     Rectangle()
                         .stroke(lineWidth: 2)
                         .frame(width: box.width, height: box.height)
@@ -117,12 +119,12 @@ struct FramingGuide: View {
                 }
                 
                 // 只有 Debug Build 才顯示實際裁切框
-                #if DEBUG
-                if let r = cropBoxInView {
-                    Rectangle().path(in: r).stroke(style: .init(lineWidth: 3))
-                        .foregroundStyle(.yellow)
-                }
-                #endif
+//                #if DEBUG
+//                if let r = cropBoxInView {
+//                    Rectangle().path(in: r).stroke(style: .init(lineWidth: 3))
+//                        .foregroundStyle(.yellow)
+//                }
+//                #endif
                 
                 // 中心十字準星（點擊時出現，縮小後淡出）
                 if crossVisible {
@@ -140,6 +142,11 @@ struct FramingGuide: View {
                 }
             }
             .contentShape(Rectangle())
+            .toast(
+                isPresented: $showToast,
+                message: "目標已遺失，請重新鎖定再拍照",
+                duration: 1.6
+            )
             .gesture(makeGesture(container: geo.size))
             .onAppear {
                 if !didInit {
@@ -160,6 +167,14 @@ struct FramingGuide: View {
                                   width: new.size.width / W, height: new.size.height / H)
                 onRectChange?(norm)
             }
+            .onChange(of: targetMode) { oldValue, newValue in
+                if case .autoTracking(.tracking) = oldValue,
+                   case .autoTracking(.losting)  = newValue {
+                    withAnimation {
+                        showToast = true
+                    }
+                }
+            }
         }
         .compositingGroup()
     }
@@ -172,35 +187,22 @@ struct FramingGuide: View {
         let tap     = tapGesture(container: container)
 
         switch targetMode {
-        // 手動瞄準
-        case .manualAim:
-            return AnyGesture(drag.map { _ in ()})
-        // 自動追蹤
-        case .autoTracking(let status):
-            switch status {
-            case .aiming:
-//                return AnyGesture(
-//                    drag
-//                        .simultaneously(with: tap)
-//                        .map { _ in () }
-//                )
-                return AnyGesture(
-                    drag
-                      .simultaneously(with: magnify)
-                      .simultaneously(with: tap)
-                      .map { _ in () }
-                )
-            case .tracking:
-                return AnyGesture(drag.map { _ in ()})
-            }
-        // 調整瞄準框大小
-        case .adjustFrame:
-            return AnyGesture(
-                drag
-                  .simultaneously(with: magnify)
-                  .simultaneously(with: tap)
-                  .map { _ in () }
-            )
+            // 手動瞄準 & 自動追蹤
+        case .manualAim, .autoTracking:
+            let gesture: AnyGesture<Void> = isAdjusting
+                    ? AnyGesture(
+                        drag
+                            .simultaneously(with: magnify)
+                            .simultaneously(with: tap)
+                            .map { _ in () }
+                    )
+                    : AnyGesture(
+                        drag
+                            .simultaneously(with: tap)
+                            .map { _ in () }
+                    )
+            
+            return gesture
         }
     }
     
@@ -218,7 +220,7 @@ struct FramingGuide: View {
                 width: box.width / container.width,
                 height: box.height / container.height
             )
-            print("瞄準框的資訊：\(box)")
+
             onCenterTap?(pointInView, normRect)
 
             // 觸發十字準星縮小 + 淡出動畫
@@ -386,3 +388,4 @@ struct DemoView: View {
 //        print("Center (normalized):", pt)
 //    })
 //}
+

@@ -22,6 +22,22 @@ final class AnimalTracker {
 
     /// 當前的追蹤請求。成功 startTracking 後會建立，失敗或遺失追蹤時會被設為 nil。
     private var trackingRequest: VNTrackObjectRequest?
+    
+    /// 上一次的觀測結果（可選，用於進階功能或調試
+    private var lastObservation: VNDetectedObjectObservation?
+    
+    /// 追蹤中？
+    var isTracking: Bool { trackingRequest != nil }
+    
+    /// 當追蹤更新時回呼最新的 Vision normalized boundingBox。
+    /// - 注意：若要用於 UIKit 或 AVFoundation 的畫面座標，需做座標系轉換：
+    ///   - Vision: 原點在左下，寬高為 0…1
+    ///   - UIKit: 原點在左上，且需乘上實際像素或視圖大小
+    var onUpdate: ((CGRect) -> Void)?
+    
+    /// 當追蹤判定遺失時呼叫，傳出最後一次的 boundingBox（可能為 nil）
+    var onLost: ((CGRect?) -> Void)?
+
 
     /// 開始追蹤。
     /// - Parameter initialBoundingBox: 初始偵測到的物件邊界框（Vision normalized，0…1，原點在左下）。
@@ -36,6 +52,12 @@ final class AnimalTracker {
         self.trackingRequest = request
     }
 
+    /// 停止追蹤
+    func stopTracking() {
+        trackingRequest = nil
+        lastObservation = nil
+    }
+    
     /// 在新影格上更新追蹤狀態。
     /// - Parameter pixelBuffer: 來自相機或影片的影格資料。
     /// - 流程：
@@ -55,6 +77,8 @@ final class AnimalTracker {
             // 若 Vision 執行失敗，停止追蹤
             print("Tracking failed: \(error)")
             trackingRequest = nil
+            onLost?(lastObservation?.boundingBox)
+            lastObservation = nil
             return
         }
 
@@ -63,19 +87,16 @@ final class AnimalTracker {
               newObs.confidence > 0.3 else {
             print("Lost tracking")
             trackingRequest = nil
+            onLost?(lastObservation?.boundingBox)
+            lastObservation = nil
             return
         }
 
         // 更新輸入觀測以持續追蹤
         request.inputObservation = newObs
-
+ 
         // 回傳 Vision normalized 座標（0…1，原點在左下）
         onUpdate?(newObs.boundingBox)
     }
 
-    /// 當追蹤更新時回呼最新的 Vision normalized boundingBox。
-    /// - 注意：若要用於 UIKit 或 AVFoundation 的畫面座標，需做座標系轉換：
-    ///   - Vision: 原點在左下，寬高為 0…1
-    ///   - UIKit: 原點在左上，且需乘上實際像素或視圖大小
-    var onUpdate: ((CGRect) -> Void)?
 }
