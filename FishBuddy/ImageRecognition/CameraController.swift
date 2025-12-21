@@ -56,6 +56,10 @@ protocol CameraControllerOutputs {
 final class CameraController: NSObject, ObservableObject {
     /// 設定相機捕捉模式，預設，綁定後清出預設
     private var targetModeBinding: Binding<TargetMode> = .constant(.manualAim)
+    
+    /// 目前使用中的相機裝置（後鏡頭 / 前鏡頭）
+    private var captureDevice: AVCaptureDevice?
+    
     /// 背景去除用物件
     var backgroundRemoverVK: BackgroundRemoverVK?
     // 由外部注入或稍後設定的 CLIP 特徵擷取器
@@ -134,6 +138,10 @@ final class CameraController: NSObject, ObservableObject {
     @Published var cropRectNormalized: CGRect? = nil
     /// 使用者設定的裁切框中心，用來對焦
     @Published var cropRectCenter: CGPoint? = nil
+    /// 目前放大比率
+    @Published var currentZoomFactor: CGFloat = 1.0
+    
+    @Published var trackedBoxNormalized: CGRect? // metadata rect 或 vision rect
     
     override init() {
         super.init()
@@ -155,6 +163,10 @@ final class CameraController: NSObject, ObservableObject {
                 width: visionRect.width,
                 height: visionRect.height
             )
+            
+            Task { @MainActor in
+                self.trackedBoxNormalized = metadataRect
+            }
             
             let rectInLayer = layer.layerRectConverted(fromMetadataOutputRect: metadataRect)
             
@@ -307,7 +319,35 @@ final class CameraController: NSObject, ObservableObject {
         sessionQueue.sync { [self] in
             captureSession?.stopRunning() // 停止影像擷取
             captureSession = nil // 釋放 session
+            captureDevice = nil
             isRunning = false
+        }
+    }
+
+    /// 暫停相機 session（不銷毀，僅停止）
+    public func pause() {
+        sessionQueue.async { [weak self] in
+            guard let self, let session = self.captureSession, self.isRunning else { return }
+            session.stopRunning()
+            self.isRunning = false
+        }
+    }
+
+    /// 恢復相機 session（若尚未建立則重建）
+    public func resume() {
+        sessionQueue.async { [weak self] in
+            guard let self else { return }
+            if let session = self.captureSession, !self.isRunning {
+                session.startRunning()
+                self.isRunning = true
+            } else if self.captureSession == nil {
+                let captureSession = AVCaptureSession()
+                self.captureSession = captureSession
+                self.checkPermission()
+                self.setupCaptureSession(position: self.backCamera ? .back : .front)
+                captureSession.startRunning()
+                self.isRunning = true
+            }
         }
     }
 
@@ -427,6 +467,9 @@ final class CameraController: NSObject, ObservableObject {
             print("Unable to find video device")
             return
         }
+        
+        self.captureDevice = videoDevice
+        
         // 建立裝置輸入
         guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice) else {
             print("Unable to create AVCaptureDeviceInput")
@@ -470,8 +513,33 @@ final class CameraController: NSObject, ObservableObject {
         }
     }
     
-    // MARK: - 目前用不到的裁切相關方法
-    /// 將 UIImage 轉為「已套用方向」的位圖（.up），避免裁切時座標錯亂 (目前用不到)
+    /// 鏡頭放大縮小
+    func updateZoom(_ zoomFactor: CGFloat) {
+        let factor = zoomFactor
+        sessionQueue.async { [weak self] in
+            guard let self,
+                  let device = self.captureDevice
+            else { return }
+            
+            let minZoom = device.minAvailableVideoZoomFactor
+            let maxZoom = device.maxAvailableVideoZoomFactor
+            let newZoom = max(minZoom, min(factor, maxZoom))
+            
+            do {
+                try device.lockForConfiguration()
+                device.videoZoomFactor = newZoom
+                device.unlockForConfiguration()
+                
+                DispatchQueue.main.async {
+                    self.currentZoomFactor = newZoom
+                }
+            } catch {
+                print("Zoom failed: \(error)")
+            }
+        }
+    }
+    
+    /// 將 UIImage 轉為「已套用方向」的位圖（.up），避免裁切時座標錯亂
     private func imageByFixingOrientation(_ image: UIImage) -> UIImage {
         // 若圖片本身的方向就是 .up（代表位圖像素已符合直立方向），直接回傳，避免不必要的重繪成本
         if image.imageOrientation == .up { return image }
@@ -592,12 +660,32 @@ extension CameraController: AVCapturePhotoCaptureDelegate {
         // 先固定方向，再依使用者的裁切框（若有）裁出 ROI
         let base = imageByFixingOrientation(rawImage)
         let finalImage: UIImage
-        if let roi = self.cropRectNormalized {
-            finalImage = crop(base, by: roi) ?? base
-        } else {
-            finalImage = base
-        }
+        
+        let mode = targetModeBinding.wrappedValue
 
+        // 依照模式切座標
+        switch mode {
+        case .manualAim:
+            // 手動瞄準模式的處理
+            // 例如：使用 cropRectNormalized 來裁切
+            if let roi = self.cropRectNormalized {
+                finalImage = crop(base, by: roi) ?? base
+            } else {
+                finalImage = base
+            }
+
+        case .autoTracking(.tracking):
+            // 自動追蹤中
+            if let roi = self.trackedBoxNormalized {
+                finalImage = crop(base, by: roi) ?? base
+            } else {
+                finalImage = base
+            }
+
+        case .autoTracking(.losting):
+            return
+        }
+        
         if let embedding = clip.multiCropAverageEmbedding(for: finalImage, cropScale: 0.85) {
             Task { @MainActor in
                 self.onPhotoReady?((embedding, finalImage))

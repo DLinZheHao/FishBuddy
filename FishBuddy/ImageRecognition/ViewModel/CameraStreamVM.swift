@@ -31,8 +31,12 @@ class CameraStreamVM: ObservableObject {
     /// 相機捕捉模式
     @Published var targetMode: TargetMode = .manualAim
     
+    /// 相機鏡頭縮放
+    @Published var lastZoomFactor: CGFloat = 1.0
+    
     /// 是否在自由調整瞄準框模式
     @Published var isInAdjustFrameMode: Bool = false
+    
     
     /// 讀取資料庫：目前是直接讀取 json 資料作為資料庫
     func loadDatabaseIfNeeded() {

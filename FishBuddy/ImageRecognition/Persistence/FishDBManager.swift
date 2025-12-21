@@ -7,187 +7,23 @@
 
 import SQLite
 import Foundation
-
-/// 快捷的取得 Embedding 資料：使用 json
-actor EmbeddingStore {
-    /// 共用實例
-    static let shared = EmbeddingStore()
-    /// 資料庫
-    var fishDB: FishDB?
-    /// 讀取的 taxonItem 暫存
-    var taxonItemCache: [TaxonItem] = []
-    /// In-memory 向量索引快取（只建一次，除非資料有變動）
-    private var indexCache: InMemoryVectorIndex?
-    /// 相似度最低接受門檻（cosine），依你的資料集可微調，預設 0.5
-    var acceptThreshold: Float = 0.6
-    /// 與次高分的最小差距（動態門檻），預設 0.1；可設為 0 表示不啟用
-    var minGapDelta: Float = 0.1
-    /// 當前索引的維度；避免用錯模型維度
-    private var indexDim: Int = 0
-    
-    init() {
-        do {
-            let fm = FileManager.default
-            let docs = try fm.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-            let dest = docs.appendingPathComponent("catalog.sqlite")
-
-            // 第一次啟動：若 Documents 裡沒有 DB，嘗試從 bundle 複製預載檔
-            if !fm.fileExists(atPath: dest.path) {
-                if let src = Bundle.main.url(forResource: "catalog", withExtension: "sqlite") {
-                    try fm.copyItem(at: src, to: dest)
-                    print("已從 bundle 複製 DB 至:", dest.path)
-                } else {
-                    print("⚠️ bundle 內找不到 catalog.sqlite，將在首次啟動時以 DDL 建立空 schema。")
-                }
-            }
-
-            self.fishDB = try FishDB(path: dest.path)
-            print("DB 路徑在:", dest.path)
-        } catch {
-            print("資料庫初始化失敗: \(error)")
-        }
-    }
-    
-    /// 取得（或建立）InMemoryVectorIndex：會從 SQLite 載入全部向量，打包成 N×D 矩陣，只做一次
-    /// - Parameter dim: 向量維度（例如 512 或 768）
-    /// - Returns: 可重用的 InMemoryVectorIndex 實例
-    func getIndex(dim: Int) async throws {
-        if let idx = indexCache, indexDim == dim {
-            return
-        }
-        guard let fishDB else { throw NSError(domain: "EmbeddingStore", code: 1, userInfo: [NSLocalizedDescriptionKey: "FishDB 未初始化"]) }
-        
-        // 從 SQLite 讀取全部資料列
-        var items: [TaxonItem]
-         
-        // 加入暫存機制，不用每次都讀取資料庫
-        if taxonItemCache.isEmpty {
-            items = try fishDB.loadAll()
-            
-            if taxonItemCache.isEmpty {
-                taxonItemCache = items
-            }
-        } else {
-            items = taxonItemCache
-        }
-        // 以 dim 檢查每筆維度
-        guard items.allSatisfy({ $0.embedding.count == dim }) else {
-            throw NSError(domain: "EmbeddingStore", code: 2, userInfo: [NSLocalizedDescriptionKey: "向量維度不一致或與 dim 不符"]) }
-        let idx = InMemoryVectorIndex(items: items, dim: dim)
-        indexCache = idx
-        indexDim = dim
-    }
-    
-    func searchWithItems(query: [Float], topK: Int) async throws -> [(TaxonItem, Float)] {
-        if let idx = indexCache {
-            let results = idx.search(query: query, topK: topK)
-            
-            // 門檻 + 與次高分差距規則
-            if let best = results.first {
-                let gapOK = results.count < 2 || (best.score - results[1].score) >= minGapDelta
-                if best.score >= (acceptThreshold * 100) && gapOK {
-                    return results.compactMap { r in
-                        if let item = taxonItemCache.first(where: { String($0.taxonId) == r.id }) {
-                            return (item, r.score)
-                        }
-                        return nil
-                    }
-                }
-            }
-            
-        }
-        return []
-    }
-}
+import Accelerate
 
 final class FishDB {
     /// 資料庫
     private let db: Connection
 
-    // 以預處理時相同的 DDL 作為後援（僅在找不到任何表時才執行）
-    private static let schemaDDL: String = {
-        return """
-PRAGMA journal_mode=OFF;
-PRAGMA synchronous=OFF;
-BEGIN IMMEDIATE;
-CREATE TABLE species (
-  taxon_id INTEGER PRIMARY KEY,
-  scientific_name TEXT,
-  common_name TEXT,
-  rank TEXT,
-  slug TEXT
-);
-CREATE TABLE photos (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  taxon_id INTEGER NOT NULL,
-  url TEXT NOT NULL,
-  license_code TEXT,
-  attribution TEXT,
-  source TEXT
-);
-
-CREATE TABLE distribution (
-  taxon_id INTEGER PRIMARY KEY,
-  type TEXT,              -- e.g., 'tiles' | 'places' | 'range' | 'observations'
-  kml_url TEXT
-);
-
-CREATE TABLE distribution_layers (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  taxon_id INTEGER NOT NULL,
-  layer_key TEXT NOT NULL,
-  type TEXT NOT NULL,
-  url TEXT NOT NULL,
-  minzoom INTEGER NOT NULL,
-  maxzoom INTEGER NOT NULL
-);
-
-CREATE TABLE embeddings (
-  taxon_id INTEGER PRIMARY KEY,
-  dim INTEGER NOT NULL,
-  vec BLOB NOT NULL
-);
-
-CREATE TABLE text_embeddings (
-  taxon_id INTEGER PRIMARY KEY,
-  dim INTEGER NOT NULL,
-  vec BLOB NOT NULL
-);
-
-CREATE TABLE species_meta (
-  taxon_id INTEGER PRIMARY KEY,
-  meta_json TEXT
-);
-CREATE TABLE embedding_meta (
-  taxon_id INTEGER PRIMARY KEY,
-  meta_json TEXT
-);
-
-CREATE TABLE text_embedding_meta (
-  taxon_id INTEGER PRIMARY KEY,
-  meta_json TEXT
-);
-
-CREATE TABLE user_prompt_zh (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  taxon_id INTEGER NOT NULL,
-  category TEXT NOT NULL,  -- e.g. morphology / pattern / traits / habitat
-  text TEXT NOT NULL
-);
-
-CREATE INDEX idx_user_prompt_zh_taxon ON user_prompt_zh(taxon_id);
-CREATE INDEX idx_species_sci ON species(scientific_name);
-CREATE INDEX idx_photos_taxon ON photos(taxon_id);
-CREATE INDEX idx_distribution_layers_taxon ON distribution_layers(taxon_id);
-"""
-    }()
-
     /// 若資料庫是新建且沒有任何預期的表，執行 DDL 建立 schema
     private func bootstrapIfEmpty() throws {
-        let count = try db.scalar("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('species','photos','embeddings','text_embeddings','species_meta','embedding_meta','text_embedding_meta');") as! Int64
+        let sql = createRequiredTables()
+
+        // Count required tables in the database
+        let count = try db.scalar(sql) as! Int64
+        
+        // If the tables do not exist, use schemaDDL to create them
         if count == 0 {
             // SQLite.swift 的 db.run 不支援一次執行多條語句；需要逐條執行
-            let statements = FishDB.schemaDDL
+            let statements = createSchemaDDL()
                 .split(separator: ";")
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty }
@@ -196,13 +32,163 @@ CREATE INDEX idx_distribution_layers_taxon ON distribution_layers(taxon_id);
                 try db.run(sql)
             }
 
-            let newCount = try db.scalar("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('species','photos','embeddings','text_embeddings','species_meta','embedding_meta','text_embedding_meta');") as! Int64
+            let newCount = try db.scalar(sql) as! Int64
             print("✅ 已執行 bootstrap DDL，建表完成（表數=\(newCount)）")
         }
     }
+    
+    /// SQL string to get tables count
+    private func createRequiredTables() -> String {
+        let requiredTables = [
+            "species",
+            "raw_species_json",
+            "photos",
+            "wiki_photos",
+            "distribution_layers",
+            "photo_embeddings"
+        ]
 
+        let tableList = requiredTables
+            .map { "'\($0)'" }
+            .joined(separator: ",")
+
+        let sql = """
+        SELECT COUNT(*)
+        FROM sqlite_master
+        WHERE type = 'table'
+          AND name IN (\(tableList));
+        """
+        
+        return sql
+    }
+    
+    /// Generate schema DDL for required tables
+    private func createSchemaDDL() -> String {
+        // SQL statements to execute (in order)
+        var statements: [String] = []
+
+        // WAL 設定
+        statements.append("PRAGMA journal_mode=WAL;")
+
+        // 同步策略（效能/安全折衷）
+        statements.append("PRAGMA synchronous=NORMAL;")
+
+        // 外鍵
+        statements.append("PRAGMA foreign_keys=ON;")
+
+        // Begin transaction
+        statements.append("BEGIN IMMEDIATE;")
+
+        // 1) species
+        let speciesTableSQL = """
+        CREATE TABLE IF NOT EXISTS species (
+          taxon_id            INTEGER PRIMARY KEY,   -- 唯一辨識值
+          scientific_name     TEXT NOT NULL,
+          common_name_zh      TEXT,
+          common_name_en_json TEXT,                  -- JSON array string (["...", "..."])
+          taxonomy_json       TEXT,                  -- JSON object string
+          basic_info_json     TEXT,
+          morphology_json     TEXT,
+          diet_and_behavior_json TEXT,
+          ecology_and_behavior_json TEXT,
+          habitat_and_distribution_json TEXT,
+          environment_and_depth_json TEXT,
+          reproduction_json   TEXT,
+          growth_and_life_history_json TEXT,
+          conservation_and_human_uses_json TEXT,
+          benefits_and_uses_json TEXT,
+          taiwan_and_regional_notes_json TEXT,
+          distribution_json   TEXT,                  -- 也先整包存著，避免漏欄位
+          embedding_meta_json TEXT
+        );
+        """
+        statements.append(speciesTableSQL)
+
+        // 2) raw_species_json（完全不漏任何 key/內容）
+        let rawSpeciesTableSQL = """
+        CREATE TABLE IF NOT EXISTS raw_species_json (
+          taxon_id  INTEGER PRIMARY KEY,
+          raw_json  TEXT NOT NULL,
+          FOREIGN KEY (taxon_id) REFERENCES species(taxon_id) ON DELETE CASCADE
+        );
+        """
+        statements.append(rawSpeciesTableSQL)
+
+        // 3) photos
+        let photosTableSQL = """
+        CREATE TABLE IF NOT EXISTS photos (
+          taxon_id      INTEGER NOT NULL,
+          idx           INTEGER NOT NULL,            -- array index，避免順序丟失
+          url           TEXT NOT NULL,
+          license_code  TEXT,
+          attribution   TEXT,
+          source        TEXT,
+          PRIMARY KEY (taxon_id, idx),
+          FOREIGN KEY (taxon_id) REFERENCES species(taxon_id) ON DELETE CASCADE
+        );
+        CREATE INDEX IF NOT EXISTS idx_photos_taxon ON photos(taxon_id);
+        CREATE INDEX IF NOT EXISTS idx_photos_url   ON photos(url);
+        """
+        statements.append(photosTableSQL)
+
+        // 4) wiki_photos
+        let wikiPhotosTableSQL = """
+        CREATE TABLE IF NOT EXISTS wiki_photos (
+          taxon_id          INTEGER NOT NULL,
+          idx               INTEGER NOT NULL,
+          url               TEXT NOT NULL,
+          license_code      TEXT,
+          license           TEXT,
+          source            TEXT,
+          attribution_html  TEXT,
+          PRIMARY KEY (taxon_id, idx),
+          FOREIGN KEY (taxon_id) REFERENCES species(taxon_id) ON DELETE CASCADE
+        );
+        CREATE INDEX IF NOT EXISTS idx_wiki_photos_taxon ON wiki_photos(taxon_id);
+        CREATE INDEX IF NOT EXISTS idx_wiki_photos_url   ON wiki_photos(url);
+        """
+        statements.append(wikiPhotosTableSQL)
+
+        // 5) distribution_layers
+        let distributionLayersTableSQL = """
+        CREATE TABLE IF NOT EXISTS distribution_layers (
+          taxon_id  INTEGER NOT NULL,
+          idx       INTEGER NOT NULL,
+          layer_key TEXT NOT NULL,
+          type      TEXT,
+          url       TEXT,
+          minzoom   INTEGER,
+          maxzoom   INTEGER,
+          PRIMARY KEY (taxon_id, idx),
+          FOREIGN KEY (taxon_id) REFERENCES species(taxon_id) ON DELETE CASCADE
+        );
+        CREATE INDEX IF NOT EXISTS idx_layers_taxon ON distribution_layers(taxon_id);
+        CREATE INDEX IF NOT EXISTS idx_layers_key   ON distribution_layers(layer_key);
+        """
+        statements.append(distributionLayersTableSQL)
+
+        // 6) photo_embeddings
+        let photoEmbeddingsTableSQL = """
+        CREATE TABLE IF NOT EXISTS photo_embeddings (
+          taxon_id     INTEGER NOT NULL,
+          idx          INTEGER NOT NULL,     -- 第幾張 embedding（對應 photos 的 idx）
+          dtype        TEXT NOT NULL,        -- 'f32'
+          vector_blob  BLOB NOT NULL,        -- raw bytes
+          PRIMARY KEY (taxon_id, idx),
+          FOREIGN KEY (taxon_id) REFERENCES species(taxon_id) ON DELETE CASCADE
+        );
+        CREATE INDEX IF NOT EXISTS idx_pe_taxon ON photo_embeddings(taxon_id);
+        """
+        statements.append(photoEmbeddingsTableSQL)
+
+        // Commit transaction
+        statements.append("COMMIT;")
+
+        return statements.joined(separator: "\n")
+    }
+
+    /// Initializes FishDB and ensures the database file and required schema exist.
     init(path: String) throws {
-        // 先確保檔案存在：若文件不存在，SQLite.swift 會建立空白 DB，導致後續查詢找不到表
         let fm = FileManager.default
         if !fm.fileExists(atPath: path) {
             print("⚠️ 指定路徑尚無 DB 檔，將建立空白資料庫並以 DDL 建立 schema: \(path)")
@@ -424,8 +410,6 @@ CREATE INDEX idx_distribution_layers_taxon ON distribution_layers(taxon_id);
         }
     }
 }
-
-import Accelerate
 
 final class InMemoryVectorIndex {
     /// 向量維度（embedding 的維度 D）

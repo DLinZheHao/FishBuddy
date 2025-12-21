@@ -8,7 +8,6 @@
 import SwiftUI
 import AVFoundation
 import CoreML
-import Kingfisher
 
 struct CameraStreamView: View {
     /// 相機鏡頭物件
@@ -50,10 +49,17 @@ struct CameraStreamView: View {
                             // 點中心時開始追蹤（rect 已是 0..1 正規化）
                             camera.startTracking(withNormalizedBox: rect)
                         },
+                        onZoomChange: { scale in
+                            camera.updateZoom(scale)
+                        },
+                        onZoomEnd: {
+                            vm.lastZoomFactor = camera.currentZoomFactor
+                        },
                         targetMode: $vm.targetMode,
                         cropBoxInView: $camera.cropBoxInView,
                         trackedBoxInView: $camera.trackedBoxInView,
-                        isAdjusting: $vm.isInAdjustFrameMode
+                        isAdjusting: $vm.isInAdjustFrameMode,
+                        lastZoomFactor: $vm.lastZoomFactor
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity) // 充滿與預覽同大小
                     .ignoresSafeArea()
@@ -167,7 +173,8 @@ struct CameraStreamView: View {
                     CaptureToolbar(
                         lastPhoto: lastPhoto,
                         onCapture: { handleCaptureTapped() },
-                        onClose: onClose ?? {}
+                        onClose: onClose ?? {},
+                        zoom: camera.currentZoomFactor
                     )
                     .padding(.bottom, 16)
                 }
@@ -229,10 +236,12 @@ struct CameraStreamView: View {
                 }
                 
                 camera.bindTargetMode($vm.targetMode)
+                
+                camera.resume()
             }
             .onDisappear {
                 // 在 Tab 切換時不要停止相機與釋放資源，避免重建成本
-                // 若需要在真正離開功能頁時釋放，請在上層做集中管理再呼叫 stop/detatch。
+                camera.pause()
             }
         }
     }
@@ -249,134 +258,6 @@ struct CameraStreamView: View {
                 showToast = true
             }
         }
-    }
-}
-
-// MARK: - 底部工具列（拍照 + 最新縮圖）
-private struct CaptureToolbar: View {
-    let lastPhoto: UIImage?
-    let onCapture: () -> Void
-    let onClose: () -> Void
-
-    /// 左右兩側固定寬度，確保快門在幾何正中央
-    private let sideWidth: CGFloat = 88
-
-    var body: some View {
-        HStack {
-            // 左邊區塊：固定 sideWidth，按鈕靠左
-            HStack {
-                Button(action: onClose) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(.white)
-                        .frame(width: 44, height: 44)
-                        .background(Color.black.opacity(0.4))
-                        .clipShape(Circle())
-                }
-                Spacer()
-            }
-            .frame(width: sideWidth, alignment: .leading)
-
-            Spacer(minLength: 0)
-
-            // 中間快門：幾何正中央
-            Button(action: onCapture) {
-                Circle()
-                    .fill(Color.white)
-                    .frame(width: 76, height: 76)
-                    .overlay(
-                        Circle().stroke(Color.black, lineWidth: 2)
-                    )
-                    .padding(4)
-                    .background(
-                        Circle()
-                            .fill(Color.white) // 塗上想要的顏色
-                    )
-                    .overlay(
-                        Circle().stroke(Color.black, lineWidth: 2)
-                    )
-            }
-
-            Spacer(minLength: 0)
-
-            // 右邊區塊：固定 sideWidth，縮圖靠右
-            HStack {
-                Spacer()
-                if let image = lastPhoto {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 56, height: 56)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                } else {
-                    Color.clear
-                        .frame(width: 56, height: 56) // 固定 56，避免寬度變來變去
-                }
-            }
-            .frame(width: sideWidth, alignment: .trailing)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-    }
-}
-
-// MARK: - 搜尋結果單列：圖片邊長 = 文字區塊高度
-private struct SearchResultRow: View {
-    let imageURL: URL?
-    let title: String
-    let idText: String
-    let scoreText: String
-
-    @State private var textHeight: CGFloat = 0
-
-    var body: some View {
-        HStack(spacing: 8) {
-            KFImage(imageURL)
-                .placeholder { ProgressView() }
-                .cancelOnDisappear(true)
-                .resizable()
-                .scaledToFill()
-                .frame(width: max(textHeight, 1), height: max(textHeight, 1)) // 正方形，避免初始 0 尺吋
-                .clipped()
-                .cornerRadius(8)
-
-            VStack(alignment: .leading) {
-                Text(title)
-                    .font(.title3)
-                    .foregroundColor(.primary)
-                
-                Text(idText)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                Text(scoreText)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            // 量測 VStack 的實際高度
-            .background(
-                GeometryReader { proxy in
-                    Color.clear
-                        .preference(key: TextHeightPreferenceKey.self, value: proxy.size.height)
-                }
-            )
-
-            Spacer()
-        }
-        .onPreferenceChange(TextHeightPreferenceKey.self) { h in
-            // 更新圖片邊長
-            textHeight = h
-        }
-        .padding(.vertical, 4)
-        .padding(.horizontal, 8)
-        .background(RoundedRectangle(cornerRadius: 8).fill(.secondary.opacity(0.1)))
-    }
-}
-
-private struct TextHeightPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
     }
 }
 
@@ -463,3 +344,20 @@ struct EmbeddingConsumer: View {
 //}
 #endif
 
+//@Environment(\.scenePhase) private var scenePhase
+//
+//var body: some View {
+//    ZStack { ... }
+//    .onAppear { camera.startIfNeeded() }
+//    .onDisappear { camera.stop() }
+//    .onChange(of: scenePhase) { newPhase in
+//        switch newPhase {
+//        case .background, .inactive:
+//            camera.stop()
+//        case .active:
+//            camera.startIfNeeded()
+//        default:
+//            break
+//        }
+//    }
+//}

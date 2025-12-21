@@ -27,6 +27,7 @@ import SwiftUI
  - clamp(_:in:) 會把框限制在容器中，並保證最大尺寸不會超過容器的 98%。
 */
 
+@MainActor
 struct FramingGuide: View {
     enum Aspect {
         /// 4:3 寬螢幕
@@ -57,7 +58,11 @@ struct FramingGuide: View {
     var onRectChange: ((CGRect) -> Void)? = nil
     /// 點擊框時回傳中心點（0...1 正規化；原點左上、相對容器）
     var onCenterTap: ((CGPoint, CGRect) -> Void)? = nil
-
+    /// 使用者縮放鏡頭
+    var onZoomChange: ((CGFloat) -> Void)? = nil
+    /// 使用者縮放結束
+    var onZoomEnd: (() -> Void)? = nil
+    
     /// 目標模式
     @Binding var targetMode: TargetMode
     /// 畫面才切結果
@@ -66,6 +71,8 @@ struct FramingGuide: View {
     @Binding var trackedBoxInView: CGRect?
     /// 是否在方框調整模式
     @Binding var isAdjusting: Bool
+    /// 最後的縮放數值
+    @Binding var lastZoomFactor: CGFloat
     
     // Crosshair 動畫狀態
     @State private var crossVisible = false
@@ -185,6 +192,7 @@ struct FramingGuide: View {
         let drag    = dragGesture(container: container)
         let magnify = magnifyGesture(container: container)
         let tap     = tapGesture(container: container)
+        let magnifyCamera = magnifyGestureForCamera()
 
         switch targetMode {
             // 手動瞄準 & 自動追蹤
@@ -198,6 +206,7 @@ struct FramingGuide: View {
                     )
                     : AnyGesture(
                         drag
+                            .simultaneously(with: magnifyCamera)
                             .simultaneously(with: tap)
                             .map { _ in () }
                     )
@@ -279,6 +288,19 @@ struct FramingGuide: View {
             }
     }
     
+    /// 鏡頭縮放手勢
+    private func magnifyGestureForCamera() -> some Gesture {
+        MagnificationGesture()
+            .onChanged { scale in
+                let targetZoom = scale * lastZoomFactor   // ← 這裡才乘
+                onZoomChange?(targetZoom)
+            }
+            .onEnded { _ in
+                // 記住這次結束後的 zoom，當成下一次 pinch 的基準
+                onZoomEnd?()
+            }
+    }
+
     // MARK: - 工具
     /// 把矩形 `r` 夾限在 `container` 尺寸內，
     /// 並限制最大寬高不超過容器的 98%（同時維持比例一致）。
@@ -370,6 +392,7 @@ struct CrosshairShape: Shape {
 }
 
 // 展示 CornerBracketShape 的簡易示範用法
+@MainActor
 struct DemoView: View {
     var body: some View {
         ZStack {

@@ -12,6 +12,8 @@
 		051B88322E6E8A9600209CDB /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B88312E6E8A9600209CDB /* ViewExtension.swift */; };
 		051B88382E6E8AE600209CDB /* CustomRounded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B88362E6E8AE600209CDB /* CustomRounded.swift */; };
 		051B883D2E73B66900209CDB /* LoadingCircleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B883C2E73B66900209CDB /* LoadingCircleView.swift */; };
+		052E49012EF7CDBF00DACA85 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 052E49002EF7CDBF00DACA85 /* catalog.sqlite */; };
+		052E49032EF7D56E00DACA85 /* EmbeddingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052E49022EF7D56B00DACA85 /* EmbeddingStore.swift */; };
 		0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0546FBB52DCB30F1001695D8 /* custom-icons.ttf */; };
 		054C84432CD9B994005595EF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84422CD9B994005595EF /* AppDelegate.swift */; };
 		054C84452CD9B994005595EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84442CD9B994005595EF /* SceneDelegate.swift */; };
@@ -82,7 +84,8 @@
 		05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E672DF2CDB0C78006CF3BF /* APILoggerPlugin.swift */; };
 		05E672E42CDB0CB3006CF3BF /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */; };
 		05ED74DE2ECD92AF002E56A7 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05ED74DD2ECD92AF002E56A7 /* ToastView.swift */; };
-		05F025042EC21535009D3531 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 05F025032EC21535009D3531 /* catalog.sqlite */; };
+		05ED74E02ECDB608002E56A7 /* CaptureToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05ED74DF2ECDB608002E56A7 /* CaptureToolbar.swift */; };
+		05ED74E22ECDB639002E56A7 /* SearchResultRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05ED74E12ECDB639002E56A7 /* SearchResultRow.swift */; };
 		05F025072EC9B441009D3531 /* SideButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F025062EC9B441009D3531 /* SideButton.swift */; };
 		05F3BED42D92824C00DDAC72 /* TideDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F3BED32D92824C00DDAC72 /* TideDataModel.swift */; };
 		05FAEF132DF2743900E9BD08 /* bottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FAEF122DF2743900E9BD08 /* bottomSheetView.swift */; };
@@ -106,6 +109,8 @@
 		051B88312E6E8A9600209CDB /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
 		051B88362E6E8AE600209CDB /* CustomRounded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRounded.swift; sourceTree = "<group>"; };
 		051B883C2E73B66900209CDB /* LoadingCircleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingCircleView.swift; sourceTree = "<group>"; };
+		052E49002EF7CDBF00DACA85 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
+		052E49022EF7D56B00DACA85 /* EmbeddingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddingStore.swift; sourceTree = "<group>"; };
 		0546FBB52DCB30F1001695D8 /* custom-icons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "custom-icons.ttf"; sourceTree = "<group>"; };
 		054C843F2CD9B994005595EF /* FishBuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FishBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		054C84422CD9B994005595EF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -171,7 +176,8 @@
 		05E672DF2CDB0C78006CF3BF /* APILoggerPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APILoggerPlugin.swift; sourceTree = "<group>"; };
 		05E672E32CDB0CB3006CF3BF /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
 		05ED74DD2ECD92AF002E56A7 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
-		05F025032EC21535009D3531 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
+		05ED74DF2ECDB608002E56A7 /* CaptureToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureToolbar.swift; sourceTree = "<group>"; };
+		05ED74E12ECDB639002E56A7 /* SearchResultRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultRow.swift; sourceTree = "<group>"; };
 		05F025062EC9B441009D3531 /* SideButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideButton.swift; sourceTree = "<group>"; };
 		05F3BED32D92824C00DDAC72 /* TideDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideDataModel.swift; sourceTree = "<group>"; };
 		05FAEF122DF2743900E9BD08 /* bottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = bottomSheetView.swift; sourceTree = "<group>"; };
@@ -277,6 +283,7 @@
 			isa = PBXGroup;
 			children = (
 				05C94D922E6ABF7C0051B078 /* mobileclip_s1_image.mlpackage */,
+				052E49002EF7CDBF00DACA85 /* catalog.sqlite */,
 				05C94D912E6ABF7C0051B078 /* ImageRecognition */,
 				05D266AF2DDABBE400F140D3 /* PraticeDraft */,
 				05589EF72CE6F7DE003881AA /* Componet */,
@@ -539,14 +546,6 @@
 			path = Map;
 			sourceTree = "<group>";
 		};
-		058F58A12E764C79009913C5 /* Database */ = {
-			isa = PBXGroup;
-			children = (
-				05F025032EC21535009D3531 /* catalog.sqlite */,
-			);
-			path = Database;
-			sourceTree = "<group>";
-		};
 		05C13B842E98E25200BE9FA0 /* ImageInspectorView  */ = {
 			isa = PBXGroup;
 			children = (
@@ -617,7 +616,7 @@
 		05C94DA62E6AC9760051B078 /* Persistence */ = {
 			isa = PBXGroup;
 			children = (
-				058F58A12E764C79009913C5 /* Database */,
+				052E49022EF7D56B00DACA85 /* EmbeddingStore.swift */,
 				05C94DA72E6ACA4C0051B078 /* FishDBManager.swift */,
 			);
 			path = Persistence;
@@ -682,6 +681,8 @@
 			isa = PBXGroup;
 			children = (
 				05F025062EC9B441009D3531 /* SideButton.swift */,
+				05ED74DF2ECDB608002E56A7 /* CaptureToolbar.swift */,
+				05ED74E12ECDB639002E56A7 /* SearchResultRow.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -876,7 +877,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				054C844C2CD9B995005595EF /* Assets.xcassets in Resources */,
-				05F025042EC21535009D3531 /* catalog.sqlite in Resources */,
+				052E49012EF7CDBF00DACA85 /* catalog.sqlite in Resources */,
 				0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */,
 				05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */,
 				05589EF62CE6F5C5003881AA /* Weather.storyboard in Resources */,
@@ -893,6 +894,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05ED74E02ECDB608002E56A7 /* CaptureToolbar.swift in Sources */,
 				054D35602EB9F9830051C5C4 /* AnimalTracker.swift in Sources */,
 				05C94DA82E6ACA4C0051B078 /* FishDBManager.swift in Sources */,
 				054C846E2CDB06AA005595EF /* WeatherAllModel.swift in Sources */,
@@ -918,6 +920,7 @@
 				051B88382E6E8AE600209CDB /* CustomRounded.swift in Sources */,
 				051B882F2E6E8A7400209CDB /* SkeletonListView.swift in Sources */,
 				051B88302E6E8A7400209CDB /* SkeletonView.swift in Sources */,
+				052E49032EF7D56E00DACA85 /* EmbeddingStore.swift in Sources */,
 				05FAEF1C2DF2C22A00E9BD08 /* TripModel.swift in Sources */,
 				05823E052EB0666A00BDC553 /* MKMapRectExtension.swift in Sources */,
 				054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */,
@@ -933,6 +936,7 @@
 				05D266B42DDABC1600F140D3 /* gestureView.swift in Sources */,
 				054C84602CD9C0AF005595EF /* UIControlPublisher.swift in Sources */,
 				05C94DA52E6AC4E80051B078 /* UIViewExtension.swift in Sources */,
+				05ED74E22ECDB639002E56A7 /* SearchResultRow.swift in Sources */,
 				0571B4282E861A7E005CBFF8 /* TestMapView.swift in Sources */,
 				05589EF92CE6F808003881AA /* FeatrueTitleBar.swift in Sources */,
 				05FAEF202DF2C2AD00E9BD08 /* GestureAnimationSubViews.swift in Sources */,
