@@ -10,19 +10,22 @@ import Foundation
 import Accelerate
 
 final class FishDB {
-    /// 資料庫
+    /// SQLite.swift connection
     private let db: Connection
 
-    /// 若資料庫是新建且沒有任何預期的表，執行 DDL 建立 schema
+    ///
+    var decoder = JSONDecoder()
+    
+    /// If this is a brand-new DB (no required tables), run DDL to create schema.
     private func bootstrapIfEmpty() throws {
         let sql = createRequiredTables()
 
         // Count required tables in the database
         let count = try db.scalar(sql) as! Int64
-        
+
         // If the tables do not exist, use schemaDDL to create them
         if count == 0 {
-            // SQLite.swift 的 db.run 不支援一次執行多條語句；需要逐條執行
+            // SQLite.swift `db.run` does not support executing multiple statements at once; execute one-by-one.
             let statements = createSchemaDDL()
                 .split(separator: ";")
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -36,7 +39,7 @@ final class FishDB {
             print("✅ 已執行 bootstrap DDL，建表完成（表數=\(newCount)）")
         }
     }
-    
+
     /// SQL string to get tables count
     private func createRequiredTables() -> String {
         let requiredTables = [
@@ -58,22 +61,22 @@ final class FishDB {
         WHERE type = 'table'
           AND name IN (\(tableList));
         """
-        
+
         return sql
     }
-    
+
     /// Generate schema DDL for required tables
     private func createSchemaDDL() -> String {
         // SQL statements to execute (in order)
         var statements: [String] = []
 
-        // WAL 設定
+        // WAL
         statements.append("PRAGMA journal_mode=WAL;")
 
-        // 同步策略（效能/安全折衷）
+        // Sync policy (performance/safety tradeoff)
         statements.append("PRAGMA synchronous=NORMAL;")
 
-        // 外鍵
+        // Foreign keys
         statements.append("PRAGMA foreign_keys=ON;")
 
         // Begin transaction
@@ -82,11 +85,11 @@ final class FishDB {
         // 1) species
         let speciesTableSQL = """
         CREATE TABLE IF NOT EXISTS species (
-          taxon_id            INTEGER PRIMARY KEY,   -- 唯一辨識值
+          taxon_id            INTEGER PRIMARY KEY,
           scientific_name     TEXT NOT NULL,
           common_name_zh      TEXT,
-          common_name_en_json TEXT,                  -- JSON array string (["...", "..."])
-          taxonomy_json       TEXT,                  -- JSON object string
+          common_name_en_json TEXT,
+          taxonomy_json       TEXT,
           basic_info_json     TEXT,
           morphology_json     TEXT,
           diet_and_behavior_json TEXT,
@@ -98,13 +101,13 @@ final class FishDB {
           conservation_and_human_uses_json TEXT,
           benefits_and_uses_json TEXT,
           taiwan_and_regional_notes_json TEXT,
-          distribution_json   TEXT,                  -- 也先整包存著，避免漏欄位
+          distribution_json   TEXT,
           embedding_meta_json TEXT
         );
         """
         statements.append(speciesTableSQL)
 
-        // 2) raw_species_json（完全不漏任何 key/內容）
+        // 2) raw_species_json (store the full raw JSON without losing any fields)
         let rawSpeciesTableSQL = """
         CREATE TABLE IF NOT EXISTS raw_species_json (
           taxon_id  INTEGER PRIMARY KEY,
@@ -118,7 +121,7 @@ final class FishDB {
         let photosTableSQL = """
         CREATE TABLE IF NOT EXISTS photos (
           taxon_id      INTEGER NOT NULL,
-          idx           INTEGER NOT NULL,            -- array index，避免順序丟失
+          idx           INTEGER NOT NULL,
           url           TEXT NOT NULL,
           license_code  TEXT,
           attribution   TEXT,
@@ -171,9 +174,9 @@ final class FishDB {
         let photoEmbeddingsTableSQL = """
         CREATE TABLE IF NOT EXISTS photo_embeddings (
           taxon_id     INTEGER NOT NULL,
-          idx          INTEGER NOT NULL,     -- 第幾張 embedding（對應 photos 的 idx）
-          dtype        TEXT NOT NULL,        -- 'f32'
-          vector_blob  BLOB NOT NULL,        -- raw bytes
+          idx          INTEGER NOT NULL,
+          dtype        TEXT NOT NULL,
+          vector_blob  BLOB NOT NULL,
           PRIMARY KEY (taxon_id, idx),
           FOREIGN KEY (taxon_id) REFERENCES species(taxon_id) ON DELETE CASCADE
         );
@@ -197,8 +200,9 @@ final class FishDB {
         try bootstrapIfEmpty()
     }
 
-    // 小工具：Float 陣列 <-> Data(BLOB)
-    // [Float32] -> Blob
+    // MARK: - Float array <-> Data(BLOB)
+
+    /// [Float32] -> SQLite.Blob
     private func floatsToBlob(_ v: [Float32]) -> SQLite.Blob {
         v.withUnsafeBufferPointer { buf in
             let raw = UnsafeRawBufferPointer(buf)
@@ -206,302 +210,283 @@ final class FishDB {
         }
     }
 
-    // Blob -> [Float32]
+    /// SQLite.Blob -> [Float32]
     private func blobToFloats(_ b: SQLite.Blob) -> [Float32] {
         b.bytes.withUnsafeBytes { Array($0.bindMemory(to: Float32.self)) }
     }
 
-    // 讀取所有資料
-    func loadAll() throws -> [TaxonItem] {
-        // === 基礎表（species） ===
-        let speciesT = Table("species")
-        let s_taxon  = SQLite.Expression<Int>("taxon_id")
-        let s_sci    = SQLite.Expression<String?>("scientific_name")
-        let s_common = SQLite.Expression<String?>("common_name")
-        let s_slug   = SQLite.Expression<String?>("slug")
+    /// A single photo embedding row (matches `photo_embeddings` schema).
+    struct PhotoEmbeddingLite: Sendable {
+        let idx: Int
+        let vector: [Float]
+    }
 
-        // === 關聯表（photos） ===
-        let photosT  = Table("photos")
-        let p_taxon  = SQLite.Expression<Int>("taxon_id")
-        let p_url    = SQLite.Expression<String?>("url")
-        let p_lic    = SQLite.Expression<String?>("license_code")
-        let p_attr   = SQLite.Expression<String?>("attribution")
-        let p_src    = SQLite.Expression<String?>("source")
+    /// Load ALL photo embeddings from `photo_embeddings`.
+    /// - Returns: Map of `taxon_id -> [(idx, vector)]`.
+    func loadAllEmbeddings() throws -> [Int: [PhotoEmbeddingLite]] {
+        let peT = Table("photo_embeddings")
+        let pe_taxon = SQLite.Expression<Int>("taxon_id")
+        let pe_idx   = SQLite.Expression<Int>("idx")
+        let pe_blob  = SQLite.Expression<SQLite.Blob>("vector_blob")
 
-        // === 關聯表（embeddings） ===
-        let embedsT  = Table("embeddings")
-        let e_taxon  = SQLite.Expression<Int>("taxon_id")
-        let e_dim    = SQLite.Expression<Int>("dim")
-        let e_vec    = SQLite.Expression<SQLite.Blob>("vec")
+        var out: [Int: [PhotoEmbeddingLite]] = [:]
 
-        // === 關聯表（text_embeddings） ===
-        let textEmbedsT = Table("text_embeddings")
-        let te_taxon  = SQLite.Expression<Int>("taxon_id")
-        let te_dim    = SQLite.Expression<Int>("dim")
-        let te_vec    = SQLite.Expression<SQLite.Blob>("vec")
+        let q = peT
+            .select(pe_taxon, pe_idx, pe_blob)
+            .order(pe_taxon.asc, pe_idx.asc)
 
-        // === 關聯表（meta JSON） ===
-        let sMetaT   = Table("species_meta")
-        let sm_taxon = SQLite.Expression<Int>("taxon_id")
-        let sm_json  = SQLite.Expression<String?>("meta_json")
+        for r in try db.prepare(q) {
+            let tid = r[pe_taxon]
+            let idx = r[pe_idx]
 
-        let eMetaT   = Table("embedding_meta")
-        let em_taxon = SQLite.Expression<Int>("taxon_id")
-        let em_json  = SQLite.Expression<String?>("meta_json")
+            // Stored as raw Float32 bytes
+            let vec32: [Float32] = blobToFloats(r[pe_blob])
+            let vec = vec32.map { Float($0) }
 
-        // === 關聯表（text_embedding_meta） ===
-        let tEMetaT   = Table("text_embedding_meta")
-        let tem_taxon = SQLite.Expression<Int>("taxon_id")
-        let tem_json  = SQLite.Expression<String?>("meta_json")
-
-        // === 關聯表（distribution） ===
-        let distributionT = Table("distribution")
-        let d_taxon       = SQLite.Expression<Int>("taxon_id")
-        let d_type        = SQLite.Expression<String?>("type")
-        let d_kmlUrl      = SQLite.Expression<String?>("kml_url")
-
-        // === 關聯表（distribution_layers） ===
-        let distributionLT = Table("distribution_layers")
-        let dl_taxon     = SQLite.Expression<Int>("taxon_id")
-        let dl_layer_key = SQLite.Expression<String>("layer_key")
-        let dl_type      = SQLite.Expression<String>("type")
-        let dl_url       = SQLite.Expression<String>("url")
-        let dl_minzoom   = SQLite.Expression<Int>("minzoom")
-        let dl_maxzoom   = SQLite.Expression<Int>("maxzoom")
-        
-        // === 關聯表（user_prompt_zh） ===
-        let userPromptT = Table("user_prompt_zh")
-        let up_taxon    = SQLite.Expression<Int>("taxon_id")
-        let up_category = SQLite.Expression<String>("category")
-        let up_text     = SQLite.Expression<String>("text")
-        
-        // 1) 撈全部 species
-        let speciesRows = try Array(db.prepare(speciesT.select(s_taxon, s_sci, s_common, s_slug)))
-
-        // 2) 撈 photos 並分組
-        var photosMap: [Int: [Photo]] = [:]
-        for r in try db.prepare(photosT.select(p_taxon, p_url, p_lic, p_attr, p_src)) {
-            let tid = r[p_taxon]
-            let photo = Photo(
-                url: r[p_url] ?? "",
-                licenseCode: r[p_lic],
-                attribution: r[p_attr],
-                source: r[p_src]
-            )
-            photosMap[tid, default: []].append(photo)
+            out[tid, default: []].append(PhotoEmbeddingLite(idx: idx, vector: vec))
         }
 
-        // 3) 撈 embeddings（BLOB → [Float]）
-        var embedMap: [Int: [Float]] = [:]
-        for r in try db.prepare(embedsT.select(e_taxon, e_dim, e_vec)) {
-            let tid = r[e_taxon]
-            let vec32: [Float32] = blobToFloats(r[e_vec])
-            embedMap[tid] = vec32.map { Float($0) }
-        }
-
-        // 4) 撈 meta（JSON 反序列化）
-        let decoder = JSONDecoder()
-        var speciesMetaMap: [Int: Meta] = [:]
-        for r in try db.prepare(sMetaT.select(sm_taxon, sm_json)) {
-            if let js = r[sm_json],
-               let data = js.data(using: .utf8),
-               let meta = try? decoder.decode(Meta.self, from: data) {
-                speciesMetaMap[r[sm_taxon]] = meta
-            }
-        }
-        
-        var embedMetaMap: [Int: EmbeddingMeta] = [:]
-        for r in try db.prepare(eMetaT.select(em_taxon, em_json)) {
-            if let js = r[em_json],
-               let data = js.data(using: .utf8),
-               let meta = try? decoder.decode(EmbeddingMeta.self, from: data) {
-                embedMetaMap[r[em_taxon]] = meta
-            }
-        }
-        
-        var textEmbedMetaMap: [Int: EmbeddingMeta] = [:]
-        for r in try db.prepare(tEMetaT.select(tem_taxon, tem_json)) {
-            if let js = r[tem_json],
-               let data = js.data(using: .utf8),
-               let meta = try? decoder.decode(EmbeddingMeta.self, from: data) {
-                textEmbedMetaMap[r[tem_taxon]] = meta
-            }
-        }
-        
-        var textEmbedMap: [Int: [Float]] = [:]
-        for r in try db.prepare(textEmbedsT.select(te_taxon, te_dim, te_vec)) {
-            let tid = r[te_taxon]
-            let vec32: [Float32] = blobToFloats(r[te_vec])
-            textEmbedMap[tid] = vec32.map { Float($0) }
-        }
-        
-        // 5) 撈 distribution（每個 taxon 一筆）
-        var distMap: [Int: Distribution] = [:]
-        for r in try db.prepare(distributionT.select(d_taxon, d_type, d_kmlUrl)) {
-            let tid = r[d_taxon]
-            let dist = Distribution(type: r[d_type], kmlURL: r[d_kmlUrl])
-            distMap[tid] = dist
-        }
-
-        // 6) 撈 distribution_layers（每個 taxon 多筆）並分組
-        var distLayersMap: [Int: [DistributionLayer]] = [:]
-        for r in try db.prepare(distributionLT.select(dl_taxon, dl_layer_key, dl_type, dl_url, dl_minzoom, dl_maxzoom)) {
-            let tid = r[dl_taxon]
-            let layer = DistributionLayer(
-                layerKey: r[dl_layer_key],
-                type: r[dl_type],
-                url: r[dl_url],
-                minzoom: r[dl_minzoom],
-                maxzoom: r[dl_maxzoom]
-            )
-            distLayersMap[tid, default: []].append(layer)
-        }
-        
-        // 7) 撈 user_prompt_zh（每個 taxon 多筆）→ 依 category 分配到 UserPrompt 的各欄位
-        // Map: taxon_id -> UserPrompt（含 morphology / pattern / traits / habitat 四個欄位陣列）
-        var userPromptMap: [Int: UserPrompt] = [:]
-        for r in try db.prepare(userPromptT.select(up_taxon, up_category, up_text)) {
-            let tid = r[up_taxon]
-            let category = r[up_category]
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-                .lowercased()
-            let text = r[up_text]
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !text.isEmpty else { continue }
-
-            // 取出或建立預設的 UserPrompt
-            var up = userPromptMap[tid] ?? UserPrompt.defaultValue
-
-            // 依 up_category 放入對應欄位
-            switch category {
-            case "morphology", "morph", "morphologies":
-                up.morphology.append(text)
-            case "pattern", "patterns":
-                up.pattern.append(text)
-            case "traits", "trait", "behavior", "behaviour":
-                up.traits.append(text)
-            case "habitat", "habitats", "env", "environment":
-                up.habitat.append(text)
-            default:
-                // 未知類別：視需求選擇忽略、歸入某一欄位、或另外記錄
-                print("⚠️ 未知的 user_prompt 類別：\(category) (taxon_id=\(tid))")
-            }
-
-            userPromptMap[tid] = up
-        }
-
-        // 8) 組裝 TaxonItem
-        return speciesRows.map { r in
-            let tid = r[s_taxon]
-            return TaxonItem(
-                taxonId: tid,
-                scientificName: r[s_sci],
-                commonName: r[s_common],
-                slug: r[s_slug],
-                photos: photosMap[tid],
-                meta: speciesMetaMap[tid],
-                embedding: embedMap[tid] ?? [],
-                textEmbedding: textEmbedMap[tid] ?? [],
-                embeddingMeta: embedMetaMap[tid],
-                distribution: distMap[tid],
-                distributionLayers: distLayersMap[tid],
-                userPrompt: userPromptMap[tid]
-            )
-        }
+        return out
     }
 }
 
+extension FishDB {
+
+    func loadTaxonItems(taxonIds: [Int]) throws -> [TaxonItem] {
+        guard !taxonIds.isEmpty else { return [] }
+
+        // ---- species ----
+        let sT = Table("species")
+        let s_taxon = SQLite.Expression<Int>("taxon_id")
+        let s_scientific = SQLite.Expression<String>("scientific_name")
+        let s_commonZh = SQLite.Expression<String?>("common_name_zh")
+
+        let s_taxonomy = SQLite.Expression<String?>("taxonomy_json")
+        let s_basic = SQLite.Expression<String?>("basic_info_json")
+        let s_morph = SQLite.Expression<String?>("morphology_json")
+        let s_diet = SQLite.Expression<String?>("diet_and_behavior_json")
+        let s_ecology = SQLite.Expression<String?>("ecology_and_behavior_json")
+        let s_habitat = SQLite.Expression<String?>("habitat_and_distribution_json")
+        let s_envDepth = SQLite.Expression<String?>("environment_and_depth_json")
+        let s_repro = SQLite.Expression<String?>("reproduction_json")
+        let s_growth = SQLite.Expression<String?>("growth_and_life_history_json")
+        let s_conservation = SQLite.Expression<String?>("conservation_and_human_uses_json")
+        let s_benefits = SQLite.Expression<String?>("benefits_and_uses_json")
+        let s_taiwanNotes = SQLite.Expression<String?>("taiwan_and_regional_notes_json")
+        let s_distribution = SQLite.Expression<String?>("distribution_json")
+        let s_embeddingMeta = SQLite.Expression<String?>("embedding_meta_json")
+
+        var out: [Int: TaxonItem] = [:]
+
+        for r in try db.prepare(sT.filter(taxonIds.contains(s_taxon))) {
+            let tid = r[s_taxon]
+
+            // JSON decode（有值才 decode；格式壞就 throw，方便你抓資料問題）
+            let taxonomy = try JSONHelper.decode(r[s_taxonomy], as: Taxonomy.self, decoder: decoder)
+            let basicInfo = try JSONHelper.decode(r[s_basic], as: BasicInfo.self, decoder: decoder)
+            let morphology = try JSONHelper.decode(r[s_morph], as: Morphology.self, decoder: decoder)
+            let dietAndBehavior = try JSONHelper.decode(r[s_diet], as: DietAndBehavior.self, decoder: decoder)
+            let ecologyAndBehavior = try JSONHelper.decode(r[s_ecology], as: EcologyAndBehavior.self, decoder: decoder)
+            let habitatAndDistribution = try JSONHelper.decode(r[s_habitat], as: HabitatAndDistribution.self, decoder: decoder)
+            let environmentAndDepth = try JSONHelper.decode(r[s_envDepth], as: EnvironmentAndDepth.self, decoder: decoder)
+            let reproduction = try JSONHelper.decode(r[s_repro], as: Reproduction.self, decoder: decoder)
+            let growthAndLifeHistory = try JSONHelper.decode(r[s_growth], as: GrowthAndLifeHistory.self, decoder: decoder)
+            let conservationAndHumanUses = try JSONHelper.decode(r[s_conservation], as: ConservationAndHumanUses.self, decoder: decoder)
+            let benefitsAndUses = try JSONHelper.decode(r[s_benefits], as: BenefitsAndUses.self, decoder: decoder)
+            let taiwanAndRegionalNotes = try JSONHelper.decode(r[s_taiwanNotes], as: TaiwanAndRegionalNotes.self, decoder: decoder)
+            let distribution = try JSONHelper.decode(r[s_distribution], as: Distribution.self, decoder: decoder)
+            let embeddingMeta = try JSONHelper.decode(r[s_embeddingMeta], as: EmbeddingMeta.self, decoder: decoder)
+
+            // 組 TaxonItem（photos/wiki/layers 先空，後面 fan-out 再塞）
+            let item = TaxonItem(
+                taxonId: tid,
+                scientificName: r[s_scientific],
+                commonNameZh: r[s_commonZh],
+                taxonomy: taxonomy,
+                basicInfo: basicInfo,
+                morphology: morphology,
+                dietAndBehavior: dietAndBehavior,
+                ecologyAndBehavior: ecologyAndBehavior,
+                habitatAndDistribution: habitatAndDistribution,
+                environmentAndDepth: environmentAndDepth,
+                reproduction: reproduction,
+                conservationAndHumanUses: conservationAndHumanUses,
+                benefitsAndUses: benefitsAndUses,
+                taiwanAndRegionalNotesJSON: taiwanAndRegionalNotes,
+                distribution: distribution,
+                embeddingMeta: embeddingMeta,
+                growthAndLifeHistory: growthAndLifeHistory,
+                photos: [],
+                wikiPhotos: [],
+                distributionLayers: []
+            )
+
+            out[tid] = item
+        }
+
+        if out.isEmpty { return [] }
+
+        // ---- photos ----
+        let pT = Table("photos")
+        let p_taxon = SQLite.Expression<Int>("taxon_id")
+        let p_idx = SQLite.Expression<Int>("idx")
+        let p_url = SQLite.Expression<String>("url")
+        let p_license = SQLite.Expression<String?>("license_code")
+        let p_attr = SQLite.Expression<String?>("attribution")
+        let p_source = SQLite.Expression<String?>("source")
+
+        for r in try db.prepare(pT.filter(taxonIds.contains(p_taxon)).order(p_taxon.asc, p_idx.asc)) {
+            let tid = r[p_taxon]
+            guard var t = out[tid] else { continue }
+            t.photos.append(.init(
+                idx: r[p_idx],
+                url: r[p_url],
+                licenseCode: r[p_license],
+                attribution: r[p_attr],
+                source: r[p_source]
+            ))
+            out[tid] = t
+        }
+
+        // ---- wiki_photos ----
+        let wT = Table("wiki_photos")
+        let w_taxon = SQLite.Expression<Int>("taxon_id")
+        let w_idx = SQLite.Expression<Int>("idx")
+        let w_url = SQLite.Expression<String>("url")
+        let w_licenseCode = SQLite.Expression<String?>("license_code")
+        let w_license = SQLite.Expression<String?>("license")
+        let w_source = SQLite.Expression<String?>("source")
+        let w_attrHTML = SQLite.Expression<String?>("attribution_html")
+
+        for r in try db.prepare(wT.filter(taxonIds.contains(w_taxon)).order(w_taxon.asc, w_idx.asc)) {
+            let tid = r[w_taxon]
+            guard var t = out[tid] else { continue }
+            t.wikiPhotos.append(.init(
+                idx: r[w_idx],
+                url: r[w_url],
+                licenseCode: r[w_licenseCode],
+                license: r[w_license],
+                source: r[w_source],
+                attributionHTML: r[w_attrHTML]
+            ))
+            out[tid] = t
+        }
+
+        // ---- distribution_layers ----
+        let dT = Table("distribution_layers")
+        let d_taxon = SQLite.Expression<Int>("taxon_id")
+        let d_idx = SQLite.Expression<Int>("idx")
+        let d_key = SQLite.Expression<String>("layer_key")
+        let d_type = SQLite.Expression<String?>("type")
+        let d_url = SQLite.Expression<String?>("url")
+        let d_min = SQLite.Expression<Int?>("minzoom")
+        let d_max = SQLite.Expression<Int?>("maxzoom")
+
+        for r in try db.prepare(dT.filter(taxonIds.contains(d_taxon)).order(d_taxon.asc, d_idx.asc)) {
+            let tid = r[d_taxon]
+            guard var t = out[tid] else { continue }
+            t.distributionLayers.append(.init(
+                idx: r[d_idx],
+                layerKey: r[d_key],
+                type: r[d_type],
+                url: r[d_url],
+                minZoom: r[d_min],
+                maxZoom: r[d_max]
+            ))
+            out[tid] = t
+        }
+
+        return taxonIds.compactMap { out[$0] }
+    }
+}
+
+/// Dense in-memory index for fast similarity search.
+///
+/// Design notes:
+/// - We keep ALL vectors packed in one contiguous `matrix` (row-major) to maximize cache locality.
+/// - Query uses `vDSP_mmul` (GEMV) to compute N dot-products efficiently.
+/// - We do NOT keep species/photo metadata here; only `(taxonId, photoIdx)` keys.
 final class InMemoryVectorIndex {
-    /// 向量維度（embedding 的維度 D）
+    /// Identifies exactly which embedding row matched.
+    /// - `taxonId`: species primary key
+    /// - `photoIdx`: photo/embedding index (matches `photos.idx` and `photo_embeddings.idx`)
+    struct EmbeddingKey: Hashable, Sendable {
+        let taxonId: Int
+        let photoIdx: Int
+    }
+
+    /// Vector dimension (D)
     let dim: Int
 
-    /// 各資料列的 id 與名稱：
-    /// 保留在獨立的連續陣列，避免把字串塞進矩陣資料結構造成額外的間接取用（pointer chasing）。
-    private(set) var ids: [String] = []
-    private(set) var names: [String] = []
+    /// Row keys aligned with `matrix` rows.
+    /// `keys[i]` corresponds to the i-th row in `matrix`.
+    private(set) var keys: [EmbeddingKey] = []
 
-    /// 連續矩陣（N × D，row-major）
-    /// - 為什麼要用一維 [Float]？Swift 的 `Float` 就是 Float32，連續記憶體對 CPU cache 友善、能吃到 SIMD。
-    /// - row-major：第 i 列從 index `i*dim` 開始連續擺 D 個元素，適合做「矩陣×向量」的掃描。
-    /// - 對比 [[Float]]：雙層陣列會有多個非連續的 buffer，逐列 dot product 會有大量間接存取、較難吃到向量化加速。
+    /// Packed row-major matrix (N × D) stored in a single contiguous buffer.
     private(set) var matrix: [Float] = []
-    private(set) var textMatrix: [Float] = []
-    
-    
-    /// 建構子：把輸入的多筆向量（每筆長度 = dim）pack 成連續的 row-major 矩陣
-    /// - rows: 原始資料，假設每個 `vector` 都已經 L2 normalize（若要用 cosine 分數）
-    /// - dim: 向量維度 D
-    init(items: [TaxonItem], dim: Int) {
+
+    /// Create an index by packing all photo embeddings into a contiguous matrix.
+    /// - Important: For cosine similarity, both stored vectors and `query` should be L2-normalized.
+    /// - Ordering: deterministic (taxonId asc, photoIdx asc) for stable results.
+    init(embeddingsByTaxonId: [Int: [FishDB.PhotoEmbeddingLite]], dim: Int) {
         self.dim = dim
-        self.ids = items.map { String($0.taxonId) }
-        self.names = items.compactMap { $0.scientificName }
 
-        // 建出 N×D 的連續 buffer，初始化為 0
-        self.matrix = [Float](repeating: 0, count: items.count * dim)
-        self.textMatrix = [Float](repeating: 0, count: items.count * dim)
-        
+        // Flatten to a deterministic row list: (key, vector)
+        var rows: [(EmbeddingKey, [Float])] = []
+        rows.reserveCapacity(embeddingsByTaxonId.values.reduce(0) { $0 + $1.count })
 
-        // 將每一筆向量按列（row）塞進 matrix：
-        // 第 i 列的區間是 [i*dim, (i+1)*dim)
-        for (i, item) in items.enumerated() {
-            // 圖片向量長度必須等於 dim，否則直接中止（比起靜默錯誤更好偵錯）
-            precondition(item.embedding.count == dim, "維度不一致：image embedding=")
-
-            // 將 image embedding 複製進 matrix 的對應區段（固定長度 dim）
-            matrix.replaceSubrange(i*dim..<(i+1)*dim, with: item.embedding)
-
-            // 對文字向量做安全處理：
-            // 1) 若長度==dim → 直接寫入
-            // 2) 若為空（沒有文字向量）→ 以 0 向量填充，維持固定長度 dim
-            // 3) 其他長度 → 屬於資料異常，主動失敗便於追查
-            let te: [Float]
-            if item.textEmbedding.count == dim {
-                te = item.textEmbedding
-            } else if item.textEmbedding.isEmpty {
-                te = [Float](repeating: 0, count: dim)
-            } else {
-                preconditionFailure("textEmbedding 維度不一致：expected=\(dim), actual=\(item.textEmbedding.count), taxonId=\(item.taxonId)")
+        for taxonId in embeddingsByTaxonId.keys.sorted() {
+            guard let list = embeddingsByTaxonId[taxonId] else { continue }
+            for e in list.sorted(by: { $0.idx < $1.idx }) {
+                rows.append((EmbeddingKey(taxonId: taxonId, photoIdx: e.idx), e.vector))
             }
-            textMatrix.replaceSubrange(i*dim..<(i+1)*dim, with: te)
+        }
+
+        self.keys = rows.map { $0.0 }
+        self.matrix = [Float](repeating: 0, count: rows.count * dim)
+
+        // Pack vectors into row-major matrix.
+        for (i, row) in rows.enumerated() {
+            let v = row.1
+            precondition(v.count == dim,
+                         "Embedding dimension mismatch: expected=\(dim), actual=\(v.count), key=\(row.0)")
+            matrix.replaceSubrange(i * dim..<(i + 1) * dim, with: v)
         }
     }
 
-    /// 以 cosine（內積）計分；query 必須已 L2 normalize
-    /// - 思路：把所有分數一次算完 = `scores = matrix(N×D) × query(D×1)` → 得到 `N×1`
-    /// - 為什麼快：交給 Accelerate / vDSP（底層為 BLAS + SIMD + 多核心最佳化），
-    ///   一次性地對連續記憶體做「矩陣×向量」計算，比逐筆 for-loop dot product 快、cache 命中率高。
-    func search(query: [Float], topK: Int) -> [(id: String, name: String, score: Float)] {
-        precondition(query.count == dim)
-        let n = ids.count
+    /// Search top-K by cosine (dot product) similarity.
+    /// - If all vectors are L2-normalized, dot product == cosine similarity.
+    /// - Returns: top-K `(EmbeddingKey, score)` pairs where score is mapped to 0~100.
+    func search(query: [Float], topK: Int) -> [(key: EmbeddingKey, score: Float)] {
+        precondition(query.count == dim, "Query dimension mismatch: expected=\(dim), actual=\(query.count)")
+        let n = keys.count
+        guard n > 0, topK > 0 else { return [] }
 
-        // 計算圖片分數：scoresImg = matrix(N×D) × query(D×1)
-        var scoresImg = [Float](repeating: 0, count: n)
+        // scores = matrix(N×D) × query(D×1) => N scores
+        var scores = [Float](repeating: 0, count: n)
         var q = query
-        // 拿到所有魚的 image 相似度分數
-        vDSP_mmul(matrix, 1, &q, 1, &scoresImg, 1, vDSP_Length(n), 1, vDSP_Length(dim))
+        vDSP_mmul(matrix, 1, &q, 1, &scores, 1, vDSP_Length(n), 1, vDSP_Length(dim))
 
-        // 預設只用圖片；若有文字矩陣，做晚期融合：score = 0.8 * img + 0.2 * text
-        var scores = scoresImg
-        if !textMatrix.isEmpty {
-            var scoresText = [Float](repeating: 0, count: n)
-            vDSP_mmul(textMatrix, 1, &q, 1, &scoresText, 1, vDSP_Length(n), 1, vDSP_Length(dim))
-            var wImg: Float = 0.8
-            var wTxt: Float = 0.2
-            // scores = wImg * scoresImg + wTxt * scoresText
-            // scores = 0.8 * scoresImg + 0.2 * scoresText
-            vDSP_vsmsa(scoresImg, 1, &wImg, [0], &scores, 1, vDSP_Length(n))
-            vDSP_vsma(scoresText, 1, &wTxt, scores, 1, &scores, 1, vDSP_Length(n))
-            // ----------------------------------------------------------------------
-        }
-
-        // 將 cosine 分數轉換為 0~100 的相似度百分比
+        // Convert cosine similarity to a UI-friendly score.
+        // Cosine similarity is in [-1, 1] (math space):
+        //   -1 = opposite direction (very dissimilar)
+        //    0 = orthogonal (unrelated)
+        //    1 = same direction (most similar)
+        //
+        // For UI, we linearly map it to [0, 100]:
+        //   score = (cosine + 1) * 50
+        // So:
+        //   -1 -> 0, 0 -> 50, 1 -> 100
+        //
+        // Clamp is applied to guard against floating-point drift.
         for i in 0..<scores.count {
             let clamped = max(-1, min(1, scores[i]))
-            scores[i] = (clamped + 1) * 50  // -1→0, 0→50, 1→100
+            scores[i] = (clamped + 1) * 50
         }
 
-        let idx = (0..<n).sorted { scores[$0] > scores[$1] }.prefix(topK)
-        return idx.map { (ids[$0], names[$0], scores[$0]) }
+        let k = min(topK, n)
+        let idxs = (0..<n).sorted { scores[$0] > scores[$1] }.prefix(k)
+        return idxs.map { (keys[$0], scores[$0]) }
     }
 }
 
@@ -519,13 +504,12 @@ final class InMemoryVectorIndex {
 */
 
 /*
- 做什麼：
- 1) 把 N 條「魚的向量」排成一個連續的大表格（N×D），攤平成一條 [Float]。
- 2) 查詢時，一次做 matrix × query（矩陣×向量），得到每條魚的相似度分數。
- 3) 依分數挑出前 K 名，回傳 (id, name, score)。
- 為什麼這樣做比較快：
- - 連續記憶體：把資料攤平 → CPU 讀取連續、快取命中高，比 [[Float]] 這種多層陣列更有效率。
- - 一次算完：用 vDSP_mmul（底層 BLAS/SIMD/可能多核心）做 GEMV，比逐筆 for 迴圈做 dot product 快很多。
- - L2 normalize 後：cosine(v,q) == v·q（內積），所以直接用「矩陣×向量」就能拿到所有 cosine 分數。
- */
-
+做什麼：
+1) 把 N 條「魚的向量」排成一個連續的大表格（N×D），攤平成一條 [Float]。
+2) 查詢時，一次做 matrix × query（矩陣×向量），得到每條魚的相似度分數。
+3) 依分數挑出前 K 名，回傳 (taxonId, photoIdx, score)。
+為什麼這樣做比較快：
+- 連續記憶體：把資料攤平 → CPU 讀取連續、快取命中高，比 [[Float]] 這種多層陣列更有效率。
+- 一次算完：用 vDSP_mmul（底層 BLAS/SIMD/可能多核心）做 GEMV，比逐筆 for 迴圈做 dot product 快很多。
+- L2 normalize 後：cosine(v,q) == v·q（內積），所以直接用「矩陣×向量」就能拿到所有 cosine 分數。
+*/

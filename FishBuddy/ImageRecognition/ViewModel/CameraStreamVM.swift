@@ -43,7 +43,7 @@ class CameraStreamVM: ObservableObject {
         Task(priority: .utility) {
             do {
                 // 依你的模型維度設定（例如 512 或 768）。這裡先用 512，你可視實際模型調整。
-                try await EmbeddingStore.shared.getIndex(dim: 512)
+                try await EmbeddingStore.shared.buildIndexIfNeeded(dim: 512)
             } catch {
                 print("❌ 建立/取得 InMemoryVectorIndex 失敗:", error)
             }
@@ -53,12 +53,8 @@ class CameraStreamVM: ObservableObject {
     /// 搜尋結果：目前自己計算，並產出結果
     func search(query: [Float], topK: Int = 3) async {
         Task { @MainActor in
-            do {
-                let results = try await EmbeddingStore.shared.searchWithItems(query: query, topK: topK)
-                self.imageSearchResult = results
-            } catch {
-                print("沒有符合的結果")
-            }
+            let results = await EmbeddingStore.shared.search(query: query, topK: topK)
+            self.imageSearchResult = results
         }
     }
     

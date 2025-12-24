@@ -18,45 +18,200 @@ struct EmbeddingImgModel: Codable {
 
 /// 完整對應 JSON `items[]` 的資料結構（保持原樣 + 可選 embedding 欄位）
 struct TaxonItem: Codable {
-    /// 物種的唯一識別碼
-    @Default var taxonId: Int
-    /// 物種的學名
-    let scientificName: String?
-    /// 物種的中文名或通用名
-    let commonName: String?
-    /// 物種的 URL 友好名稱
-    let slug: String?
-    /// 物種相關圖片（資料表 photos）
-    let photos: [Photo]?
-    /// 物種詳細資料
-    let meta: Meta?
-    /// 預先處理的圖片向量資料
-    @Default var embedding: [Float]
-    /// 預處理的文字向量資料
-    @Default var textEmbedding: [Float]
-    let embeddingMeta: EmbeddingMeta?
-    /// 物種分布（資料表 distribution 與 distribution_layers）
-    let distribution: Distribution?
-    /// 物種分布圖層
-    let distributionLayers: [DistributionLayer]?
-    /// 物種提示
-    let userPrompt: UserPrompt?
     
+    @Default var taxonId: Int
+    
+    @Default var scientificName: String
+    
+    // flat json array
+    let commonNameZh: String?
+    
+    // species 表中的 JSON 欄位（保留原始 JSON，避免過度解析）
+    let taxonomy: Taxonomy?
+    let basicInfo: BasicInfo?
+    let morphology: Morphology?
+    let dietAndBehavior: DietAndBehavior?
+    let ecologyAndBehavior: EcologyAndBehavior?
+    let habitatAndDistribution: HabitatAndDistribution?
+    let environmentAndDepth: EnvironmentAndDepth?
+    let reproduction: Reproduction?
+    let conservationAndHumanUses: ConservationAndHumanUses?
+    let benefitsAndUses: BenefitsAndUses?
+    let taiwanAndRegionalNotesJSON: TaiwanAndRegionalNotes?
+    let distribution: Distribution?
+    let embeddingMeta: EmbeddingMeta?
+    let growthAndLifeHistory: GrowthAndLifeHistory?
+    
+    // fan-out 關聯表
+    @Default var photos: [ResolvedPhoto]
+    @Default var wikiPhotos: [ResolvedWikiPhoto]
+    @Default var distributionLayers: [ResolvedDistributionLayer]
+}
+
+struct GrowthAndLifeHistory: Codable {
+    @Default var maximumLengthCm: String
+    @Default var growthNotes: String
+    @Default var lifeHistoryNotes: String
+
     enum CodingKeys: String, CodingKey {
-        case taxonId = "taxon_id"
-        case scientificName = "scientific_name"
-        case commonName = "common_name"
-        case slug
-        case photos
-        case meta
-        case embedding
-        case embeddingMeta = "embedding_meta"
-        case textEmbedding = "text_embedding"
-        case distribution
-        case distributionLayers = "distribution_layers"
-        case userPrompt = "user_prompt"
+        case maximumLengthCm  = "maximum_length_cm"
+        case growthNotes      = "growth_notes"
+        case lifeHistoryNotes = "life_history_notes"
     }
 }
+
+struct TaiwanAndRegionalNotes: Codable {
+    @Default var taiwanDistribution: String
+    @Default var regionalEcologicalRole: String
+
+    enum CodingKeys: String, CodingKey {
+        case taiwanDistribution     = "taiwan_distribution"
+        case regionalEcologicalRole = "regional_ecological_role"
+    }
+}
+
+struct BenefitsAndUses: Codable {
+    @Default var fisheryAndFood: String
+    @Default var aquariumTrade: String
+    @Default var ecologicalBenefits: String
+
+    enum CodingKeys: String, CodingKey {
+        case fisheryAndFood     = "fishery_and_food"
+        case aquariumTrade      = "aquarium_trade"
+        case ecologicalBenefits = "ecological_benefits"
+    }
+}
+
+struct ConservationAndHumanUses: Codable {
+    @Default var conservationStatus: String
+    @Default var threats: String
+    @Default var managementOrProtection: String
+
+    enum CodingKeys: String, CodingKey {
+        case conservationStatus = "conservation_status"
+        case threats
+        case managementOrProtection = "management_or_protection"
+    }
+}
+
+struct Reproduction: Codable {
+    @Default var reproductiveMode: String
+    @Default var spawningBehavior: String
+    @Default var parentalCare: String
+
+    enum CodingKeys: String, CodingKey {
+        case reproductiveMode = "reproductive_mode"
+        case spawningBehavior = "spawning_behavior"
+        case parentalCare     = "parental_care"
+    }
+}
+
+struct EnvironmentAndDepth: Codable {
+    @Default var environment: String
+    @Default var depthRangeM: String
+
+    enum CodingKeys: String, CodingKey {
+        case environment
+        case depthRangeM = "depth_range_m"
+    }
+}
+
+struct Taxonomy: Codable {
+    @Default var phylum: String
+    @Default var classType: String
+    @Default var order: String
+    @Default var family: String
+    @Default var genus: String
+    
+    enum CodingKeys: String, CodingKey {
+        case phylum
+        case classType = "class"
+        case order
+        case family
+        case genus
+    }
+}
+ 
+struct BasicInfo: Codable {
+    @Default var summary: String
+}
+
+struct Morphology: Codable {
+    @Default var bodyShape: String
+    @Default var colorationAndPattern: String
+    @Default var finsAndSpecialFeatures: String
+    
+    enum CodingKeys: String, CodingKey {
+        case bodyShape = "body_shape"
+        case colorationAndPattern = "coloration_and_pattern"
+        case finsAndSpecialFeatures = "fins_and_special_features"
+    }
+}
+
+struct DietAndBehavior: Codable {
+    @Default var diet: String
+    @Default var foragingBehavior: String
+    
+    enum CodingKeys: String, CodingKey {
+        case diet
+        case foragingBehavior = "foraging_behavior"
+    }
+}
+
+struct EcologyAndBehavior: Codable {
+    @Default var generalEcology: String
+    @Default var socialStructure: String
+    @Default var dailyRhythm: String
+    
+    enum CodingKeys: String, CodingKey {
+        case generalEcology = "general_ecology"
+        case socialStructure = "social_structure"
+        case dailyRhythm = "daily_rhythm"
+    }
+}
+
+struct HabitatAndDistribution: Codable {
+    @Default var globalDistribution: String
+    @Default var localHabitatType: String
+
+    enum CodingKeys: String, CodingKey {
+        case globalDistribution = "global_distribution"
+        case localHabitatType   = "local_habitat_type"
+    }
+}
+
+struct ResolvedPhoto: Codable, Sendable {
+    let idx: Int
+    let url: String
+    let licenseCode: String?
+    let attribution: String?
+    let source: String?
+}
+
+struct ResolvedWikiPhoto: Codable, Sendable {
+    let idx: Int
+    let url: String
+    let licenseCode: String?
+    let license: String?
+    let source: String?
+    let attributionHTML: String?
+}
+
+struct ResolvedDistributionLayer: Codable, Sendable {
+    let idx: Int
+    let layerKey: String
+    let type: String?
+    let url: String?
+    let minZoom: Int?
+    let maxZoom: Int?
+}
+
+
+
+
+
+
+
 
 struct UserPrompt: Codable, DefaultValue {
     static var defaultValue = UserPrompt(morphology: [], pattern: [], traits: [], habitat: [])
@@ -156,11 +311,15 @@ struct EmbeddingMeta: Codable {
 /// 物種分布（distribution）
 struct Distribution: Codable {
     let type: String?
+    let layers: [DistributionLayer]?
     let kmlURL: String?
+    let places: [String]?
 
     enum CodingKeys: String, CodingKey {
         case type
+        case layers
         case kmlURL = "kml_url"
+        case places
     }
 }
 
@@ -187,3 +346,10 @@ struct SearchResult {
     let score: Float
 }
 
+
+/// Minimal species row for list/search bootstrap (no heavy JSON / blobs).
+struct SpeciesLite: Sendable {
+    let taxonId: Int
+    let scientificName: String
+    let commonNameZh: String?
+}

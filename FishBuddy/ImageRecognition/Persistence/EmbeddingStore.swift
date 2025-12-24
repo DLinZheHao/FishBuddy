@@ -14,8 +14,6 @@ actor EmbeddingStore {
     static let shared = EmbeddingStore()
     /// 資料庫
     var fishDB: FishDB?
-    /// 讀取的 taxonItem 暫存
-    var taxonItemCache: [TaxonItem] = []
     /// In-memory 向量索引快取（只建一次，除非資料有變動）
     private var indexCache: InMemoryVectorIndex?
     /// 相似度最低接受門檻（cosine），依你的資料集可微調，預設 0.5
@@ -83,7 +81,7 @@ actor EmbeddingStore {
     /// 取得（或建立）InMemoryVectorIndex：會從 SQLite 載入全部向量，打包成 N×D 矩陣，只做一次
     /// - Parameter dim: 向量維度（例如 512 或 768）
     /// - Returns: 可重用的 InMemoryVectorIndex 實例
-    func getIndex(dim: Int) async throws {
+    func buildIndexIfNeeded(dim: Int) async throws {
         if let idx = indexCache, indexDim == dim {
             return
         }
@@ -92,45 +90,70 @@ actor EmbeddingStore {
             throw NSError(domain: "EmbeddingStore", code: 1, userInfo: [NSLocalizedDescriptionKey: "FishDB 未初始化"])
         }
         
-        // 從 SQLite 讀取全部資料列
-        var items: [TaxonItem]
-         
-        // 加入暫存機制，不用每次都讀取資料庫
-        if taxonItemCache.isEmpty {
-            items = try fishDB.loadAll()
-            
-            if taxonItemCache.isEmpty {
-                taxonItemCache = items
+        // 從 SQLite 讀取全部 embedding（以 taxon_id 分組）
+        let embeddingsByTaxonId = try fishDB.loadAllEmbeddings()
+
+        // 以 dim 檢查每筆向量維度（任一不符就直接丟錯，避免用錯模型或資料被污染）
+        for (taxonId, list) in embeddingsByTaxonId {
+            for e in list {
+                guard e.vector.count == dim else {
+                    throw NSError(
+                        domain: "EmbeddingStore",
+                        code: 2,
+                        userInfo: [NSLocalizedDescriptionKey: "向量維度不一致：taxon_id=\(taxonId) idx=\(e.idx) expected=\(dim) actual=\(e.vector.count)"]
+                    )
+                }
             }
-        } else {
-            items = taxonItemCache
         }
-        // 以 dim 檢查每筆維度
-        guard items.allSatisfy({ $0.embedding.count == dim }) else {
-            throw NSError(domain: "EmbeddingStore", code: 2, userInfo: [NSLocalizedDescriptionKey: "向量維度不一致或與 dim 不符"]) }
-        let idx = InMemoryVectorIndex(items: items, dim: dim)
+
+        // 建立（或重建）in-memory index：只保留 (taxonId, photoIdx) key + packed matrix，用於快速計算
+        let idx = InMemoryVectorIndex(embeddingsByTaxonId: embeddingsByTaxonId, dim: dim)
         indexCache = idx
         indexDim = dim
     }
     
-    func searchWithItems(query: [Float], topK: Int) async throws -> [(TaxonItem, Float)] {
-        if let idx = indexCache {
-            let results = idx.search(query: query, topK: topK)
-            
-            // 門檻 + 與次高分差距規則
-            if let best = results.first {
-                let gapOK = results.count < 2 || (best.score - results[1].score) >= minGapDelta
-                if best.score >= (acceptThreshold * 100) && gapOK {
-                    return results.compactMap { r in
-                        if let item = taxonItemCache.first(where: { String($0.taxonId) == r.id }) {
-                            return (item, r.score)
-                        }
-                        return nil
-                    }
-                }
+    /// Search top-K embeddings.
+    /// - Returns: `(taxonId, photoIdx, score)` where score is mapped to 0~100.
+    func search(query: [Float], topK: Int) async -> [(TaxonItem, Float)] {
+        guard let idx = indexCache, let fishDB else { return [] }
+        let results: [(key: InMemoryVectorIndex.EmbeddingKey, score: Float)] = idx.search(query: query, topK: topK)
+        guard !results.isEmpty else { return [] }
+
+        // 1) 同一個 taxonId 可能多筆（不同 photoIdx）
+        //    我們只保留該 taxonId 的「最高分」
+        var bestScoreByTaxon: [Int: Float] = [:]
+        for r in results {
+            let tid = r.key.taxonId
+            let s = r.score
+            if let cur = bestScoreByTaxon[tid] {
+                if s > cur { bestScoreByTaxon[tid] = s }
+            } else {
+                bestScoreByTaxon[tid] = s
             }
-            
         }
-        return []
+
+        // 2) 依分數排序，得到 taxonIds（這就是你要回傳的排序）
+        let sortedTaxonIds = bestScoreByTaxon
+            .sorted { $0.value > $1.value }
+            .map { $0.key }
+
+        // 3) 一次去 DB 撈出 TaxonItem（你已經寫好了）
+        var items: [TaxonItem] = []
+        do {
+            items = try fishDB.loadTaxonItems(taxonIds: sortedTaxonIds)
+        } catch {
+            fatalError("DB 載入失敗")
+        }
+        
+        // 4) 建 dictionary 方便配對
+        let itemById: [Int: TaxonItem] = Dictionary(uniqueKeysWithValues: items.map { ($0.taxonId, $0) })
+
+        // 5) 回傳「TaxonItem + score」且一定對得上
+        let final: [(item: TaxonItem, score: Float)] = sortedTaxonIds.compactMap { tid in
+            guard let item = itemById[tid], let score = bestScoreByTaxon[tid] else { return nil }
+            return (item: item, score: score)
+        }
+
+        return final
     }
 }

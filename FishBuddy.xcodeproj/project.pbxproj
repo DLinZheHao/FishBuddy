@@ -14,6 +14,7 @@
 		051B883D2E73B66900209CDB /* LoadingCircleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B883C2E73B66900209CDB /* LoadingCircleView.swift */; };
 		052E49012EF7CDBF00DACA85 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 052E49002EF7CDBF00DACA85 /* catalog.sqlite */; };
 		052E49032EF7D56E00DACA85 /* EmbeddingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052E49022EF7D56B00DACA85 /* EmbeddingStore.swift */; };
+		05343ECD2EFBCC1300513485 /* JsonHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05343ECC2EFBCC0D00513485 /* JsonHelper.swift */; };
 		0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0546FBB52DCB30F1001695D8 /* custom-icons.ttf */; };
 		054C84432CD9B994005595EF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84422CD9B994005595EF /* AppDelegate.swift */; };
 		054C84452CD9B994005595EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84442CD9B994005595EF /* SceneDelegate.swift */; };
@@ -111,6 +112,7 @@
 		051B883C2E73B66900209CDB /* LoadingCircleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingCircleView.swift; sourceTree = "<group>"; };
 		052E49002EF7CDBF00DACA85 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
 		052E49022EF7D56B00DACA85 /* EmbeddingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddingStore.swift; sourceTree = "<group>"; };
+		05343ECC2EFBCC0D00513485 /* JsonHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonHelper.swift; sourceTree = "<group>"; };
 		0546FBB52DCB30F1001695D8 /* custom-icons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "custom-icons.ttf"; sourceTree = "<group>"; };
 		054C843F2CD9B994005595EF /* FishBuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FishBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		054C84422CD9B994005595EF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -262,6 +264,14 @@
 			path = LoddingCircle;
 			sourceTree = "<group>";
 		};
+		05343ECB2EFBCC0300513485 /* Json */ = {
+			isa = PBXGroup;
+			children = (
+				05343ECC2EFBCC0D00513485 /* JsonHelper.swift */,
+			);
+			path = Json;
+			sourceTree = "<group>";
+		};
 		054C84362CD9B994005595EF = {
 			isa = PBXGroup;
 			children = (
@@ -317,6 +327,7 @@
 		054C845B2CD9C030005595EF /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				05343ECB2EFBCC0300513485 /* Json */,
 				05589EF02CE6F084003881AA /* Extension */,
 				05E672E12CDB0C93006CF3BF /* DebugLogger */,
 				054C846A2CDB0531005595EF /* Codable */,
@@ -963,6 +974,7 @@
 				05FAEF232DF2D45700E9BD08 /* GestureAnimationViewModel.swift in Sources */,
 				05FAEF2E2E00F41800E9BD08 /* CardDM.swift in Sources */,
 				05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */,
+				05343ECD2EFBCC1300513485 /* JsonHelper.swift in Sources */,
 				054C84452CD9B994005595EF /* SceneDelegate.swift in Sources */,
 				05589EE92CE6EDBF003881AA /* WeatherLobbyVM.swift in Sources */,
 				058877032DC1BE5B00B1D13E /* WeatherView2.swift in Sources */,
