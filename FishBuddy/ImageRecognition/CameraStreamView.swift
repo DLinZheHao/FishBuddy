@@ -146,20 +146,33 @@ struct CameraStreamView: View {
                                     .buttonStyle(.plain)
                                 }
                                 
-                                ForEach(Array(results.prefix(3)), id: \.0.taxonId) { (item, score) in
-                                    NavigationLink {
-                                        TaxonDetailView(taxon: item)
-                                            .navigationBarTitleDisplayMode(.inline)
-                                    } label: {
-                                        SearchResultRow(
-                                            imageURL: URL(string: item.photos?.first?.url ?? ""),
-                                            title: item.commonName ?? "",
-                                            idText: "ID: \(item.taxonId)",
-                                            scoreText: String(format: "相似度: %.2f", score)
-                                        )
-                                    }
-                                    .buttonStyle(.plain) // 保留自訂列外觀
+                                ForEach(Array(results.prefix(3)), id: \.taxon.taxonId) { (item, score) in
+                                    SearchResultRow(
+                                        imageURL: URL(string: item.photos.first?.url ?? ""),
+                                        title: item.commonNameZh ?? "",
+                                        idText: "ID: \(item.taxonId)",
+                                        scoreText: String(format: "相似度: %.2f", score)
+                                    )
                                 }
+                                
+                                //                                    SearchResultRow(
+                                //                                        imageURL: URL(string: item.photos?.first?.url ?? ""),
+                                //                                        title: item.commonName ?? "",
+                                //                                        idText: "ID: \(item.taxonId)",
+                                //                                        scoreText: String(format: "相似度: %.2f", score)
+                                //                                    )
+                                //                                    NavigationLink {
+                                //                                        TaxonDetailView(taxon: item)
+                                //                                            .navigationBarTitleDisplayMode(.inline)
+                                //                                    } label: {
+                                //                                        SearchResultRow(
+                                //                                            imageURL: URL(string: item.photos?.first?.url ?? ""),
+                                //                                            title: item.commonName ?? "",
+                                //                                            idText: "ID: \(item.taxonId)",
+                                //                                            scoreText: String(format: "相似度: %.2f", score)
+                                //                                        )
+                                //                                    }
+                                //                                    .buttonStyle(.plain) // 保留自訂列外觀
                             }
                             .padding(12)
                             .frame(maxWidth: .infinity, alignment: .leading)

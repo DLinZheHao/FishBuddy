@@ -142,7 +142,7 @@ actor EmbeddingStore {
         do {
             items = try fishDB.loadTaxonItems(taxonIds: sortedTaxonIds)
         } catch {
-            fatalError("DB 載入失敗")
+            fatalError("DB 載入失敗 \(error)")
         }
         
         // 4) 建 dictionary 方便配對

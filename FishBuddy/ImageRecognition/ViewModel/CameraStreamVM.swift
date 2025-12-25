@@ -26,7 +26,7 @@ class CameraStreamVM: ObservableObject {
     @Published var streamID = UUID()
     
     /// 由 CameraController 提供的相片特徵向量串流
-    @Published var imageSearchResult: [(TaxonItem, Float)]?
+    @Published var imageSearchResult: [(taxon: TaxonItem, score: Float)]?
     
     /// 相機捕捉模式
     @Published var targetMode: TargetMode = .manualAim

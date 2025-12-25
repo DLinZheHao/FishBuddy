@@ -204,6 +204,15 @@ struct ResolvedDistributionLayer: Codable, Sendable {
     let url: String?
     let minZoom: Int?
     let maxZoom: Int?
+    
+    enum CodingKeys: String, CodingKey {
+        case idx
+        case layerKey = "layer_key"
+        case type
+        case url
+        case minZoom
+        case maxZoom
+    }
 }
 
 
@@ -325,11 +334,11 @@ struct Distribution: Codable {
 
 /// 物種分布圖層（distribution_layers）
 struct DistributionLayer: Codable {
-    let layerKey: String
-    let type: String
-    let url: String
-    let minzoom: Int
-    let maxzoom: Int
+    let layerKey: String?
+    let type: String?
+    let url: String?
+    let minzoom: Int?
+    let maxzoom: Int?
 
     enum CodingKeys: String, CodingKey {
         case layerKey = "layer_key"
