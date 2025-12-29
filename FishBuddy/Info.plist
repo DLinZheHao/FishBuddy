@@ -2,8 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSCameraUsageDescription</key>
-	<string>需要使用相機來拍攝照片或影片</string>
+	<key>Privacy – Photo Library Additions Usage Description</key>
+	<string>需要將拍攝結果儲存到您的相簿以供確認</string>
+	<key>UIAccessibilityTextSizesEnabled</key>
+	<false/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>custom-icons.ttf</string>
@@ -27,7 +29,5 @@
 			</array>
 		</dict>
 	</dict>
-	<key>UIAccessibilityTextSizesEnabled</key>
-	<false/>
 </dict>
 </plist>

@@ -1143,6 +1143,8 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FishBuddy/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "需要使用相機來拍攝照片或影片";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "需要將拍攝結果儲存到您的相簿以供確認";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -1172,6 +1174,8 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FishBuddy/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "需要使用相機來拍攝照片或影片";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "需要將拍攝結果儲存到您的相簿以供確認";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;

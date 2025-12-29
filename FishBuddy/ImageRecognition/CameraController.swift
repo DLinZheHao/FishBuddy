@@ -8,7 +8,7 @@ import SwiftUI
 import AVFoundation
 import CoreImage
 import UIKit
-
+import Photos
 
 /// 相機捕捉模式
 enum TargetMode: Equatable {
@@ -54,6 +54,12 @@ protocol CameraControllerOutputs {
 
 // CameraController 負責管理相機的存取、權限、相機切換、相機資料流的取得與釋放等功能
 final class CameraController: NSObject, ObservableObject {
+    // MARK: - Debug
+    private let enableCoordDebugLogs: Bool = true
+    private func dbg(_ message: String) {
+        guard enableCoordDebugLogs else { return }
+        print(message)
+    }
     /// 設定相機捕捉模式，預設，綁定後清出預設
     private var targetModeBinding: Binding<TargetMode> = .constant(.manualAim)
     
@@ -134,14 +140,17 @@ final class CameraController: NSObject, ObservableObject {
     /// 測試拍照完後，背景的切割結果
     var backgroundRemove: ((UIImage) -> Void)?
     
-    /// 使用者設定的裁切框（相對座標；原點左上；x,y,w,h ∈ 0...1）。nil 代表不裁切。
+    /// 使用者設定的裁切框（Preview/UI 正規化座標；原點左上；x,y,w,h ∈ 0...1）。
+    /// 注意：這不是 metadataRect；它是相對於 previewLayer.bounds 的 0..1。
+    /// nil 代表不裁切。
     @Published var cropRectNormalized: CGRect? = nil
     /// 使用者設定的裁切框中心，用來對焦
     @Published var cropRectCenter: CGPoint? = nil
     /// 目前放大比率
     @Published var currentZoomFactor: CGFloat = 1.0
     
-    @Published var trackedBoxNormalized: CGRect? // metadata rect 或 vision rect
+    /// 追蹤框（metadataRect 空間；0..1；原點左上）。由 tracker.onUpdate 產生。
+    @Published var trackedBoxNormalized: CGRect?
     
     override init() {
         super.init()
@@ -187,6 +196,7 @@ final class CameraController: NSObject, ObservableObject {
     /// 由 UI 設定 / 清除裁切框（在主執行緒呼叫）
     func startTracking(withNormalizedBox norm: CGRect) {
         guard let layer = previewLayer else { return }
+        dbg("[ROI] startTracking inputNorm(UI 0..1, top-left)=\(norm) layerBounds=\(layer.bounds) gravity=\(layer.videoGravity)")
         // 1️⃣ normalized (0..1, UI) → layer 座標
         let layerRect = CGRect(
             x: norm.origin.x * layer.bounds.width,
@@ -194,13 +204,17 @@ final class CameraController: NSObject, ObservableObject {
             width: norm.size.width * layer.bounds.width,
             height: norm.size.height * layer.bounds.height
         )
-        
+        dbg("[ROI] layerRect(points)=\(layerRect)")
+        // Store preview-normalized ROI for manualAim still-photo cropping.
+        cropRectNormalized = norm
+
         // 2️⃣ layer rect → metadata rect (0..1, top-left，含 .resizeAspectFill 的裁切資訊)
         let metadataRect = layer.metadataOutputRectConverted(fromLayerRect: layerRect)
-        cropRectNormalized = metadataRect // 記錄裁切框
+        dbg("[ROI] metadataRect(0..1, top-left)=\(metadataRect)")
 
-        // 立即把「最後會用來裁切的 ROI（metadata 空間）」回繪到預覽層上，供 UI 疊畫
-        let overlayRect = layer.layerRectConverted(fromMetadataOutputRect: metadataRect)
+        // 立即把「手動裁切框（preview-normalized）」回繪到預覽層上，供 UI 疊畫
+        let overlayRect = layerRect
+        dbg("[ROI] overlayRect(points, fromPreviewNorm)=\(overlayRect)")
         DispatchQueue.main.async { [weak self] in
             self?.cropBoxInView = overlayRect
         }
@@ -212,13 +226,12 @@ final class CameraController: NSObject, ObservableObject {
             width: metadataRect.width,
             height: metadataRect.height
         )
-        
+        dbg("[ROI] visionRect(0..1, bottom-left)=\(visionRect)")
         // 4️⃣ 丟給你的 AnimalTracker.startTracking(initialBoundingBox:)
         tracker.startTracking(initialBoundingBox: visionRect)
         targetModeBinding.wrappedValue = .autoTracking(.tracking)
     }
 
-    /// 將已儲存的 ROI（metadata 空間）回繪成預覽層座標，供 UI 疊畫
     public func updateCropOverlayFromStoredROI() {
         guard let layer = previewLayer else {
             DispatchQueue.main.async { [weak self] in self?.cropBoxInView = nil }
@@ -228,7 +241,18 @@ final class CameraController: NSObject, ObservableObject {
             DispatchQueue.main.async { [weak self] in self?.cropBoxInView = nil }
             return
         }
-        let overlayRect = layer.layerRectConverted(fromMetadataOutputRect: roi)
+
+        // roi is preview-normalized (0..1, top-left). Convert to layer points directly.
+        let overlayRect = CGRect(
+            x: roi.origin.x * layer.bounds.width,
+            y: roi.origin.y * layer.bounds.height,
+            width: roi.size.width * layer.bounds.width,
+            height: roi.size.height * layer.bounds.height
+        )
+
+        dbg("[ROI] updateCropOverlay stored previewNorm=\(roi) layerBounds=\(layer.bounds)")
+        dbg("[ROI] updateCropOverlay overlayRect(points)=\(overlayRect)")
+
         DispatchQueue.main.async { [weak self] in
             self?.cropBoxInView = overlayRect
         }
@@ -238,6 +262,12 @@ final class CameraController: NSObject, ObservableObject {
     public func attachPreviewLayer(_ layer: AVCaptureVideoPreviewLayer) {
         Task { @MainActor in
             self.previewLayer = layer
+            self.dbg("[PreviewLayer] attached videoGravity=\(layer.videoGravity) bounds=\(layer.bounds) connection=\(String(describing: layer.connection))")
+            // Bounds may be .zero until layout; log again on next runloop.
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.dbg("[PreviewLayer] post-layout bounds=\(layer.bounds) frame=\(layer.frame)")
+            }
             self.updateCropOverlayFromStoredROI()
         }
     }
@@ -575,11 +605,119 @@ final class CameraController: NSObject, ObservableObject {
                       width: w.rounded(.towardZero), height: h.rounded(.towardZero))
     }
 
-    /// 依照 normalized rect 裁切 UIImage（若 rect 無效或超界會自動夾限）
-    private func crop(_ image: UIImage, by normalizedRect: CGRect) -> UIImage? {
+    /// Clamp a rect to the image bounds.
+    private func clampPixelRect(_ rect: CGRect, imageWidth: Int, imageHeight: Int) -> CGRect {
+        let x0 = max(0, min(CGFloat(imageWidth), rect.minX))
+        let y0 = max(0, min(CGFloat(imageHeight), rect.minY))
+        let x1 = max(0, min(CGFloat(imageWidth), rect.maxX))
+        let y1 = max(0, min(CGFloat(imageHeight), rect.maxY))
+        let w = max(0, x1 - x0)
+        let h = max(0, y1 - y0)
+        return CGRect(x: x0.rounded(.towardZero), y: y0.rounded(.towardZero),
+                      width: w.rounded(.towardZero), height: h.rounded(.towardZero))
+    }
+
+    /// Convert a preview-normalized rect (0..1 in previewLayer.bounds, top-left) into a pixel rect in the final still photo,
+    /// assuming the preview uses `.resizeAspectFill`.
+    private func pixelRectFromPreviewNormalized(
+        _ previewNorm: CGRect,
+        previewSize: CGSize,
+        imageWidth: Int,
+        imageHeight: Int
+    ) -> CGRect {
+        // Convert normalized -> preview points
+        let r = CGRect(
+            x: previewNorm.origin.x * previewSize.width,
+            y: previewNorm.origin.y * previewSize.height,
+            width: previewNorm.size.width * previewSize.width,
+            height: previewNorm.size.height * previewSize.height
+        )
+
+        // AspectFill geometry: scale image to cover preview, then center-crop.
+        let iw = CGFloat(imageWidth)
+        let ih = CGFloat(imageHeight)
+        let pw = previewSize.width
+        let ph = previewSize.height
+        guard iw > 0, ih > 0, pw > 0, ph > 0 else { return .zero }
+
+        let scale = max(pw / iw, ph / ih)
+        let displayW = iw * scale
+        let displayH = ih * scale
+        let offsetX = (pw - displayW) / 2.0
+        let offsetY = (ph - displayH) / 2.0
+
+        // Map preview points back to image pixels.
+        let x = (r.minX - offsetX) / scale
+        let y = (r.minY - offsetY) / scale
+        let w = r.width / scale
+        let h = r.height / scale
+
+        let pixel = CGRect(x: x, y: y, width: w, height: h)
+        return clampPixelRect(pixel, imageWidth: imageWidth, imageHeight: imageHeight)
+    }
+
+    /// Crop still photo using preview-normalized ROI under `.resizeAspectFill`.
+    private func cropUsingPreviewNormalized(_ image: UIImage, previewNorm: CGRect) -> UIImage? {
+        guard let layer = previewLayer else {
+            dbg("[Crop] previewLayer is nil; cannot map preview ROI")
+            return nil
+        }
         guard let cg = image.cgImage else { return nil }
-        // 將「校正後的相對選框」換算到照片像素座標
-        let pr = pixelRect(for: normalizedRect, width: cg.width, height: cg.height)
+
+        let previewSize = layer.bounds.size
+        let pr = pixelRectFromPreviewNormalized(previewNorm, previewSize: previewSize, imageWidth: cg.width, imageHeight: cg.height)
+
+        dbg("[Crop][AspectFill] previewBounds=\(layer.bounds) previewNorm=\(previewNorm)")
+        dbg("[Crop][AspectFill] imagePx=\(cg.width)x\(cg.height) -> pixelRect(px)=\(pr)")
+
+        guard pr.width > 0, pr.height > 0 else { return nil }
+        guard let cgCropped = cg.cropping(to: pr) else { return nil }
+        return UIImage(cgImage: cgCropped, scale: image.scale, orientation: .up)
+    }
+
+    /// Convert a preview-layer POINTS rect into a pixel rect in the final still photo, assuming `.resizeAspectFill`.
+    private func pixelRectFromPreviewPoints(
+        _ previewPoints: CGRect,
+        previewSize: CGSize,
+        imageWidth: Int,
+        imageHeight: Int
+    ) -> CGRect {
+        let iw = CGFloat(imageWidth)
+        let ih = CGFloat(imageHeight)
+        let pw = previewSize.width
+        let ph = previewSize.height
+        guard iw > 0, ih > 0, pw > 0, ph > 0 else { return .zero }
+
+        let scale = max(pw / iw, ph / ih)
+        let displayW = iw * scale
+        let displayH = ih * scale
+        let offsetX = (pw - displayW) / 2.0
+        let offsetY = (ph - displayH) / 2.0
+
+        let x = (previewPoints.minX - offsetX) / scale
+        let y = (previewPoints.minY - offsetY) / scale
+        let w = previewPoints.width / scale
+        let h = previewPoints.height / scale
+
+        let pixel = CGRect(x: x, y: y, width: w, height: h)
+        return clampPixelRect(pixel, imageWidth: imageWidth, imageHeight: imageHeight)
+    }
+
+    /// Crop still photo using a preview-layer POINTS rect under `.resizeAspectFill`.
+    private func cropUsingPreviewPoints(_ image: UIImage, previewPoints: CGRect, tag: String) -> UIImage? {
+        guard let layer = previewLayer else {
+            dbg("[Crop] previewLayer is nil; cannot map preview points")
+            return nil
+        }
+        guard let cg = image.cgImage else { return nil }
+
+        let previewSize = layer.bounds.size
+        let pr = pixelRectFromPreviewPoints(previewPoints, previewSize: previewSize, imageWidth: cg.width, imageHeight: cg.height)
+
+        dbg("[Crop][AspectFill][\(tag)] previewBounds=\(layer.bounds)")
+        dbg("[Crop][AspectFill][\(tag)] previewPoints=\(previewPoints)")
+        dbg("[Crop][AspectFill][\(tag)] imagePx=\(cg.width)x\(cg.height) -> pixelRect(px)=\(pr)")
+
         guard pr.width > 0, pr.height > 0 else { return nil }
         guard let cgCropped = cg.cropping(to: pr) else { return nil }
         return UIImage(cgImage: cgCropped, scale: image.scale, orientation: .up)
@@ -655,42 +793,65 @@ extension CameraController: AVCapturePhotoCaptureDelegate {
         }
         guard let data = photo.fileDataRepresentation(),
               let rawImage = UIImage(data: data) else { return }
+        dbg("[Photo] rawImage size(points)=\(rawImage.size) scale=\(rawImage.scale) orientation=\(rawImage.imageOrientation.rawValue)")
         guard let clip = clipExtractor else { return }
 
         // 先固定方向，再依使用者的裁切框（若有）裁出 ROI
         let base = imageByFixingOrientation(rawImage)
-        let finalImage: UIImage
-        
+        if let cg = base.cgImage {
+            dbg("[Photo] base(.up) cgSize(px)=\(cg.width)x\(cg.height) uiSize(points)=\(base.size) scale=\(base.scale)")
+        } else {
+            dbg("[Photo] base(.up) has no cgImage")
+        }
         let mode = targetModeBinding.wrappedValue
-
+        dbg("[Photo] targetMode=\(mode)")
+        let finalImage: UIImage
         // 依照模式切座標
         switch mode {
         case .manualAim:
-            // 手動瞄準模式的處理
-            // 例如：使用 cropRectNormalized 來裁切
             if let roi = self.cropRectNormalized {
-                finalImage = crop(base, by: roi) ?? base
+                dbg("[Photo][manualAim] roiUsed(previewNorm 0..1, top-left)=\(roi)")
+                finalImage = cropUsingPreviewNormalized(base, previewNorm: roi) ?? base
             } else {
                 finalImage = base
             }
-
         case .autoTracking(.tracking):
-            // 自動追蹤中
             if let roi = self.trackedBoxNormalized {
-                finalImage = crop(base, by: roi) ?? base
+                dbg("[Photo][autoTracking] roiUsed(metadataRect 0..1, top-left)=\(roi)")
+                if let layer = self.previewLayer {
+                    // roi is metadataRect (0..1, top-left). Convert to preview-layer points first.
+                    let rectInLayer = layer.layerRectConverted(fromMetadataOutputRect: roi)
+                    finalImage = cropUsingPreviewPoints(base, previewPoints: rectInLayer, tag: "autoTracking") ?? base
+                } else {
+                    finalImage = base
+                }
             } else {
                 finalImage = base
             }
-
         case .autoTracking(.losting):
             return
         }
-        
         if let embedding = clip.multiCropAverageEmbedding(for: finalImage, cropScale: 0.85) {
             Task { @MainActor in
                 self.onPhotoReady?((embedding, finalImage))
+//                saveToPhotoLibrary(finalImage, completion: {_ in })
             }
         }
     }
 }
 
+func saveToPhotoLibrary(_ image: UIImage, completion: @escaping (Result<Void, Error>) -> Void) {
+    PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
+        guard status == .authorized || status == .limited else {
+            completion(.failure(NSError(domain: "PhotoAuth", code: 1)))
+            return
+        }
+
+        PHPhotoLibrary.shared().performChanges({
+            PHAssetChangeRequest.creationRequestForAsset(from: image)
+        }) { success, error in
+            if let error = error { completion(.failure(error)); return }
+            success ? completion(.success(())) : completion(.failure(NSError(domain: "PhotoSave", code: 2)))
+        }
+    }
+}

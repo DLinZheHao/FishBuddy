@@ -24,6 +24,9 @@ struct CameraStreamView: View {
     @State private var showToast = false
     /// 顯示 toast 文字
     @State private var toastMessage = ""
+
+    /// Debug: preview layer bounds (points)
+    @State private var previewLayerBounds: CGRect = .zero
     
     /// 回去天氣頁面的閉包
     var onClose: (() -> Void)?
@@ -34,7 +37,15 @@ struct CameraStreamView: View {
                 // 整個鏡頭預覽區域
                 ZStack(alignment: .topLeading) {
                     // 鏡頭畫面
-                    CameraPreview(session: vm.captureSession, camera: camera)
+                    CameraPreview(
+                        session: vm.captureSession,
+                        camera: camera,
+                        onPreviewLayout: { bounds in
+                            // NOTE: bounds is in points, origin is typically (0,0)
+                            self.previewLayerBounds = bounds
+                            print("[PreviewLayout] bounds=\(bounds) size=\(bounds.size)")
+                        }
+                    )
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .ignoresSafeArea()
                     // 瞄準框
@@ -44,6 +55,7 @@ struct CameraStreamView: View {
                             // 連續調整時即時同步到 CameraController 的 ROI 與疊畫
                             camera.cropRectNormalized = norm
                             camera.updateCropOverlayFromStoredROI()
+                            print("[FramingGuide] onRectChange normalized=\(norm) previewBounds=\(previewLayerBounds) cropBoxInView=\(String(describing: camera.cropBoxInView))")
                         },
                         onCenterTap: { pointInView, rect in
                             // 點中心時開始追蹤（rect 已是 0..1 正規化）
@@ -64,6 +76,12 @@ struct CameraStreamView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity) // 充滿與預覽同大小
                     .ignoresSafeArea()
                     .zIndex(1) // 確保在預覽上層
+                    .onChange(of: camera.cropBoxInView) { newValue in
+                        print("[FramingGuide] cropBoxInView changed: \(String(describing: newValue)) previewBounds=\(previewLayerBounds)")
+                    }
+                    .onChange(of: camera.trackedBoxInView) { newValue in
+                        print("[FramingGuide] trackedBoxInView changed: \(String(describing: newValue)) previewBounds=\(previewLayerBounds)")
+                    }
                     
                     // 左上角：功能說明（tooltip/popover）
                     Button {
@@ -278,15 +296,27 @@ struct CameraStreamView: View {
 final class PreviewView: UIView {
     override class var layerClass: AnyClass { AVCaptureVideoPreviewLayer.self }
     var videoPreviewLayer: AVCaptureVideoPreviewLayer { layer as! AVCaptureVideoPreviewLayer }
+
+    /// Called after layout; provides the layer bounds in points.
+    var onLayout: ((CGRect) -> Void)?
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        onLayout?(videoPreviewLayer.bounds)
+    }
 }
 
 struct CameraPreview: UIViewRepresentable {
     let session: AVCaptureSession?
     weak var camera: CameraController?
-    
+    var onPreviewLayout: ((CGRect) -> Void)?
+
     func makeUIView(context: Context) -> PreviewView {
         let v = PreviewView(frame: .zero)
         v.videoPreviewLayer.videoGravity = .resizeAspectFill
+        v.onLayout = { bounds in
+            onPreviewLayout?(bounds)
+        }
         if let camera = camera {
             camera.attachPreviewLayer(v.videoPreviewLayer)
         }
@@ -297,6 +327,10 @@ struct CameraPreview: UIViewRepresentable {
         // 若後來才取得 session，或換了新的 session，都在此更新
         if uiView.videoPreviewLayer.session !== session {
             uiView.videoPreviewLayer.session = session
+        }
+        // Keep callback updated across SwiftUI updates
+        uiView.onLayout = { bounds in
+            onPreviewLayout?(bounds)
         }
     }
 }
