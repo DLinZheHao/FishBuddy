@@ -76,12 +76,6 @@ struct CameraStreamView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity) // 充滿與預覽同大小
                     .ignoresSafeArea()
                     .zIndex(1) // 確保在預覽上層
-                    .onChange(of: camera.cropBoxInView) { newValue in
-                        print("[FramingGuide] cropBoxInView changed: \(String(describing: newValue)) previewBounds=\(previewLayerBounds)")
-                    }
-                    .onChange(of: camera.trackedBoxInView) { newValue in
-                        print("[FramingGuide] trackedBoxInView changed: \(String(describing: newValue)) previewBounds=\(previewLayerBounds)")
-                    }
                     
                     // 左上角：功能說明（tooltip/popover）
                     Button {
@@ -165,32 +159,19 @@ struct CameraStreamView: View {
                                 }
                                 
                                 ForEach(Array(results.prefix(3)), id: \.taxon.taxonId) { (item, score) in
-                                    SearchResultRow(
-                                        imageURL: URL(string: item.photos.first?.url ?? ""),
-                                        title: item.commonNameZh ?? "",
-                                        idText: "ID: \(item.taxonId)",
-                                        scoreText: String(format: "相似度: %.2f", score)
-                                    )
+                                    NavigationLink {
+                                        TaxonDetailView(taxon: item)
+                                            .navigationBarTitleDisplayMode(.inline)
+                                    } label: {
+                                        SearchResultRow(
+                                            imageURL: URL(string: item.photos.first?.url ?? ""),
+                                            title: item.commonNameZh ?? "",
+                                            idText: "ID: \(item.taxonId)",
+                                            scoreText: String(format: "相似度: %.2f", score)
+                                        )
+                                    }
+                                    .buttonStyle(.plain) // 保留自訂列外觀
                                 }
-                                
-                                //                                    SearchResultRow(
-                                //                                        imageURL: URL(string: item.photos?.first?.url ?? ""),
-                                //                                        title: item.commonName ?? "",
-                                //                                        idText: "ID: \(item.taxonId)",
-                                //                                        scoreText: String(format: "相似度: %.2f", score)
-                                //                                    )
-                                //                                    NavigationLink {
-                                //                                        TaxonDetailView(taxon: item)
-                                //                                            .navigationBarTitleDisplayMode(.inline)
-                                //                                    } label: {
-                                //                                        SearchResultRow(
-                                //                                            imageURL: URL(string: item.photos?.first?.url ?? ""),
-                                //                                            title: item.commonName ?? "",
-                                //                                            idText: "ID: \(item.taxonId)",
-                                //                                            scoreText: String(format: "相似度: %.2f", score)
-                                //                                        )
-                                //                                    }
-                                //                                    .buttonStyle(.plain) // 保留自訂列外觀
                             }
                             .padding(12)
                             .frame(maxWidth: .infinity, alignment: .leading)

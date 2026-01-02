@@ -35,3 +35,18 @@ struct Taxon: Identifiable, Hashable {
     let ecology: String?
     let distribution: FishDistribution?
 }
+
+struct StatPillModel: Identifiable {
+    let id = UUID()
+    let icon: String
+    let title: String
+    let value: String
+    let color: Color
+
+    init(icon: String, title: String, value: String, color: Color = .blue) {
+        self.icon = icon
+        self.title = title
+        self.value = value
+        self.color = color
+    }
+}

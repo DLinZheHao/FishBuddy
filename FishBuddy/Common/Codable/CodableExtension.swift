@@ -16,7 +16,23 @@ typealias DefaultCodableValue = DefaultValue & Codable
 struct Default<T: DefaultCodableValue> {
     var wrappedValue: T
 }
-
+extension KeyedDecodingContainer {
+    func decodeStringLossy(forKey key: Key) -> String {
+        if let s = try? decode(String.self, forKey: key) {
+            return s
+        }
+        if let i = try? decode(Int.self, forKey: key) {
+            return "\(i)"
+        }
+        if let d = try? decode(Double.self, forKey: key) {
+            if d.rounded() == d {
+                return "\(Int(d))"
+            }
+            return "\(d)"
+        }
+        return ""
+    }
+}
 // 包裝器遵守 Codable 協議，實現默認的 decoder 和 encoder 方法
 extension Default: Codable {
     init(from decoder: Decoder) throws {

@@ -15,6 +15,8 @@
 		052E49012EF7CDBF00DACA85 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 052E49002EF7CDBF00DACA85 /* catalog.sqlite */; };
 		052E49032EF7D56E00DACA85 /* EmbeddingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052E49022EF7D56B00DACA85 /* EmbeddingStore.swift */; };
 		05343ECD2EFBCC1300513485 /* JsonHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05343ECC2EFBCC0D00513485 /* JsonHelper.swift */; };
+		053B67432F02711E009C4001 /* ColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053B67422F027115009C4001 /* ColorExtension.swift */; };
+		053B67452F04F5F3009C4001 /* TaxonDetailSubViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 053B67442F04F5F1009C4001 /* TaxonDetailSubViews.swift */; };
 		0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0546FBB52DCB30F1001695D8 /* custom-icons.ttf */; };
 		054C84432CD9B994005595EF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84422CD9B994005595EF /* AppDelegate.swift */; };
 		054C84452CD9B994005595EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C84442CD9B994005595EF /* SceneDelegate.swift */; };
@@ -113,6 +115,8 @@
 		052E49002EF7CDBF00DACA85 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
 		052E49022EF7D56B00DACA85 /* EmbeddingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddingStore.swift; sourceTree = "<group>"; };
 		05343ECC2EFBCC0D00513485 /* JsonHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonHelper.swift; sourceTree = "<group>"; };
+		053B67422F027115009C4001 /* ColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtension.swift; sourceTree = "<group>"; };
+		053B67442F04F5F1009C4001 /* TaxonDetailSubViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaxonDetailSubViews.swift; sourceTree = "<group>"; };
 		0546FBB52DCB30F1001695D8 /* custom-icons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "custom-icons.ttf"; sourceTree = "<group>"; };
 		054C843F2CD9B994005595EF /* FishBuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FishBuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		054C84422CD9B994005595EF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -440,6 +444,7 @@
 			children = (
 				05823E032EB0664D00BDC553 /* Map */,
 				051B88312E6E8A9600209CDB /* ViewExtension.swift */,
+				053B67422F027115009C4001 /* ColorExtension.swift */,
 				05589EF12CE6F0A7003881AA /* UIStoryboardExtension.swift */,
 				05589EF32CE6F2D2003881AA /* UIViewControllerExtension.swift */,
 				05E245F02D0A801000C6C048 /* UILabelExtension.swift */,
@@ -809,6 +814,7 @@
 		05FC90EA2E9894020053A1C2 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				053B67442F04F5F1009C4001 /* TaxonDetailSubViews.swift */,
 				057F16252EA1DF2000EC7710 /* DistributionCardView.swift */,
 				057F16272EA1E07600EC7710 /* UserPromptView.swift */,
 			);
@@ -925,6 +931,7 @@
 				05823E072EB0673E00BDC553 /* CachedTileOverlay.swift in Sources */,
 				05F025072EC9B441009D3531 /* SideButton.swift in Sources */,
 				058F58A72E7BA42C009913C5 /* BackgroundRemoverVK.swift in Sources */,
+				053B67452F04F5F3009C4001 /* TaxonDetailSubViews.swift in Sources */,
 				054C84472CD9B994005595EF /* LobbyViewController.swift in Sources */,
 				0595566F2E14D5BA0050147C /* TideView.swift in Sources */,
 				05FAEF182DF279A700E9BD08 /* BottomSheetSubViews.swift in Sources */,
@@ -971,6 +978,7 @@
 				05513A432DAE44540021573F /* WeatherView.swift in Sources */,
 				05623FD02E1234D300B33D2D /* SearchBar.swift in Sources */,
 				05589EE52CE6ECD8003881AA /* Display.swift in Sources */,
+				053B67432F02711E009C4001 /* ColorExtension.swift in Sources */,
 				05FAEF232DF2D45700E9BD08 /* GestureAnimationViewModel.swift in Sources */,
 				05FAEF2E2E00F41800E9BD08 /* CardDM.swift in Sources */,
 				05E245EB2D0A7EB800C6C048 /* TagLineView.swift in Sources */,

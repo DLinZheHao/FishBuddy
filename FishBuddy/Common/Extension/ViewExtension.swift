@@ -62,3 +62,17 @@ extension View {
         .animation(.easeInOut(duration: 0.25), value: isPresented.wrappedValue)
     }
 }
+
+extension View {
+    func cardStyle() -> some View {
+        self
+            .background(Color.white)
+            .cornerRadius(16)
+            .shadow(
+                color: Color.black.opacity(0.08),
+                radius: 12,
+                x: 0,
+                y: 4
+            )
+    }
+}

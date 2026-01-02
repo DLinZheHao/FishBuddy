@@ -312,7 +312,7 @@ extension FishDB {
                 reproduction: reproduction,
                 conservationAndHumanUses: conservationAndHumanUses,
                 benefitsAndUses: benefitsAndUses,
-                taiwanAndRegionalNotesJSON: taiwanAndRegionalNotes,
+                taiwanAndRegionalNotes: taiwanAndRegionalNotes,
                 distribution: distribution,
                 embeddingMeta: embeddingMeta,
                 growthAndLifeHistory: growthAndLifeHistory,

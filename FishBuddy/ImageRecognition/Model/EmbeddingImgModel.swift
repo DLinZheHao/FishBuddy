@@ -5,6 +5,8 @@
 //  Created by 林哲豪 on 2025/9/1.
 //
 
+import Foundation
+import SwiftUI
 
 /// database 裡的資料
 struct EmbeddingImgModel: Codable {
@@ -37,7 +39,7 @@ struct TaxonItem: Codable {
     let reproduction: Reproduction?
     let conservationAndHumanUses: ConservationAndHumanUses?
     let benefitsAndUses: BenefitsAndUses?
-    let taiwanAndRegionalNotesJSON: TaiwanAndRegionalNotes?
+    let taiwanAndRegionalNotes: TaiwanAndRegionalNotes?
     let distribution: Distribution?
     let embeddingMeta: EmbeddingMeta?
     let growthAndLifeHistory: GrowthAndLifeHistory?
@@ -57,6 +59,37 @@ struct GrowthAndLifeHistory: Codable {
         case maximumLengthCm  = "maximum_length_cm"
         case growthNotes      = "growth_notes"
         case lifeHistoryNotes = "life_history_notes"
+    }
+
+    // ✅ 讓你可以手動 new（你剛剛那種寫法）
+    init(maximumLengthCm: String, growthNotes: String, lifeHistoryNotes: String) {
+        self._maximumLengthCm  = Default(wrappedValue: maximumLengthCm)
+        self._growthNotes      = Default(wrappedValue: growthNotes)
+        self._lifeHistoryNotes = Default(wrappedValue: lifeHistoryNotes)
+    }
+    
+    // ✅ 手動初始化（Preview / fallback / 非 JSON 用）
+    init() {
+        self._maximumLengthCm = Default(wrappedValue: "")
+        self._growthNotes = Default(wrappedValue: "")
+        self._lifeHistoryNotes = Default(wrappedValue: "")
+    }
+
+    // ✅ JSON decode 用（處理 number / string 混用）
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        self._maximumLengthCm = Default(
+            wrappedValue: container.decodeStringLossy(forKey: .maximumLengthCm)
+        )
+
+        self._growthNotes = Default(
+            wrappedValue: (try? container.decode(String.self, forKey: .growthNotes)) ?? ""
+        )
+
+        self._lifeHistoryNotes = Default(
+            wrappedValue: (try? container.decode(String.self, forKey: .lifeHistoryNotes)) ?? ""
+        )
     }
 }
 
@@ -196,6 +229,55 @@ struct ResolvedWikiPhoto: Codable, Sendable {
     let source: String?
     let attributionHTML: String?
 }
+
+extension ResolvedPhoto {
+    func toUnifiedPhoto() -> UnifiedPhoto? {
+        guard let u = URL(string: url) else { return nil }
+        return UnifiedPhoto(
+            idx: idx,
+            url: u,
+            licenseCode: licenseCode,
+            licenseText: nil,
+            attributionText: attribution,
+            attributionHTML: nil,
+            source: source,
+            kind: .photo
+        )
+    }
+}
+
+extension ResolvedWikiPhoto {
+    func toUnifiedPhoto() -> UnifiedPhoto? {
+        guard let u = URL(string: url) else { return nil }
+        return UnifiedPhoto(
+            idx: idx,
+            url: u,
+            licenseCode: licenseCode,
+            licenseText: license,
+            attributionText: nil,          // 你也可以在這裡做 HTML->Text
+            attributionHTML: attributionHTML,
+            source: source,
+            kind: .wiki
+        )
+    }
+}
+
+struct UnifiedPhoto: Sendable, Hashable {
+    let idx: Int
+    let url: URL
+    let licenseCode: String?
+    let licenseText: String?          // wiki 才有的 license（人類可讀）
+    let attributionText: String?      // 統一成 text（必要時由 HTML 轉）
+    let attributionHTML: String?      // 需要保留原始 HTML 就留
+    let source: String?
+    let kind: Kind
+
+    enum Kind: Sendable, Hashable {
+        case photo
+        case wiki
+    }
+}
+
 
 struct ResolvedDistributionLayer: Codable, Sendable {
     let idx: Int
@@ -361,4 +443,114 @@ struct SpeciesLite: Sendable {
     let taxonId: Int
     let scientificName: String
     let commonNameZh: String?
+}
+
+extension TaxonItem {
+
+    // B'：英文名 chips（直接用 common_name_en）
+    var displayENNames: [String] {
+        []
+    }
+
+    // C：Quick Stats（完全不新增欄位，只做顯示層格式化）
+    func makeQuickStats() -> [StatPillModel] {
+        var out: [StatPillModel] = []
+
+        // 1) SIZE
+        if let cm = growthAndLifeHistory?.maximumLengthCm {
+            out.append(.init(icon: "ruler", title: "SIZE", value: normalizeSize(cm), color: .blue))
+        }
+
+        // 2) DEPTH
+        if let raw = environmentAndDepth?.depthRangeM, !raw.isEmpty {
+            out.append(.init(icon: "arrow.down.to.line", title: "DEPTH", value: normalizeDepth(raw), color: .teal))
+        }
+
+        // 3) IUCN
+        if let status = conservationAndHumanUses?.conservationStatus, !status.isEmpty {
+            let code = extractIUCNCode(status) ?? status
+            let isRisky = !(code.uppercased().contains("LC") || code.uppercased().contains("LEAST CONCERN"))
+            out.append(.init(icon: "leaf", title: "IUCN", value: code, color: isRisky ? .red : .green))
+        }
+
+//        // 4) FAMILY（沒有就 GENUS）
+//        if let family = taxonomy?.family, !family.isEmpty {
+//            out.append(.init(icon: "point.3.connected.trianglepath.dotted", title: "FAMILY", value: family, color: .indigo))
+//        } else if let genus = taxonomy?.genus, !genus.isEmpty {
+//            out.append(.init(icon: "point.3.connected.trianglepath.dotted", title: "GENUS", value: genus, color: .indigo))
+//        }
+
+        return out
+    }
+    
+    // MARK: - helpers（顯示層格式化，JSON 不動）
+
+    private func normalizeDepth(_ raw: String) -> String {
+        let text = raw.replacingOccurrences(of: "～", with: "-")
+                      .replacingOccurrences(of: "—", with: "-")
+                      .replacingOccurrences(of: "–", with: "-")
+
+        // 擷取數字區間或單一數字
+        let pattern = #"(\d+(?:\.\d+)?)(?:\s*-\s*(\d+(?:\.\d+)?))?"#
+        let regex = try? NSRegularExpression(pattern: pattern)
+
+        guard
+            let match = regex?.firstMatch(
+                in: text,
+                range: NSRange(text.startIndex..., in: text)
+            )
+        else { return raw }
+
+        let start = (text as NSString).substring(with: match.range(at: 1))
+        let endRange = match.range(at: 2)
+
+        if endRange.location != NSNotFound {
+            let end = (text as NSString).substring(with: endRange)
+            return "\(start)–\(end) m"
+        } else {
+            return "\(start) m"
+        }
+    }
+
+    private func normalizeSize(_ raw: String) -> String {
+        let text = raw.replacingOccurrences(of: "～", with: "-")
+                      .replacingOccurrences(of: "—", with: "-")
+                      .replacingOccurrences(of: "–", with: "-")
+
+        // 抓「單一數字」或「數字區間」
+        let pattern = #"(\d+(?:\.\d+)?)(?:\s*-\s*(\d+(?:\.\d+)?))?"#
+        let regex = try? NSRegularExpression(pattern: pattern)
+
+        guard
+            let match = regex?.firstMatch(
+                in: text,
+                range: NSRange(text.startIndex..., in: text)
+            )
+        else { return raw }
+
+        let start = (text as NSString).substring(with: match.range(at: 1))
+        let endRange = match.range(at: 2)
+
+        if endRange.location != NSNotFound {
+            let end = (text as NSString).substring(with: endRange)
+            return "\(start)–\(end) cm"
+        } else {
+            return "\(start) cm"
+        }
+    }
+
+    private func extractIUCNCode(_ text: String) -> String? {
+        let upper = text.uppercased()
+
+        let validCodes = ["LC", "NT", "VU", "EN", "CR", "DD", "NE", "EW", "EX"]
+
+        for code in validCodes {
+            // 確保是獨立代碼，不是單字的一部分
+            let pattern = #"(?<![A-Z])\#(code)(?![A-Z])"#
+            if upper.range(of: pattern, options: .regularExpression) != nil {
+                return code
+            }
+        }
+        return nil
+    }
 }
