@@ -63,6 +63,7 @@ struct CameraStreamView: View {
                         },
                         onZoomChange: { scale in
                             camera.updateZoom(scale)
+                            print("[Zoom] inputScale=\(scale) currentZoom=\(camera.currentZoomFactor) deviceZoom=\(camera.captureDevice?.videoZoomFactor ?? -1)")
                         },
                         onZoomEnd: {
                             vm.lastZoomFactor = camera.currentZoomFactor
@@ -127,6 +128,10 @@ struct CameraStreamView: View {
                                 SideButton(icon: "camera.rotate", title: "Switch\nCamera", isActive: !camera.backCamera) {
                                     camera.backCamera.toggle()
                                 }
+                                
+//                                SideButton(icon: "magnifyingglass", title: "Macro\nMode", isActive: camera.preferMacro) {
+//                                    camera.preferMacro.toggle()
+//                                }
                                 
                                 SideButton(icon: "slider.horizontal.3", title: "Adjust\nMode", isActive: vm.isInAdjustFrameMode) {
                                     vm.isInAdjustFrameMode.toggle()

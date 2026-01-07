@@ -64,7 +64,7 @@ final class CameraController: NSObject, ObservableObject {
     private var targetModeBinding: Binding<TargetMode> = .constant(.manualAim)
     
     /// 目前使用中的相機裝置（後鏡頭 / 前鏡頭）
-    private var captureDevice: AVCaptureDevice?
+     var captureDevice: AVCaptureDevice?
     
     /// 背景去除用物件
     var backgroundRemoverVK: BackgroundRemoverVK?
@@ -95,9 +95,17 @@ final class CameraController: NSObject, ObservableObject {
     private var photoOutput: AVCapturePhotoOutput?
 
     /// 相機/照片畫質設定（可在執行中調整）
-    public var videoPreset: AVCaptureSession.Preset = .photo   // 影像串流解析度
+    public var videoPreset: AVCaptureSession.Preset = .high   // ✅ 預覽/串流解析度（優先給 PreviewLayer）
     public var enableHighResolutionPhoto: Bool = true               // 是否啟用高解析度拍照
     public var photoQualityPrioritization: AVCapturePhotoOutput.QualityPrioritization = .quality // 以品質優先
+
+
+    /// ✅ 讓系統自動管理 HDR（EDR）串流。強制 HDR 常會讓畫面看起來更暗。
+    public var allowAutoHDR: Bool = true
+
+    /// ✅ 目標預覽 FPS（搭配低光時允許降 FPS 的設定）。
+    public var previewMaxFPS: Double = 30
+    public var previewMinFPSInLowLight: Double = 15
 
     // 相機的 session 實體，負責管理輸入與輸出
     var captureSession: AVCaptureSession? {
@@ -148,6 +156,15 @@ final class CameraController: NSObject, ObservableObject {
     @Published var cropRectCenter: CGPoint? = nil
     /// 目前放大比率
     @Published var currentZoomFactor: CGFloat = 1.0
+
+    /// 手動近拍模式：true 優先使用 Ultra Wide（近距離更容易對焦）；false 使用 Wide（畫質較佳）
+//    @Published var preferMacro: Bool = false {
+//        didSet {
+//            // 切換鏡頭策略需要重建 session
+//            stop()
+//            start()
+//        }
+//    }
     
     /// 追蹤框（metadataRect 空間；0..1；原點左上）。由 tracker.onUpdate 產生。
     @Published var trackedBoxNormalized: CGRect?
@@ -269,54 +286,6 @@ final class CameraController: NSObject, ObservableObject {
                 self.dbg("[PreviewLayer] post-layout bounds=\(layer.bounds) frame=\(layer.frame)")
             }
             self.updateCropOverlayFromStoredROI()
-        }
-    }
-
-    /// 以「UI 正規化 0..1」座標對焦（會自動考量 videoGravity / 旋轉 / 鏡像）
-    public func focus(atNormalized norm: CGPoint, previewLayer: AVCaptureVideoPreviewLayer) {
-        // 先把 0..1 的點換算成預覽層座標空間的點
-        let layerPoint = CGPoint(x: previewLayer.bounds.width  * norm.x,
-                                 y: previewLayer.bounds.height * norm.y)
-        // 再由預覽層換成裝置座標（0..1；原點與方向由系統處理，包括鏡像與重力）
-        let devicePoint = previewLayer.captureDevicePointConverted(fromLayerPoint: layerPoint)
-        focus(atDevicePoint: devicePoint)
-    }
-
-    /// 直接以裝置座標（0..1）對焦/測光
-    public func focus(atDevicePoint devicePoint: CGPoint) {
-        sessionQueue.async { [weak self] in
-            guard let self,
-                  let session = self.captureSession,
-                  let deviceInput = session.inputs.compactMap({ $0 as? AVCaptureDeviceInput }).first else { return }
-            let device = deviceInput.device
-            do {
-                try device.lockForConfiguration()
-
-                // 對焦
-                if device.isFocusPointOfInterestSupported {
-                    device.focusPointOfInterest = devicePoint
-                    if device.isFocusModeSupported(.continuousAutoFocus) {
-                        device.focusMode = .continuousAutoFocus
-                    } else if device.isFocusModeSupported(.autoFocus) {
-                        device.focusMode = .autoFocus
-                    }
-                }
-                // 測光
-                if device.isExposurePointOfInterestSupported {
-                    device.exposurePointOfInterest = devicePoint
-                    if device.isExposureModeSupported(.continuousAutoExposure) {
-                        device.exposureMode = .continuousAutoExposure
-                    } else if device.isExposureModeSupported(.autoExpose) {
-                        device.exposureMode = .autoExpose
-                    }
-                }
-                // 主體區域變化監聽：場景變化時自動調整
-                device.isSubjectAreaChangeMonitoringEnabled = true
-
-                device.unlockForConfiguration()
-            } catch {
-                print("Focus configuration failed: \(error)")
-            }
         }
     }
     
@@ -455,28 +424,24 @@ final class CameraController: NSObject, ObservableObject {
             self.permissionGranted = granted
         }
     }
-//
-//    可以把 setupCaptureSession 想成「搭舞台」：
-//        •    AVCaptureSession → 整個舞台。
-//        •    AVCaptureDeviceInput → 麥克風（相機裝置），讓舞台有輸入。
-//        •    AVCaptureVideoDataOutput → 音響喇叭（輸出），讓東西能傳出去。
-//        •    canAddInput / canAddOutput → 檢查舞台是否能裝下這些設備。
-//        •    delegate → 音控人員，持續監聽並把聲音（這裡是影像）丟給外部。
-//
-//    這樣一來，會比較容易理解為什麼每一步都必須設置。
+
+    //    可以把 setupCaptureSession 想成「搭舞台」：
+    //        •    AVCaptureSession → 整個舞台。
+    //        •    AVCaptureDeviceInput → 麥克風（相機裝置），讓舞台有輸入。
+    //        •    AVCaptureVideoDataOutput → 音響喇叭（輸出），讓東西能傳出去。
+    //        •    canAddInput / canAddOutput → 檢查舞台是否能裝下這些設備。
+    //        •    delegate → 音控人員，持續監聽並把聲音（這裡是影像）丟給外部。
     // 設定相機 session 的輸入與輸出，並處理權限、裝置選擇、輸入、輸出等流程
     func setupCaptureSession(position: AVCaptureDevice.Position) {
         guard let captureSession else { return }
 
-        // 建立影像輸出物件
-        let videoOutput = AVCaptureVideoDataOutput()
+        // ✅ 將多個 session 設定合併成一次提交，避免中途狀態不一致（切鏡頭/重建時更穩）
+        captureSession.beginConfiguration()
+        defer { captureSession.commitConfiguration() }
 
-        // 指定像素格式，確保輸出為 32BGRA；也可讓後續 CI/CG 轉換更穩定
-        videoOutput.videoSettings = [
-            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
-        ]
-        // 丟棄延遲的影格，避免佇列堆積
-        videoOutput.alwaysDiscardsLateVideoFrames = true
+        // ✅ 保險：避免重複疊加 input/output（就算你目前每次都 new session，這樣也更安全）
+        captureSession.inputs.forEach { captureSession.removeInput($0) }
+        captureSession.outputs.forEach { captureSession.removeOutput($0) }
 
         // 若無權限則直接返回
         guard permissionGranted else {
@@ -484,56 +449,169 @@ final class CameraController: NSObject, ObservableObject {
             return
         }
 
-        // 搜尋指定位置（前/後鏡頭）可用的相機裝置
-        let videoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(
-            deviceTypes: [.builtInDualCamera, .builtInWideAngleCamera],
-            mediaType: .video,
-            position: position)
+        // ✅ PreviewLayer 品質優先：先用 `.high`（穩定、接近 Camera.app preview pipeline）
+        // `.photo` 在某些機型的 preview pipeline 不一定更好；`4K` 也可能導致效能/曝光策略改變。
+        if captureSession.canSetSessionPreset(.high) {
+            captureSession.sessionPreset = .high
+            self.videoPreset = .high
+        } else if captureSession.canSetSessionPreset(.photo) {
+            captureSession.sessionPreset = .photo
+            self.videoPreset = .photo
+        }
 
-        // 取得第一個可用裝置
-        guard
-            let videoDevice = videoDeviceDiscoverySession.devices.first
-        else {
+        print("[Camera] sessionPreset=\(captureSession.sessionPreset.rawValue)")
+
+        // 建立影像輸出物件
+        let videoOutput = AVCaptureVideoDataOutput()
+        // ⚠️ 注意：VideoDataOutput 只影響你的推論/處理，不影響使用者看到的 PreviewLayer。
+        // 使用 NV12 FullRange（420f）通常效能最好；CIImage/Vision 也可直接吃。
+        videoOutput.videoSettings = [
+            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
+        ]
+        videoOutput.alwaysDiscardsLateVideoFrames = true
+
+        // 搜尋指定位置（前/後鏡頭）可用的相機裝置（亮度/畫質優先）
+        let videoDeviceDiscoverySession = AVCaptureDevice.DiscoverySession(
+            deviceTypes: [
+                // ✅ Virtual devices first: these can automatically switch Wide/Tele/UltraWide for better zoom quality
+                .builtInTripleCamera,
+                .builtInDualWideCamera,
+                .builtInDualCamera,
+
+                // Fallbacks
+                .builtInWideAngleCamera,
+                .builtInTelephotoCamera,
+                .builtInUltraWideCamera
+            ],
+            mediaType: .video,
+            position: position
+        )
+
+        let devices = videoDeviceDiscoverySession.devices
+        let preferred: AVCaptureDevice? = {
+            // Front camera: usually only wide
+            if position != .back {
+                return devices.first
+            }
+
+            // Back camera:
+            // 1) Default (quality + zoom): pick a VIRTUAL device first so iOS can switch lenses when you zoom.
+            // 2) Macro mode: if user explicitly wants macro, prefer UltraWide (close focus), else virtual.
+//            if preferMacro {
+//                return devices.first { $0.deviceType == .builtInUltraWideCamera }
+//                    ?? devices.first { $0.deviceType == .builtInTripleCamera }
+//                    ?? devices.first { $0.deviceType == .builtInDualWideCamera }
+//                    ?? devices.first { $0.deviceType == .builtInDualCamera }
+//                    ?? devices.first { $0.deviceType == .builtInWideAngleCamera }
+//            } else {
+                return devices.first { $0.deviceType == .builtInTripleCamera }
+                    ?? devices.first { $0.deviceType == .builtInDualWideCamera }
+                    ?? devices.first { $0.deviceType == .builtInDualCamera }
+                    ?? devices.first { $0.deviceType == .builtInWideAngleCamera }
+//            }
+        }()
+
+        guard let videoDevice = preferred else {
             print("Unable to find video device")
             return
         }
-        
+
         self.captureDevice = videoDevice
-        
+
+        // ✅ Auto Focus / Auto Exposure
+        do {
+            try videoDevice.lockForConfiguration()
+            defer { videoDevice.unlockForConfiguration() }
+
+            if #available(iOS 13.0, *) {
+                videoDevice.automaticallyAdjustsVideoHDREnabled = true
+            }
+
+            if videoDevice.isLowLightBoostSupported {
+                videoDevice.automaticallyEnablesLowLightBoostWhenAvailable = true
+            }
+
+            if videoDevice.isFocusModeSupported(.continuousAutoFocus) {
+                videoDevice.focusMode = .continuousAutoFocus
+            } else if videoDevice.isFocusModeSupported(.autoFocus) {
+                videoDevice.focusMode = .autoFocus
+            }
+
+            if videoDevice.isAutoFocusRangeRestrictionSupported {
+                videoDevice.autoFocusRangeRestriction = .near
+            }
+
+            if videoDevice.isSmoothAutoFocusSupported {
+                videoDevice.isSmoothAutoFocusEnabled = true
+            }
+
+            if videoDevice.isExposureModeSupported(.continuousAutoExposure) {
+                videoDevice.exposureMode = .continuousAutoExposure
+            }
+
+            videoDevice.isSubjectAreaChangeMonitoringEnabled = true
+
+            let center = CGPoint(x: 0.5, y: 0.5)
+            if videoDevice.isFocusPointOfInterestSupported {
+                videoDevice.focusPointOfInterest = center
+            }
+            
+            if videoDevice.isExposurePointOfInterestSupported {
+                videoDevice.exposurePointOfInterest = center
+            }
+
+            if videoDevice.isWhiteBalanceModeSupported(.continuousAutoWhiteBalance) {
+                videoDevice.whiteBalanceMode = .continuousAutoWhiteBalance
+            }
+
+        } catch {
+            print("Failed to lock device for configuration: \(error)")
+        }
+
         // 建立裝置輸入
         guard let videoDeviceInput = try? AVCaptureDeviceInput(device: videoDevice) else {
             print("Unable to create AVCaptureDeviceInput")
             return
         }
-        // 檢查是否可加入輸入
+
         guard captureSession.canAddInput(videoDeviceInput) else {
             print("Unable to add input")
             return
         }
-        // 將輸入加入 session
         captureSession.addInput(videoDeviceInput)
 
-        // 設定影像輸出的 delegate 與處理隊列
+        // ✅ 設定影像輸出的 delegate 與處理隊列
         videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "sampleBufferQueue"))
+
+        guard captureSession.canAddOutput(videoOutput) else {
+            print("Unable to add video output")
+            return
+        }
         captureSession.addOutput(videoOutput)
-        
-        // 設定畫質（解析度）
-        if captureSession.canSetSessionPreset(self.videoPreset) {
-            captureSession.sessionPreset = self.videoPreset
-        } else {
-            // 裝置不支援所選畫質時，退回到較低解析度以確保穩定
-            captureSession.sessionPreset = .vga640x480
+
+        if let conn = videoOutput.connection(with: .video) {
+            // ✅ 影像防手震（支援才開）
+            if conn.isVideoStabilizationSupported {
+                // ⚠️ AVCaptureConnection 沒有 supportedVideoStabilizationModes。
+                // Apple 建議用「device.activeFormat 是否支援該 mode」來判斷。
+                // 參考：AVCaptureDeviceFormat.isVideoStabilizationModeSupported(_:)。
+                if videoDevice.activeFormat.isVideoStabilizationModeSupported(.standard) {
+                    conn.preferredVideoStabilizationMode = .standard
+                } else {
+                    conn.preferredVideoStabilizationMode = .auto
+                }
+            }
+            // HDR 不在 AVCaptureConnection 上設定；已在 device.lockForConfiguration() 內處理。
         }
 
         // 新增拍照輸出（不影響既有串流流程）
         let photoOutput = AVCapturePhotoOutput()
-        // iOS 16+：不再使用 isHighResolutionCaptureEnabled。高解析度由每次拍照的
-        // AVCapturePhotoSettings.maxPhotoDimensions 控制（見 capturePhoto(...)）。
         if captureSession.canAddOutput(photoOutput) {
             captureSession.addOutput(photoOutput)
             self.photoOutput = photoOutput
+        } else {
+            print("Unable to add photo output")
         }
-
     }
     
     // 僅在尚未啟動時才會真正啟動相機
