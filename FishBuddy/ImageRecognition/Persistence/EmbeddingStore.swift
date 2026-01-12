@@ -17,7 +17,7 @@ actor EmbeddingStore {
     /// In-memory 向量索引快取（只建一次，除非資料有變動）
     private var indexCache: InMemoryVectorIndex?
     /// 相似度最低接受門檻（cosine），依你的資料集可微調，預設 0.5
-    var acceptThreshold: Float = 0.6
+    var acceptThreshold: Float = 0.5
     /// 與次高分的最小差距（動態門檻），預設 0.1；可設為 0 表示不啟用
     var minGapDelta: Float = 0.1
     /// 當前索引的維度；避免用錯模型維度
@@ -131,6 +131,13 @@ actor EmbeddingStore {
                 bestScoreByTaxon[tid] = s
             }
         }
+
+        // 1.5) 先用 acceptThreshold 過濾掉太低的分數，避免後續多餘的 DB 查詢
+        // idx.search 的分數通常是 cosine similarity（0~1），acceptThreshold 也以同尺度設定。
+        if acceptThreshold > 0 {
+            bestScoreByTaxon = bestScoreByTaxon.filter { $0.value >= acceptThreshold }
+        }
+        guard !bestScoreByTaxon.isEmpty else { return [] }
 
         // 2) 依分數排序，得到 taxonIds（這就是你要回傳的排序）
         let sortedTaxonIds = bestScoreByTaxon

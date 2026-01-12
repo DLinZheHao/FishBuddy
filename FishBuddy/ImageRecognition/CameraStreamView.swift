@@ -163,20 +163,25 @@ struct CameraStreamView: View {
                                     .buttonStyle(.plain)
                                 }
                                 
-                                ForEach(Array(results.prefix(3)), id: \.taxon.taxonId) { (item, score) in
-                                    NavigationLink {
-                                        TaxonDetailView(taxon: item)
-                                            .navigationBarTitleDisplayMode(.inline)
-                                    } label: {
-                                        SearchResultRow(
-                                            imageURL: URL(string: item.photos.first?.url ?? ""),
-                                            title: item.commonNameZh ?? "",
-                                            idText: "ID: \(item.taxonId)",
-                                            scoreText: String(format: "相似度: %.2f", score)
-                                        )
+                                ScrollView {
+                                    LazyVStack(alignment: .leading, spacing: 8) {
+                                        ForEach(results, id: \.taxon.taxonId) { (item, score) in
+                                            NavigationLink {
+                                                TaxonDetailView(taxon: item)
+                                                    .navigationBarTitleDisplayMode(.inline)
+                                            } label: {
+                                                SearchResultRow(
+                                                    imageURL: URL(string: item.photos.first?.url ?? ""),
+                                                    title: item.commonNameZh ?? "",
+                                                    idText: "ID: \(item.taxonId)",
+                                                    scoreText: String(format: "相似度: %.2f", score)
+                                                )
+                                            }
+                                            .buttonStyle(.plain) // 保留自訂列外觀
+                                        }
                                     }
-                                    .buttonStyle(.plain) // 保留自訂列外觀
                                 }
+                                .frame(maxHeight: 260)
                             }
                             .padding(12)
                             .frame(maxWidth: .infinity, alignment: .leading)

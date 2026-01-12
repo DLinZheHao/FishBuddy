@@ -51,7 +51,7 @@ class CameraStreamVM: ObservableObject {
     }
     
     /// 搜尋結果：目前自己計算，並產出結果
-    func search(query: [Float], topK: Int = 3) async {
+    func search(query: [Float], topK: Int = 20) async {
         Task { @MainActor in
             let results = await EmbeddingStore.shared.search(query: query, topK: topK)
             self.imageSearchResult = results

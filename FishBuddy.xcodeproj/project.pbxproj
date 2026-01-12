@@ -33,6 +33,10 @@
 		054C846E2CDB06AA005595EF /* WeatherAllModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054C846D2CDB06AA005595EF /* WeatherAllModel.swift */; };
 		054D35602EB9F9830051C5C4 /* AnimalTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054D355F2EB9F9720051C5C4 /* AnimalTracker.swift */; };
 		05513A432DAE44540021573F /* WeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05513A422DAE44540021573F /* WeatherView.swift */; };
+		05515DE52F0F9BAC009AAD00 /* Playground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05515DE42F0F9BAC009AAD00 /* Playground.swift */; };
+		05515DE72F13774B009AAD00 /* SpeciesDigestGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05515DE62F137736009AAD00 /* SpeciesDigestGenerator.swift */; };
+		05515DE92F13792C009AAD00 /* SpeciesDigest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05515DE82F137923009AAD00 /* SpeciesDigest.swift */; };
+		05515DEB2F1393F6009AAD00 /* SpeciesDigestTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05515DEA2F1393F4009AAD00 /* SpeciesDigestTestView.swift */; };
 		055446FB2E8241D000BF51AC /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 055446FA2E8241D000BF51AC /* Kingfisher */; };
 		05589EE52CE6ECD8003881AA /* Display.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05589EE42CE6ECD8003881AA /* Display.swift */; };
 		05589EE72CE6ED93003881AA /* WeatherLobbyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05589EE62CE6ED93003881AA /* WeatherLobbyViewController.swift */; };
@@ -135,6 +139,10 @@
 		054C846D2CDB06AA005595EF /* WeatherAllModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAllModel.swift; sourceTree = "<group>"; };
 		054D355F2EB9F9720051C5C4 /* AnimalTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimalTracker.swift; sourceTree = "<group>"; };
 		05513A422DAE44540021573F /* WeatherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView.swift; sourceTree = "<group>"; };
+		05515DE42F0F9BAC009AAD00 /* Playground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Playground.swift; sourceTree = "<group>"; };
+		05515DE62F137736009AAD00 /* SpeciesDigestGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeciesDigestGenerator.swift; sourceTree = "<group>"; };
+		05515DE82F137923009AAD00 /* SpeciesDigest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeciesDigest.swift; sourceTree = "<group>"; };
+		05515DEA2F1393F4009AAD00 /* SpeciesDigestTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeciesDigestTestView.swift; sourceTree = "<group>"; };
 		05589EE42CE6ECD8003881AA /* Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Display.swift; sourceTree = "<group>"; };
 		05589EE62CE6ED93003881AA /* WeatherLobbyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherLobbyViewController.swift; sourceTree = "<group>"; };
 		05589EE82CE6EDBF003881AA /* WeatherLobbyVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherLobbyVM.swift; sourceTree = "<group>"; };
@@ -413,6 +421,14 @@
 			path = SwiftUI;
 			sourceTree = "<group>";
 		};
+		05515DE12F0F9B87009AAD00 /* Playgrounds */ = {
+			isa = PBXGroup;
+			children = (
+				05515DE42F0F9BAC009AAD00 /* Playground.swift */,
+			);
+			path = Playgrounds;
+			sourceTree = "<group>";
+		};
 		05589EE32CE6ECA4003881AA /* Metohd */ = {
 			isa = PBXGroup;
 			children = (
@@ -601,6 +617,7 @@
 		05C94D8C2E6ABF7C0051B078 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				05515DE82F137923009AAD00 /* SpeciesDigest.swift */,
 				05C94D8B2E6ABF7C0051B078 /* EmbeddingImgModel.swift */,
 			);
 			path = Model;
@@ -609,6 +626,7 @@
 		05C94D8E2E6ABF7C0051B078 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				05515DE62F137736009AAD00 /* SpeciesDigestGenerator.swift */,
 				05C94D8D2E6ABF7C0051B078 /* CameraStreamVM.swift */,
 			);
 			path = ViewModel;
@@ -617,6 +635,7 @@
 		05C94D912E6ABF7C0051B078 /* ImageRecognition */ = {
 			isa = PBXGroup;
 			children = (
+				05515DEA2F1393F4009AAD00 /* SpeciesDigestTestView.swift */,
 				05F025052EC9B42B009D3531 /* View */,
 				05C94DA62E6AC9760051B078 /* Persistence */,
 				05C94D8A2E6ABF7C0051B078 /* ImageUtils */,
@@ -641,6 +660,7 @@
 		05D266AF2DDABBE400F140D3 /* PraticeDraft */ = {
 			isa = PBXGroup;
 			children = (
+				05515DE12F0F9B87009AAD00 /* Playgrounds */,
 				0571B4262E86172C005CBFF8 /* Map */,
 				051B88392E73B3AF00209CDB /* LoddingCircle */,
 				05623FCE2E12296C00B33D2D /* SearchBar */,
@@ -912,11 +932,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				05ED74E02ECDB608002E56A7 /* CaptureToolbar.swift in Sources */,
+				05515DE92F13792C009AAD00 /* SpeciesDigest.swift in Sources */,
 				054D35602EB9F9830051C5C4 /* AnimalTracker.swift in Sources */,
 				05C94DA82E6ACA4C0051B078 /* FishDBManager.swift in Sources */,
 				054C846E2CDB06AA005595EF /* WeatherAllModel.swift in Sources */,
 				05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */,
 				05823E0D2EB0683D00BDC553 /* ObservationDotsRenderer..swift in Sources */,
+				05515DE72F13774B009AAD00 /* SpeciesDigestGenerator.swift in Sources */,
 				05FAEF342E00F53D00E9BD08 /* CardSliderSubViews.swift in Sources */,
 				05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */,
 				05FAEF162DF2782400E9BD08 /* RestaurantModel.swift in Sources */,
@@ -940,6 +962,7 @@
 				051B88302E6E8A7400209CDB /* SkeletonView.swift in Sources */,
 				052E49032EF7D56E00DACA85 /* EmbeddingStore.swift in Sources */,
 				05FAEF1C2DF2C22A00E9BD08 /* TripModel.swift in Sources */,
+				05515DEB2F1393F6009AAD00 /* SpeciesDigestTestView.swift in Sources */,
 				05823E052EB0666A00BDC553 /* MKMapRectExtension.swift in Sources */,
 				054C846C2CDB0548005595EF /* CodableExtension.swift in Sources */,
 				05ED74DE2ECD92AF002E56A7 /* ToastView.swift in Sources */,
@@ -973,6 +996,7 @@
 				05C94D9A2E6ABF7C0051B078 /* EmbeddingImgModel.swift in Sources */,
 				05E672E42CDB0CB3006CF3BF /* DebugLogger.swift in Sources */,
 				054C84582CD9BD76005595EF /* APIService.swift in Sources */,
+				05515DE52F0F9BAC009AAD00 /* Playground.swift in Sources */,
 				05FAEF1E2DF2C24F00E9BD08 /* GestureAnimationView.swift in Sources */,
 				059556712E150AF10050147C /* TideLobbyVM.swift in Sources */,
 				05513A432DAE44540021573F /* WeatherView.swift in Sources */,

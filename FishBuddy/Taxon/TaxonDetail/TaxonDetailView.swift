@@ -13,6 +13,7 @@ struct TaxonDetailView: View {
     @State private var isFavorited: Bool = false
     @State private var showShareSheet: Bool = false
     @State private var selectedTab: SpeciesTab = .overview
+    @State private var showSpeciesDigestDebug: Bool = false
     
     let taxon: TaxonItem
 
@@ -69,8 +70,25 @@ struct TaxonDetailView: View {
                     CircleIconButton(systemName: "square.and.arrow.up") {
                         showShareSheet = true
                     }
+                    
+                    if #available(iOS 26.0, *) {
+                        CircleIconButton(systemName: "square.and.arrow.down") {
+                            showSpeciesDigestDebug = true
+                        }
+                    }
                 }
                 .padding(.horizontal, 16)
+#if DEBUG
+                .sheet(isPresented: $showSpeciesDigestDebug) {
+                    if #available(iOS 26.0, *) {
+                        SpeciesDigestDebugView(
+                            generator: SpeciesDigestGenerator(taxon: taxon)
+                        )
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.visible)
+                    }
+                }
+#endif
 //                .padding(.top, safeAreaTopInset()) // 讓按鈕不會卡到瀏海
             }
             .toolbar(.hidden, for: .navigationBar) // Replace the system navigation bar with a custom overlay
