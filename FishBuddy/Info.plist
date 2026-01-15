@@ -2,6 +2,19 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.fishbuddy.deeplink</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fishbuddy</string>
+			</array>
+		</dict>
+	</array>
 	<key>Privacy – Photo Library Additions Usage Description</key>
 	<string>需要將拍攝結果儲存到您的相簿以供確認</string>
 	<key>UIAccessibilityTextSizesEnabled</key>
@@ -23,8 +36,6 @@
 					<string>Default Configuration</string>
 					<key>UISceneDelegateClassName</key>
 					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
-					<key>UISceneStoryboardFile</key>
-					<string>Main</string>
 				</dict>
 			</array>
 		</dict>

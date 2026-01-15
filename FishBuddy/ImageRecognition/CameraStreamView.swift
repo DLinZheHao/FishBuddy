@@ -13,7 +13,7 @@ struct CameraStreamView: View {
     /// 相機鏡頭物件
     @StateObject private var camera = CameraController()
     /// ViewModel
-    @ObservedObject private var vm = CameraStreamVM()
+    @StateObject private var vm = CameraStreamVM()
     /// 最後一次拍攝照片
     @State private var lastPhoto: UIImage?
     /// 測試切割後的照片結果
@@ -236,7 +236,9 @@ struct CameraStreamView: View {
                         await MainActor.run {
                             camera.backgroundRemoverVK = remover
                             camera.clipExtractor = extractor
-                            vm.didLoadExtractor = true
+                            DispatchQueue.main.async {
+                                vm.didLoadExtractor = true
+                            }
                         }
                     }
                 }

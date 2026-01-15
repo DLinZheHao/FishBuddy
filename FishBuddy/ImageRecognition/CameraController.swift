@@ -270,7 +270,8 @@ final class CameraController: NSObject, ObservableObject {
         dbg("[ROI] updateCropOverlay stored previewNorm=\(roi) layerBounds=\(layer.bounds)")
         dbg("[ROI] updateCropOverlay overlayRect(points)=\(overlayRect)")
 
-        DispatchQueue.main.async { [weak self] in
+        Task { @MainActor [weak self] in
+            await Task.yield()          // 明確讓出這一輪 view update
             self?.cropBoxInView = overlayRect
         }
     }

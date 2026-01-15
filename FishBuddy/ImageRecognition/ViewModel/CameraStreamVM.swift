@@ -38,11 +38,11 @@ class CameraStreamVM: ObservableObject {
     @Published var isInAdjustFrameMode: Bool = false
     
     
-    /// 讀取資料庫：目前是直接讀取 json 資料作為資料庫
+    /// 讀取資料庫
     func loadDatabaseIfNeeded() {
         Task(priority: .utility) {
             do {
-                // 依你的模型維度設定（例如 512 或 768）。這裡先用 512，你可視實際模型調整。
+                // 依你的模型維度設定（例如 512 或 768）這裡先用 512
                 try await EmbeddingStore.shared.buildIndexIfNeeded(dim: 512)
             } catch {
                 print("❌ 建立/取得 InMemoryVectorIndex 失敗:", error)
