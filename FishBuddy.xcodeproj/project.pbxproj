@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -111,6 +111,16 @@
 		05FC90ED2E9894210053A1C2 /* TaxonDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FC90EC2E9894210053A1C2 /* TaxonDetailView.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		05B4994B2F1A1C6A00897C01 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 054C84372CD9B994005595EF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 054C843E2CD9B994005595EF;
+			remoteInfo = FishBuddy;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		051B882C2E6E8A7400209CDB /* SkeletonListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonListView.swift; sourceTree = "<group>"; };
 		051B882D2E6E8A7400209CDB /* SkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonView.swift; sourceTree = "<group>"; };
@@ -170,6 +180,7 @@
 		058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRemoverVK.swift; sourceTree = "<group>"; };
 		0595566E2E14D5B90050147C /* TideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideView.swift; sourceTree = "<group>"; };
 		059556702E150AF10050147C /* TideLobbyVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideLobbyVM.swift; sourceTree = "<group>"; };
+		05B499472F1A1C6A00897C01 /* FishBuddyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FishBuddyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		05C13B732E9896E400BE9FA0 /* TaxonDetailModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaxonDetailModel.swift; sourceTree = "<group>"; };
 		05C13B852E98E25F00BE9FA0 /* ImageInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageInspectorView.swift; sourceTree = "<group>"; };
 		05C13B882E98E2FA00BE9FA0 /* ImageInspectorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageInspectorModel.swift; sourceTree = "<group>"; };
@@ -211,6 +222,10 @@
 		05FC90EC2E9894210053A1C2 /* TaxonDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaxonDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		05B499482F1A1C6A00897C01 /* FishBuddyTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FishBuddyTests; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		054C843C2CD9B994005595EF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -223,6 +238,13 @@
 				05C94D842E6ABE460051B078 /* RxMoya in Frameworks */,
 				05C94DA32E6AC4070051B078 /* Toast in Frameworks */,
 				05C94D822E6ABE460051B078 /* ReactiveMoya in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		05B499442F1A1C6A00897C01 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -290,6 +312,7 @@
 			isa = PBXGroup;
 			children = (
 				054C84412CD9B994005595EF /* FishBuddy */,
+				05B499482F1A1C6A00897C01 /* FishBuddyTests */,
 				05C94D7C2E6ABE3E0051B078 /* Frameworks */,
 				054C84402CD9B994005595EF /* Products */,
 			);
@@ -299,6 +322,7 @@
 			isa = PBXGroup;
 			children = (
 				054C843F2CD9B994005595EF /* FishBuddy.app */,
+				05B499472F1A1C6A00897C01 /* FishBuddyTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -872,6 +896,29 @@
 			productReference = 054C843F2CD9B994005595EF /* FishBuddy.app */;
 			productType = "com.apple.product-type.application";
 		};
+		05B499462F1A1C6A00897C01 /* FishBuddyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 05B4994F2F1A1C6A00897C01 /* Build configuration list for PBXNativeTarget "FishBuddyTests" */;
+			buildPhases = (
+				05B499432F1A1C6A00897C01 /* Sources */,
+				05B499442F1A1C6A00897C01 /* Frameworks */,
+				05B499452F1A1C6A00897C01 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				05B4994C2F1A1C6A00897C01 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				05B499482F1A1C6A00897C01 /* FishBuddyTests */,
+			);
+			name = FishBuddyTests;
+			packageProductDependencies = (
+			);
+			productName = FishBuddyTests;
+			productReference = 05B499472F1A1C6A00897C01 /* FishBuddyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -879,11 +926,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1540;
+				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					054C843E2CD9B994005595EF = {
 						CreatedOnToolsVersion = 15.4;
+					};
+					05B499462F1A1C6A00897C01 = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = 054C843E2CD9B994005595EF;
 					};
 				};
 			};
@@ -907,6 +958,7 @@
 			projectRoot = "";
 			targets = (
 				054C843E2CD9B994005595EF /* FishBuddy */,
+				05B499462F1A1C6A00897C01 /* FishBuddyTests */,
 			);
 		};
 /* End PBXProject section */
@@ -923,6 +975,13 @@
 				05589EF62CE6F5C5003881AA /* Weather.storyboard in Resources */,
 				05E245EC2D0A7EB800C6C048 /* TagLineView.xib in Resources */,
 				054C844F2CD9B995005595EF /* Base in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		05B499452F1A1C6A00897C01 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1024,7 +1083,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		05B499432F1A1C6A00897C01 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		05B4994C2F1A1C6A00897C01 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 054C843E2CD9B994005595EF /* FishBuddy */;
+			targetProxy = 05B4994B2F1A1C6A00897C01 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		054C844D2CD9B995005595EF /* LaunchScreen.storyboard */ = {
@@ -1223,6 +1297,50 @@
 			};
 			name = Release;
 		};
+		05B4994D2F1A1C6A00897C01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z64LB69QMK;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.LinZheHao.FishBuddyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FishBuddy.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FishBuddy";
+			};
+			name = Debug;
+		};
+		05B4994E2F1A1C6A00897C01 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z64LB69QMK;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.LinZheHao.FishBuddyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FishBuddy.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FishBuddy";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1240,6 +1358,15 @@
 			buildConfigurations = (
 				054C84542CD9B995005595EF /* Debug */,
 				054C84552CD9B995005595EF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		05B4994F2F1A1C6A00897C01 /* Build configuration list for PBXNativeTarget "FishBuddyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				05B4994D2F1A1C6A00897C01 /* Debug */,
+				05B4994E2F1A1C6A00897C01 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
