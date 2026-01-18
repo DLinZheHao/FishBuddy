@@ -15,7 +15,7 @@ final class DeepLinkRouterTests: XCTestCase {
         let route = DeepLinkRouter.parse(url)
 
         // ↓ 這裡的 .taxon(id:) 依你的 Route 定義調整
-        XCTAssertEqual(route, .taxon(id: 999))
+        XCTAssertEqual(route, .taxon(id: 121261))
     }
 
     func test_parse_invalid_scheme_returnsNil() {
