@@ -60,6 +60,8 @@ jobs:
       - name: Test
         run: |
           set -euo pipefail
+          mkdir -p artifacts
+
           xcodebuild \
             -project "FishBuddy.xcodeproj" \
             -scheme "FishBuddy" \
@@ -68,6 +70,14 @@ jobs:
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             CODE_SIGNING_ALLOWED=NO \
             test \
+            | tee artifacts/xcodebuild-test.log
+
+      - name: Upload CI artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-artifacts
+          path: artifacts
 
       - name: Publish status context (ruleset compatible)
         if: always()
