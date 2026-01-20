@@ -16,10 +16,13 @@ actor EmbeddingStore {
     var fishDB: FishDB?
     /// In-memory 向量索引快取（只建一次，除非資料有變動）
     private var indexCache: InMemoryVectorIndex?
-    /// 相似度最低接受門檻（cosine），依你的資料集可微調，預設 0.5
-    var acceptThreshold: Float = 0.5
-    /// 與次高分的最小差距（動態門檻），預設 0.1；可設為 0 表示不啟用
-    var minGapDelta: Float = 0.1
+    /// 相似度最低接受門檻（0~100），依你的資料集可微調
+    /// - `idx.search(...)` 內部已將分數轉成 0~100（給使用者看的尺度）
+    /// - 設為 0 表示不啟用門檻
+    var acceptThreshold: Float = 50
+
+    /// 與次高分的最小差距（0~100 尺度），預設 10；可設為 0 表示不啟用
+    var minGapDelta: Float = 10
     /// 當前索引的維度；避免用錯模型維度
     private var indexDim: Int = 0
     
@@ -112,6 +115,44 @@ actor EmbeddingStore {
         indexDim = dim
     }
     
+    // MARK: - Decision logic (pure, unit-test friendly)
+    struct ScoredTaxon: Equatable {
+        let taxonId: Int
+        let score: Float // 0~100
+    }
+
+    /// 依照「同 taxon 取最高分」→「門檻過濾」→「分數排序」決定候選清單
+    /// - Returns: 排序後的 (taxonId, score)
+    static func decideTaxonRanking(
+        from results: [ScoredTaxon],
+        acceptThreshold: Float
+    ) -> [(taxonId: Int, score: Float)] {
+        guard !results.isEmpty else { return [] }
+
+        // 1) 同一個 taxonId 可能多筆：只保留該 taxonId 的最高分
+        var bestScoreByTaxon: [Int: Float] = [:]
+        for r in results {
+            let tid = r.taxonId
+            let s = r.score
+            if let cur = bestScoreByTaxon[tid] {
+                if s > cur { bestScoreByTaxon[tid] = s }
+            } else {
+                bestScoreByTaxon[tid] = s
+            }
+        }
+
+        // 2) acceptThreshold 過濾（0 表示不啟用）
+        if acceptThreshold > 0 {
+            bestScoreByTaxon = bestScoreByTaxon.filter { $0.value >= acceptThreshold }
+        }
+        guard !bestScoreByTaxon.isEmpty else { return [] }
+
+        // 3) 依分數排序（高到低）
+        return bestScoreByTaxon
+            .sorted { $0.value > $1.value }
+            .map { (taxonId: $0.key, score: $0.value) }
+    }
+
     /// Search top-K embeddings.
     /// - Returns: `(taxonId, photoIdx, score)` where score is mapped to 0~100.
     func search(query: [Float], topK: Int) async -> [(TaxonItem, Float)] {
@@ -121,28 +162,14 @@ actor EmbeddingStore {
 
         // 1) 同一個 taxonId 可能多筆（不同 photoIdx）
         //    我們只保留該 taxonId 的「最高分」
-        var bestScoreByTaxon: [Int: Float] = [:]
-        for r in results {
-            let tid = r.key.taxonId
-            let s = r.score
-            if let cur = bestScoreByTaxon[tid] {
-                if s > cur { bestScoreByTaxon[tid] = s }
-            } else {
-                bestScoreByTaxon[tid] = s
-            }
-        }
-
         // 1.5) 先用 acceptThreshold 過濾掉太低的分數，避免後續多餘的 DB 查詢
-        // idx.search 的分數通常是 cosine similarity（0~1），acceptThreshold 也以同尺度設定。
-        if acceptThreshold > 0 {
-            bestScoreByTaxon = bestScoreByTaxon.filter { $0.value >= acceptThreshold }
-        }
-        guard !bestScoreByTaxon.isEmpty else { return [] }
+        // idx.search 的分數已被轉成 0~100（acceptThreshold 也以同尺度設定）。
+        let scored = results.map { ScoredTaxon(taxonId: $0.key.taxonId, score: $0.score) }
+        let ranked = Self.decideTaxonRanking(from: scored, acceptThreshold: acceptThreshold)
+        guard !ranked.isEmpty else { return [] }
 
-        // 2) 依分數排序，得到 taxonIds（這就是你要回傳的排序）
-        let sortedTaxonIds = bestScoreByTaxon
-            .sorted { $0.value > $1.value }
-            .map { $0.key }
+        let sortedTaxonIds = ranked.map { $0.taxonId }
+        let bestScoreByTaxon: [Int: Float] = Dictionary(uniqueKeysWithValues: ranked.map { ($0.taxonId, $0.score) })
 
         // 3) 一次去 DB 撈出 TaxonItem（你已經寫好了）
         var items: [TaxonItem] = []

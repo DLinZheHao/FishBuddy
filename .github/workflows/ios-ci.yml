@@ -25,6 +25,11 @@ jobs:
       - name: Show Xcode version
         run: xcodebuild -version
 
+      - name: Prepare artifacts dir
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+
       - name: Cache SwiftPM
         uses: actions/cache@v4
         with:
@@ -42,6 +47,7 @@ jobs:
           xcodebuild -resolvePackageDependencies \
             -project "FishBuddy.xcodeproj" \
             -scheme "FishBuddy" \
+            | tee artifacts/xcodebuild-resolve.log \
             | xcpretty || true
 
       - name: Build (no signing)
@@ -55,12 +61,12 @@ jobs:
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             CODE_SIGNING_ALLOWED=NO \
             build \
+            | tee artifacts/xcodebuild-build.log \
             | xcpretty
 
       - name: Test
         run: |
           set -euo pipefail
-          mkdir -p artifacts
 
           xcodebuild \
             -project "FishBuddy.xcodeproj" \
@@ -78,6 +84,7 @@ jobs:
         with:
           name: ci-artifacts
           path: artifacts
+          if-no-files-found: warn
 
       - name: Publish status context (ruleset compatible)
         if: always()
