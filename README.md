@@ -78,6 +78,21 @@ Camera
 
 ⸻
 
+## Documentation
+
+Full technical documentation is available on DeepWiki:
+
+👉 https://deepwiki.com/DLinZheHao/FishBuddy
+
+Includes:
+- Architecture overview
+- Embedding pipeline
+- Camera system design
+- AI integration details
+- CI/CD workflow
+
+⸻
+
 ## Getting Started
 
 ### Requirements
