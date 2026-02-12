@@ -11,16 +11,16 @@ This project demonstrates advanced iOS engineering practices including camera pi
 Demo
 
 ### Camera recognition preview
-![Camera Preview](Assets/Demo/camera_preview.PNG)
+<img src="Assets/Demo/camera_preview.PNG" width="420"/>
 
 ### Recognition result screen
-![Recognition Result](Assets/Demo/result.PNG)
+<img src="Assets/Demo/result.PNG" width="420"/>
 
 ### Detail page
-![AI Summary](Assets/Demo/detail_page.PNG)
+<img src="Assets/Demo/detail_page.PNG" width="420"/>
 
 ### AI summary generation
-![AI Summary GIF](Assets/Demo/ai_summary.gif)
+<img src="Assets/Demo/ai_summary.gif" width="420"/>
 
 ### ⚠️ Note
 
@@ -30,39 +30,40 @@ However, species recognition itself is fully offline — no network access is re
 
 ⸻
 
-Features
-    •    🔍 Fully offline fish recognition using embedding vector search
-    •    📷 Optimized camera pipeline (HDR, device selection, ROI cropping)
-    •    🧠 Apple Foundation Model integration for species digest generation
-    •    🗂 Structured SQLite-based taxonomy database
-    •    ⚡ Top-K similarity ranking with configurable acceptance threshold
-    •    🔁 GitHub Actions CI/CD integration
+## Features
+
+- 🔍 Fully offline fish recognition using embedding vector search
+- 📷 Optimized camera pipeline (HDR, device selection, ROI cropping)
+- 🧠 Apple Foundation Model integration for species digest generation
+- 🗂 Structured SQLite-based taxonomy database
+- ⚡ Top-K similarity ranking with configurable acceptance threshold
+- 🔁 GitHub Actions CI/CD integration
 
 ⸻
 
-Technical Highlights
+## Technical Highlights
 
-Embedding Search Engine
-    •    Custom vector similarity search
-    •    Top-K ranking
-    •    Threshold-based decision logic
-    •    Optimized for mobile performance
+### Embedding Search Engine
+- Custom vector similarity search
+- Top-K ranking
+- Threshold-based decision logic
+- Optimized for mobile performance
 
-Camera Optimization
-    •    Dynamic camera device selection (Wide / Tele / Virtual)
-    •    Stable session preset tuning
-    •    HDR auto configuration
-    •    ROI coordinate transformation pipeline
+### Camera Optimization
+- Dynamic camera device selection (Wide / Tele / Virtual)
+- Stable session preset tuning
+- HDR auto configuration
+- ROI coordinate transformation pipeline
 
-AI Integration
-    •    Structured prompt engineering
-    •    Generable Guide design
-    •    Model pre-warming strategy for performance stability
+### AI Integration
+- Structured prompt engineering
+- Generable Guide design
+- Model pre-warming strategy for performance stability
 
-Data Pipeline
-    •    Automated embedding generation workflow
-    •    Taxonomy ingestion pipeline
-    •    Dataset normalization and indexing
+### Data Pipeline
+- Automated embedding generation workflow
+- Taxonomy ingestion pipeline
+- Dataset normalization and indexing
 
 ⸻
 
@@ -77,26 +78,26 @@ Camera
 
 ⸻
 
-Getting Started
+## Getting Started
 
-Requirements
-    •    Xcode 15+
-    •    iOS 17+
-    •    Swift 5.9+
+### Requirements
+- Xcode 15+
+- iOS 17+
+- Swift 5.9+
 
-Installation
-    1.    Clone the repository
-    2.    Open FishBuddy.xcodeproj
-    3.    Build and run on iOS 17 device or simulator
+### Installation
+1. Clone the repository
+2. Open FishBuddy.xcodeproj
+3. Build and run on iOS 17 device or simulator
 
 ⸻
 
-Roadmap
-    •    Improve recognition accuracy with larger embedding dataset
-    •    Add distribution map visualization
-    •    Add batch recognition mode
-    •    Optimize embedding indexing performance
-    •    Expand AI summarization capabilities
+## Roadmap
+- Improve recognition accuracy with larger embedding dataset
+- Add distribution map visualization
+- Add batch recognition mode
+- Optimize embedding indexing performance
+- Expand AI summarization capabilities
 
 ⸻
 
