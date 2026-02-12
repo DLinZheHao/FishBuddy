@@ -8,13 +8,20 @@
 import SQLite
 import Foundation
 import Accelerate
+import os
 
 final class FishDB {
     /// SQLite.swift connection
     private let db: Connection
 
-    ///
+    /// Communal JSONDecoder shared by all model decodings
     var decoder = JSONDecoder()
+    
+    
+    private let poiLog = OSLog(
+        subsystem: Bundle.main.bundleIdentifier ?? "FishBuddy",
+        category: "PointsOfInterest"
+    )
     
     /// If this is a brand-new DB (no required tables), run DDL to create schema.
     private func bootstrapIfEmpty() throws {
@@ -254,7 +261,11 @@ extension FishDB {
 
     func loadTaxonItems(taxonIds: [Int]) throws -> [TaxonItem] {
         guard !taxonIds.isEmpty else { return [] }
-
+        // part1 assess
+        let totalID = OSSignpostID(log: poiLog)
+        os_signpost(.begin, log: poiLog, name: "FishDB.loadTaxonItems.total", signpostID: totalID)
+        defer { os_signpost(.end, log: poiLog, name: "FishDB.loadTaxonItems.total", signpostID: totalID) }
+        
         // ---- species ----
         let sT = Table("species")
         let s_taxon = SQLite.Expression<Int>("taxon_id")
@@ -278,9 +289,15 @@ extension FishDB {
 
         var out: [Int: TaxonItem] = [:]
 
+        let speciesQueryID = OSSignpostID(log: poiLog)
+        os_signpost(.begin, log: poiLog, name: "FishDB.loadTaxonItems.species.query", signpostID: speciesQueryID)
+
         for r in try db.prepare(sT.filter(taxonIds.contains(s_taxon))) {
             let tid = r[s_taxon]
 
+            let decodeID = OSSignpostID(log: poiLog)
+            os_signpost(.begin, log: poiLog, name: "FishDB.loadTaxonItems.species.decode", signpostID: decodeID)
+            
             // JSON decode（有值才 decode；格式壞就 throw，方便你抓資料問題）
             let taxonomy = try JSONHelper.decode(r[s_taxonomy], as: Taxonomy.self, decoder: decoder)
             let basicInfo = try JSONHelper.decode(r[s_basic], as: BasicInfo.self, decoder: decoder)
@@ -322,10 +339,14 @@ extension FishDB {
             )
 
             out[tid] = item
+            os_signpost(.end, log: poiLog, name: "FishDB.loadTaxonItems.species.decode", signpostID: decodeID)
         }
+        os_signpost(.end, log: poiLog, name: "FishDB.loadTaxonItems.species.query", signpostID: speciesQueryID)
 
         if out.isEmpty { return [] }
 
+        let fanoutID = OSSignpostID(log: poiLog)
+        os_signpost(.begin, log: poiLog, name: "FishDB.loadTaxonItems.fanout.mediaLayers", signpostID: fanoutID)
         // ---- photos ----
         let pT = Table("photos")
         let p_taxon = SQLite.Expression<Int>("taxon_id")
@@ -396,6 +417,7 @@ extension FishDB {
             out[tid] = t
         }
 
+        os_signpost(.end, log: poiLog, name: "FishDB.loadTaxonItems.fanout.mediaLayers", signpostID: fanoutID)
         return taxonIds.compactMap { out[$0] }
     }
 }
