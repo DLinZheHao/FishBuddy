@@ -11,16 +11,16 @@ This project demonstrates advanced iOS engineering practices including camera pi
 Demo
 
 ### Camera recognition preview
-![Camera Preview](Assets/demo/camera_preview.PNG)
+![Camera Preview](Assets/Demo/camera_preview.PNG)
 
 ### Recognition result screen
-![Recognition Result](Assets/demo/result.PNG)
+![Recognition Result](Assets/Demo/result.PNG)
 
 ### Detail page
-![AI Summary](Assets/demo/detail_page.PNG)
+![AI Summary](Assets/Demo/detail_page.PNG)
 
 ### AI summary generation
-![AI Summary GIF](Assets/demo/ai_summary.gif)
+![AI Summary GIF](Assets/Demo/ai_summary.gif)
 
 ### ⚠️ Note
 
