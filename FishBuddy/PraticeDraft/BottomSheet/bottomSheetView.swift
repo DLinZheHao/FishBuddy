@@ -7,42 +7,42 @@
 
 import SwiftUI
 
-struct bottomSheetView: View {
-    
-    @State private var showSheet = false
-    
-    @State private var selectedRestaurant: Restaurant?
-    
-    var body: some View {
-        if #available(iOS 16.0, *) {
-            NavigationStack {
-                List {
-                    ForEach(restaurants) { restaurant in
-                        BasicImageRow(restaurant: restaurant)
-                            .onTapGesture {
-                                selectedRestaurant = restaurant
-                            }
-                    }
-                }
-                .listStyle(.plain)
-                
-                .navigationTitle("Restaurants")
-            }
-            .sheet(item: $selectedRestaurant) { restaurant in
-                RestaurantDetailView(restaurant: restaurant)
-                    .ignoresSafeArea()
-                    .presentationDetents([.medium, .large])
-                    .presentationDragIndicator(.hidden)
-            }
-        } else {
-            // Fallback on earlier versions
-        }
-    }
-}
-
-#Preview {
-    bottomSheetView()
-}
+//struct bottomSheetView: View {
+//    
+//    @State private var showSheet = false
+//    
+//    @State private var selectedRestaurant: Restaurant?
+//    
+//    var body: some View {
+//        if #available(iOS 16.0, *) {
+//            NavigationStack {
+//                List {
+//                    ForEach(restaurants) { restaurant in
+//                        BasicImageRow(restaurant: restaurant)
+//                            .onTapGesture {
+//                                selectedRestaurant = restaurant
+//                            }
+//                    }
+//                }
+//                .listStyle(.plain)
+//                
+//                .navigationTitle("Restaurants")
+//            }
+//            .sheet(item: $selectedRestaurant) { restaurant in
+//                RestaurantDetailView(restaurant: restaurant)
+//                    .ignoresSafeArea()
+//                    .presentationDetents([.medium, .large])
+//                    .presentationDragIndicator(.hidden)
+//            }
+//        } else {
+//            // Fallback on earlier versions
+//        }
+//    }
+//}
+//
+//#Preview {
+//    bottomSheetView()
+//}
 
 // NavigationLink(destination: RestaurantDetailView(restaurant: restaurant)
 //                           .ignoresSafeArea()

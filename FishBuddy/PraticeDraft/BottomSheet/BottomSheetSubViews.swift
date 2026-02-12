@@ -131,6 +131,6 @@ struct RestaurantDetailView: View {
 
 
 
-#Preview {
-    RestaurantDetailView(restaurant: restaurants[0])
-}
+//#Preview {
+//    RestaurantDetailView(restaurant: restaurants[0])
+//}

@@ -7,6 +7,7 @@
 
 import SQLite
 import Foundation
+import os
 
 /// 快捷的取得 Embedding 資料：使用 json
 actor EmbeddingStore {
@@ -20,11 +21,16 @@ actor EmbeddingStore {
     /// - `idx.search(...)` 內部已將分數轉成 0~100（給使用者看的尺度）
     /// - 設為 0 表示不啟用門檻
     var acceptThreshold: Float = 50
-
     /// 與次高分的最小差距（0~100 尺度），預設 10；可設為 0 表示不啟用
     var minGapDelta: Float = 10
     /// 當前索引的維度；避免用錯模型維度
     private var indexDim: Int = 0
+    
+    /// logger for performance
+    private let perfLog = OSLog(
+        subsystem: Bundle.main.bundleIdentifier ?? "FishBuddy",
+        category: "PointsOfInterest"
+    )
     
     init() {
         // init 內避免做重 IO / 可能失敗的工作（copy/open DB），讓生命週期更可控
@@ -156,29 +162,48 @@ actor EmbeddingStore {
     /// Search top-K embeddings.
     /// - Returns: `(taxonId, photoIdx, score)` where score is mapped to 0~100.
     func search(query: [Float], topK: Int) async -> [(TaxonItem, Float)] {
-        guard let idx = indexCache, let fishDB else { return [] }
-        let results: [(key: InMemoryVectorIndex.EmbeddingKey, score: Float)] = idx.search(query: query, topK: topK)
-        guard !results.isEmpty else { return [] }
+        let sid = OSSignpostID(log: perfLog)
+        // Total search pipeline
+        os_signpost(.begin, log: perfLog, name: "EmbeddingSearch.total", signpostID: sid)
 
-        // 1) 同一個 taxonId 可能多筆（不同 photoIdx）
-        //    我們只保留該 taxonId 的「最高分」
-        // 1.5) 先用 acceptThreshold 過濾掉太低的分數，避免後續多餘的 DB 查詢
-        // idx.search 的分數已被轉成 0~100（acceptThreshold 也以同尺度設定）。
+        guard let idx = indexCache, let fishDB else {
+            os_signpost(.end, log: perfLog, name: "EmbeddingSearch.total", signpostID: sid)
+            return []
+        }
+        // 1) idx.search
+        os_signpost(.begin, log: perfLog, name: "EmbeddingSearch.idx.search", signpostID: sid)
+        let results: [(key: InMemoryVectorIndex.EmbeddingKey, score: Float)] = idx.search(query: query, topK: topK)
+        os_signpost(.end, log: perfLog, name: "EmbeddingSearch.idx.search", signpostID: sid)
+        guard !results.isEmpty else {
+            os_signpost(.end, log: perfLog, name: "EmbeddingSearch.total", signpostID: sid)
+            return []
+        }
+
+        // 2) decision
+        os_signpost(.begin, log: perfLog, name: "EmbeddingSearch.decideRanking", signpostID: sid)
         let scored = results.map { ScoredTaxon(taxonId: $0.key.taxonId, score: $0.score) }
         let ranked = Self.decideTaxonRanking(from: scored, acceptThreshold: acceptThreshold)
-        guard !ranked.isEmpty else { return [] }
+        os_signpost(.end, log: perfLog, name: "EmbeddingSearch.decideRanking", signpostID: sid)
+        guard !ranked.isEmpty else {
+            os_signpost(.end, log: perfLog, name: "EmbeddingSearch.total", signpostID: sid)
+            return []
+        }
 
         let sortedTaxonIds = ranked.map { $0.taxonId }
         let bestScoreByTaxon: [Int: Float] = Dictionary(uniqueKeysWithValues: ranked.map { ($0.taxonId, $0.score) })
 
-        // 3) 一次去 DB 撈出 TaxonItem（你已經寫好了）
+        // 3) DB load
+        os_signpost(.begin, log: perfLog, name: "EmbeddingSearch.db.loadTaxa", signpostID: sid)
         var items: [TaxonItem] = []
         do {
             items = try fishDB.loadTaxonItems(taxonIds: sortedTaxonIds)
         } catch {
+            os_signpost(.end, log: perfLog, name: "EmbeddingSearch.db.loadTaxa", signpostID: sid)
+            os_signpost(.end, log: perfLog, name: "EmbeddingSearch.total", signpostID: sid)
             fatalError("DB 載入失敗 \(error)")
         }
-        
+        os_signpost(.end, log: perfLog, name: "EmbeddingSearch.db.loadTaxa", signpostID: sid)
+
         // 4) 建 dictionary 方便配對
         let itemById: [Int: TaxonItem] = Dictionary(uniqueKeysWithValues: items.map { ($0.taxonId, $0) })
 
@@ -188,6 +213,7 @@ actor EmbeddingStore {
             return (item: item, score: score)
         }
 
+        os_signpost(.end, log: perfLog, name: "EmbeddingSearch.total", signpostID: sid)
         return final
     }
 }
