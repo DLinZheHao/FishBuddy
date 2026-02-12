@@ -1,4 +1,4 @@
-FishBuddy
+## FishBuddy
 
 An AI-powered fish recognition app built with SwiftUI and Apple Vision framework.
 
@@ -8,7 +8,7 @@ This project demonstrates advanced iOS engineering practices including camera pi
 
 ⸻
 
-Demo
+## Demo
 
 ### Camera recognition preview
 <img src="Assets/Demo/camera_preview.PNG" width="420"/>
