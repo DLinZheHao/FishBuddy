@@ -7,12 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0512FBB42F41C60D00873F6A /* BioCLIPEmbeddingExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0512FBB32F41C60D00873F6A /* BioCLIPEmbeddingExtractor.swift */; };
+		0512FBB92F41C63200873F6A /* BioCLIP_iNat_Embed.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 0512FBB82F41C63200873F6A /* BioCLIP_iNat_Embed.mlpackage */; };
+		0512FD172F4309BA00873F6A /* catalog_Bio.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 0512FD162F4309BA00873F6A /* catalog_Bio.sqlite */; };
 		051B882F2E6E8A7400209CDB /* SkeletonListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B882C2E6E8A7400209CDB /* SkeletonListView.swift */; };
 		051B88302E6E8A7400209CDB /* SkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B882D2E6E8A7400209CDB /* SkeletonView.swift */; };
 		051B88322E6E8A9600209CDB /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B88312E6E8A9600209CDB /* ViewExtension.swift */; };
 		051B88382E6E8AE600209CDB /* CustomRounded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B88362E6E8AE600209CDB /* CustomRounded.swift */; };
 		051B883D2E73B66900209CDB /* LoadingCircleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 051B883C2E73B66900209CDB /* LoadingCircleView.swift */; };
-		052E49012EF7CDBF00DACA85 /* catalog.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 052E49002EF7CDBF00DACA85 /* catalog.sqlite */; };
 		052E49032EF7D56E00DACA85 /* EmbeddingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052E49022EF7D56B00DACA85 /* EmbeddingStore.swift */; };
 		0533D8F72F14EA4E0028A395 /* AppRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0533D8F62F14EA490028A395 /* AppRoute.swift */; };
 		0533D8F92F14EEDC0028A395 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0533D8F82F14EED10028A395 /* AppCoordinator.swift */; };
@@ -122,12 +124,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0512FBB32F41C60D00873F6A /* BioCLIPEmbeddingExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BioCLIPEmbeddingExtractor.swift; sourceTree = "<group>"; };
+		0512FBB82F41C63200873F6A /* BioCLIP_iNat_Embed.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = BioCLIP_iNat_Embed.mlpackage; sourceTree = "<group>"; };
+		0512FD162F4309BA00873F6A /* catalog_Bio.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog_Bio.sqlite; sourceTree = "<group>"; };
 		051B882C2E6E8A7400209CDB /* SkeletonListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonListView.swift; sourceTree = "<group>"; };
 		051B882D2E6E8A7400209CDB /* SkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonView.swift; sourceTree = "<group>"; };
 		051B88312E6E8A9600209CDB /* ViewExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
 		051B88362E6E8AE600209CDB /* CustomRounded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomRounded.swift; sourceTree = "<group>"; };
 		051B883C2E73B66900209CDB /* LoadingCircleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingCircleView.swift; sourceTree = "<group>"; };
-		052E49002EF7CDBF00DACA85 /* catalog.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = catalog.sqlite; sourceTree = "<group>"; };
 		052E49022EF7D56B00DACA85 /* EmbeddingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddingStore.swift; sourceTree = "<group>"; };
 		0533D8F62F14EA490028A395 /* AppRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRoute.swift; sourceTree = "<group>"; };
 		0533D8F82F14EED10028A395 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
@@ -330,8 +334,9 @@
 		054C84412CD9B994005595EF /* FishBuddy */ = {
 			isa = PBXGroup;
 			children = (
+				0512FBB82F41C63200873F6A /* BioCLIP_iNat_Embed.mlpackage */,
 				05C94D922E6ABF7C0051B078 /* mobileclip_s1_image.mlpackage */,
-				052E49002EF7CDBF00DACA85 /* catalog.sqlite */,
+				0512FD162F4309BA00873F6A /* catalog_Bio.sqlite */,
 				05C94D912E6ABF7C0051B078 /* ImageRecognition */,
 				05D266AF2DDABBE400F140D3 /* PraticeDraft */,
 				05589EF72CE6F7DE003881AA /* Componet */,
@@ -632,6 +637,7 @@
 		05C94D8A2E6ABF7C0051B078 /* ImageUtils */ = {
 			isa = PBXGroup;
 			children = (
+				0512FBB32F41C60D00873F6A /* BioCLIPEmbeddingExtractor.swift */,
 				054D355F2EB9F9720051C5C4 /* AnimalTracker.swift */,
 				058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */,
 				05C94D872E6ABF7C0051B078 /* CLIPFeatureExtractor.swift */,
@@ -969,7 +975,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				054C844C2CD9B995005595EF /* Assets.xcassets in Resources */,
-				052E49012EF7CDBF00DACA85 /* catalog.sqlite in Resources */,
+				0512FD172F4309BA00873F6A /* catalog_Bio.sqlite in Resources */,
 				0546FBB62DCB30F1001695D8 /* custom-icons.ttf in Resources */,
 				05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */,
 				05589EF62CE6F5C5003881AA /* Weather.storyboard in Resources */,
@@ -1001,6 +1007,7 @@
 				05823E0D2EB0683D00BDC553 /* ObservationDotsRenderer..swift in Sources */,
 				05515DE72F13774B009AAD00 /* SpeciesDigestGenerator.swift in Sources */,
 				05FAEF342E00F53D00E9BD08 /* CardSliderSubViews.swift in Sources */,
+				0512FBB42F41C60D00873F6A /* BioCLIPEmbeddingExtractor.swift in Sources */,
 				05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */,
 				05FAEF162DF2782400E9BD08 /* RestaurantModel.swift in Sources */,
 				05589EF42CE6F2D2003881AA /* UIViewControllerExtension.swift in Sources */,
@@ -1021,6 +1028,7 @@
 				051B88382E6E8AE600209CDB /* CustomRounded.swift in Sources */,
 				051B882F2E6E8A7400209CDB /* SkeletonListView.swift in Sources */,
 				051B88302E6E8A7400209CDB /* SkeletonView.swift in Sources */,
+				0512FBB92F41C63200873F6A /* BioCLIP_iNat_Embed.mlpackage in Sources */,
 				052E49032EF7D56E00DACA85 /* EmbeddingStore.swift in Sources */,
 				05FAEF1C2DF2C22A00E9BD08 /* TripModel.swift in Sources */,
 				05515DEB2F1393F6009AAD00 /* SpeciesDigestTestView.swift in Sources */,

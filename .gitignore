@@ -20,3 +20,11 @@ build/
 
 # SwiftPM cache
 .swiftpm/
+
+# SQL Database
+*.sqlite
+
+# CoreML large packages
+*.mlpackage
+**/*.mlpackage/
+**/weights/weight.bin

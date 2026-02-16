@@ -225,7 +225,8 @@ struct CameraStreamView: View {
                 if !vm.didLoadExtractor {
                     Task.detached(priority: .userInitiated) {
                         let remover = await BackgroundRemoverVK()
-                        let extractor = CLIPFeatureExtractor()
+                        // temperaliy change extractor to Bio
+                        let extractor = try! BioCLIPFeatureExtractor()
                         // 預熱：讓第一次推論不卡
                         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 224, height: 224))
                         let warmup = renderer.image { _ in
