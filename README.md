@@ -107,6 +107,12 @@ Includes:
 
 ⸻
 
+## Download Database
+
+Download latest `catalog.sqlite` from the Releases page:
+
+👉 https://github.com/DLinZheHao/FishBuddy/releases
+
 ## Roadmap
 - Improve recognition accuracy with larger embedding dataset
 - Add distribution map visualization

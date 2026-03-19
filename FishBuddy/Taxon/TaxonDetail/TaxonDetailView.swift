@@ -64,7 +64,19 @@ struct TaxonDetailView: View {
                     Spacer()
                     
                     CircleIconButton(systemName: isFavorited ? "heart.fill" : "heart") {
-                        isFavorited.toggle()
+                        Task {
+                            isFavorited.toggle()
+                            do {
+                                if isFavorited {
+                                    try await UserStore.shared.addFavorite(taxonID: taxon.taxonId)
+                                } else {
+                                    try await UserStore.shared.removeFavorite(taxonID: taxon.taxonId)
+                                }
+                            } catch {
+                                // Revert UI state on failure
+                                isFavorited.toggle()
+                            }
+                        }
                     }
                     
                     CircleIconButton(systemName: "square.and.arrow.up") {
@@ -94,6 +106,15 @@ struct TaxonDetailView: View {
             .toolbar(.hidden, for: .navigationBar) // Replace the system navigation bar with a custom overlay
             .sheet(isPresented: $showShareSheet) {
                 ShareSheet(activityItems: ["FishBuddy - Species Detail"])
+            }
+            .onAppear {
+                Task {
+                    do {
+                        isFavorited = try await UserStore.shared.isFavorite(taxonID: taxon.taxonId)
+                    } catch {
+                        isFavorited = false
+                    }
+                }
             }
         }
         .background(Color.appBackground)
@@ -395,3 +416,4 @@ extension TaxonItem {
     }
 }
 #endif
+

@@ -43,9 +43,9 @@ actor EmbeddingStore {
             let dest = try Self.defaultDBURL()
             try Self.ensureDatabaseCopiedIfNeeded(to: dest)
             self.fishDB = try FishDB(path: dest.path)
-            print("✅ DB 路徑在:", dest.path)
+            print("✅ DB 路徑在: \(dest.path)")
         } catch {
-            print("❌ 資料庫初始化失敗:", error)
+            print("❌ 資料庫初始化失敗: \(error)")
         }
     }
 
@@ -60,7 +60,7 @@ actor EmbeddingStore {
         if !fm.fileExists(atPath: dir.path) {
             try fm.createDirectory(at: dir, withIntermediateDirectories: true)
         }
-        return dir.appendingPathComponent("catalog.sqlite")
+        return dir.appendingPathComponent("catalog_Bio.sqlite")
     }
 
     /// 第一次啟動：若 Application Support 裡沒有 DB，嘗試從 bundle 複製預載檔
@@ -70,13 +70,13 @@ actor EmbeddingStore {
         let fm = FileManager.default
         guard !fm.fileExists(atPath: dest.path) else { return }
 
-        guard let src = Bundle.main.url(forResource: "catalog", withExtension: "sqlite") else {
-            print("⚠️ bundle 內找不到 catalog.sqlite，將在首次啟動時以 DDL 建立空 schema。")
+        guard let src = Bundle.main.url(forResource: "catalog_Bio", withExtension: "sqlite") else {
+            print("⚠️ bundle 內找不到 catalog_Bio.sqlite，將在首次啟動時以 DDL 建立空 schema。")
             return
         }
 
         // 原子寫入：先 copy 到 temp，再 replace
-        let tmp = dest.deletingLastPathComponent().appendingPathComponent("catalog.tmp.sqlite")
+        let tmp = dest.deletingLastPathComponent().appendingPathComponent("catalog_Bio.tmp.sqlite")
         if fm.fileExists(atPath: tmp.path) {
             try? fm.removeItem(at: tmp)
         }

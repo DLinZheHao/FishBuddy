@@ -69,7 +69,8 @@ final class CameraController: NSObject, ObservableObject {
     /// 背景去除用物件
     var backgroundRemoverVK: BackgroundRemoverVK?
     // 由外部注入或稍後設定的 CLIP 特徵擷取器
-    var clipExtractor: CLIPFeatureExtractor?
+    // temperaliy change extractor to Bio
+    var clipExtractor: BioCLIPFeatureExtractor?
     // 重用 CIContext（優先用 Metal）避免每幀建立花費：截取照片用的渲染器
     private var ciContext: CIContext = {
         if let device = MTLCreateSystemDefaultDevice() {
@@ -823,7 +824,7 @@ extension CameraController: AVCaptureVideoDataOutputSampleBufferDelegate {
                 let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
                 if let cgImage = self.ciContext.createCGImage(ciImage, from: ciImage.extent) {
                     let uiImage = UIImage(cgImage: cgImage)
-                    if let embedding = clip.multiCropAverageEmbedding(for: uiImage, cropScale: 0.85) {
+                    if let embedding = clip.embedding(for: uiImage) {
                         self.embeddingContinuation?.yield(embedding)
                     }
                 }
@@ -910,7 +911,7 @@ extension CameraController: AVCapturePhotoCaptureDelegate {
         case .autoTracking(.losting):
             return
         }
-        if let embedding = clip.multiCropAverageEmbedding(for: finalImage, cropScale: 0.85) {
+        if let embedding = clip.embedding(for: finalImage) {
             Task { @MainActor in
                 self.onPhotoReady?((embedding, finalImage))
 //                saveToPhotoLibrary(finalImage, completion: {_ in })

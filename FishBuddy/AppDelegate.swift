@@ -14,6 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         Task {
             await EmbeddingStore.shared.prepare()
+            await UserStore.shared.prepare()
             
             if #available(iOS 26.0, *) {
                 let model = SystemLanguageModel.default

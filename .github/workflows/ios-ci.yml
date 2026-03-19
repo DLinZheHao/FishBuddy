@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Select Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -49,6 +51,51 @@ jobs:
             -scheme "FishBuddy" \
             | tee artifacts/xcodebuild-resolve.log \
             | xcpretty || true
+
+      - name: Download CoreML model from GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          echo "Downloading CoreML model..."
+          gh release download v0.1.0 -p 'BioCLIP_iNat_Embed.mlpackage.zip'
+
+          echo "Unzipping..."
+          unzip -o BioCLIP_iNat_Embed.mlpackage.zip
+
+          echo "Move to expected path..."
+          mkdir -p FishBuddy
+          mv BioCLIP_iNat_Embed.mlpackage FishBuddy/
+
+          echo "Done"
+
+      - name: Download catalog database from GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          echo "Downloading catalog database..."
+          gh release download v0.1.0 -p 'catalog_Bio.sqlite'
+
+          echo "Move to expected path..."
+          mkdir -p FishBuddy
+          mv catalog_Bio.sqlite FishBuddy/
+
+          echo "Done"
+
+      - name: Inspect CoreML package
+        run: |
+          set -euo pipefail
+          echo "=== git lfs status ==="
+          git lfs ls-files || true
+
+          echo "=== model package exists? ==="
+          ls -la FishBuddy/BioCLIP_iNat_Embed.mlpackage || true
+
+          echo "=== package tree ==="
+          find FishBuddy/BioCLIP_iNat_Embed.mlpackage -maxdepth 3 -print || true
 
       - name: Build (no signing)
         run: |
@@ -90,6 +137,7 @@ jobs:
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STATUS_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
 
@@ -103,7 +151,7 @@ jobs:
 
           gh api \
             -X POST \
-            repos/${{ github.repository }}/statuses/${{ github.sha }} \
+            repos/${{ github.repository }}/statuses/${STATUS_SHA} \
             -f state="$STATE" \
             -f context="ci/ios" \
             -f description="$DESC" \
