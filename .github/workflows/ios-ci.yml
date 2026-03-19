@@ -52,6 +52,18 @@ jobs:
             | tee artifacts/xcodebuild-resolve.log \
             | xcpretty || true
 
+      - name: Inspect CoreML package
+        run: |
+          set -euo pipefail
+          echo "=== git lfs status ==="
+          git lfs ls-files || true
+
+          echo "=== model package exists? ==="
+          ls -la FishBuddy/BioCLIP_iNat_Embed.mlpackage || true
+
+          echo "=== package tree ==="
+          find FishBuddy/BioCLIP_iNat_Embed.mlpackage -maxdepth 3 -print || true
+
       - name: Build (no signing)
         run: |
           set -euo pipefail
