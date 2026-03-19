@@ -43,9 +43,9 @@ actor EmbeddingStore {
             let dest = try Self.defaultDBURL()
             try Self.ensureDatabaseCopiedIfNeeded(to: dest)
             self.fishDB = try FishDB(path: dest.path)
-            print("✅ DB 路徑在:", dest.path)
+            print("✅ DB 路徑在: \(dest.path)")
         } catch {
-            print("❌ 資料庫初始化失敗:", error)
+            print("❌ 資料庫初始化失敗: \(error)")
         }
     }
 
