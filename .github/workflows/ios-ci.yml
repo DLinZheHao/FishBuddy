@@ -52,6 +52,24 @@ jobs:
             | tee artifacts/xcodebuild-resolve.log \
             | xcpretty || true
 
+      - name: Download CoreML model from GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          echo "Downloading CoreML model..."
+          gh release download v0.1.0 -p 'BioCLIP_iNat_Embed.mlpackage.zip'
+
+          echo "Unzipping..."
+          unzip -o BioCLIP_iNat_Embed.mlpackage.zip
+
+          echo "Move to expected path..."
+          mkdir -p FishBuddy
+          mv BioCLIP_iNat_Embed.mlpackage FishBuddy/
+
+          echo "Done"
+
       - name: Inspect CoreML package
         run: |
           set -euo pipefail
