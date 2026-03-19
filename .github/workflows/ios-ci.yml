@@ -137,6 +137,7 @@ jobs:
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STATUS_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
 
@@ -150,7 +151,7 @@ jobs:
 
           gh api \
             -X POST \
-            repos/${{ github.repository }}/statuses/${{ github.sha }} \
+            repos/${{ github.repository }}/statuses/${STATUS_SHA} \
             -f state="$STATE" \
             -f context="ci/ios" \
             -f description="$DESC" \
