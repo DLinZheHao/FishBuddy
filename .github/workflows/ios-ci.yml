@@ -70,6 +70,21 @@ jobs:
 
           echo "Done"
 
+      - name: Download catalog database from GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          echo "Downloading catalog database..."
+          gh release download v0.1.0 -p 'catalog_Bio.sqlite'
+
+          echo "Move to expected path..."
+          mkdir -p FishBuddy
+          mv catalog_Bio.sqlite FishBuddy/
+
+          echo "Done"
+
       - name: Inspect CoreML package
         run: |
           set -euo pipefail
