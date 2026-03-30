@@ -14,8 +14,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         Task {
             await EmbeddingStore.shared.prepare()
-            await UserStore.shared.prepare()
-            
+            do {
+                try await UserStore.shared.prepare()
+            }
+            catch {
+                print("資料庫讀取發生錯誤！ \(error)")
+            }
             if #available(iOS 26.0, *) {
                 let model = SystemLanguageModel.default
                 

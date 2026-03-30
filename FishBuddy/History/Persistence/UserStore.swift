@@ -7,9 +7,11 @@
 
 import Foundation
 import SQLite
+import UIKit
 
 actor UserStore {
     static let shared = UserStore()
+    private let notPreparedError = NSError(domain: "UserStore", code: 1)
     
     private var db: Connection?
     private let fileName = "user.sqlite"
@@ -30,21 +32,24 @@ actor UserStore {
     
     private init() {}
     
-    func prepare() {
+    func prepare() throws {
         // 防止重複初始化
         if db != nil { return }
-        do {
-            let url = try userDBURL()
-            db = try Connection(url.path)
-            
-            // 可選：基本 pragma
-            try db?.run("PRAGMA foreign_keys = ON;")
-            
-            try ensureSchema()
-            print("✅ User DB 路徑:", url.path)
-        } catch {
-            fatalError("❌ UserStore prepare failed: \(error)")
-        }
+        
+        let url = try userDBURL()
+        db = try Connection(url.path)
+        
+        // 可選：基本 pragma
+        try db?.run("PRAGMA foreign_keys = ON;")
+        
+        try ensureSchema()
+        print("✅ User DB 路徑:", url.path)
+    }
+    
+    private func preparedDB() throws -> Connection {
+        try prepare()
+        guard let db else { throw notPreparedError }
+        return db
     }
     
     private func userDBURL() throws -> URL {
@@ -62,7 +67,7 @@ actor UserStore {
     }
     
     private func ensureSchema() throws {
-        guard let db else { throw NSError(domain: "UserStore", code: 1) }
+        guard let db else { throw notPreparedError }
         
         // recognition_session (one recognition attempt; may have a saved thumbnail)
         try db.run(sessions.create(ifNotExists: true) { t in
@@ -116,7 +121,7 @@ actor UserStore {
     
     /// 收藏（若已收藏則更新 created_at）
     func addFavorite(taxonID: Int, now: Int64 = Int64(Date().timeIntervalSince1970)) throws {
-        guard let db else { throw NSError(domain: "UserStore", code: 2) }
+        let db = try preparedDB()
         try db.run(favorites.insert(or: .replace,
                                     taxonId <- taxonID,
                                     createdAt <- now))
@@ -124,13 +129,13 @@ actor UserStore {
     
     /// 取消收藏
     func removeFavorite(taxonID: Int) throws {
-        guard let db else { throw NSError(domain: "UserStore", code: 2) }
+        let db = try preparedDB()
         try db.run(favorites.filter(taxonId == taxonID).delete())
     }
     
     /// 是否已收藏
     func isFavorite(taxonID: Int) throws -> Bool {
-        guard let db else { throw NSError(domain: "UserStore", code: 2) }
+        let db = try preparedDB()
         print("檢查是否收藏")
         // scalar(count) 會回傳 Int
         let count = try db.scalar(favorites.filter(taxonId == taxonID).count) // SELECT COUNT(*) FROM favorites WHERE taxonId = ?
@@ -151,7 +156,7 @@ actor UserStore {
     
     /// 取得收藏清單（依 created_at 由新到舊）
     func fetchFavoriteTaxonIDs(limit: Int = 500) throws -> [Int] {
-        guard let db else { throw NSError(domain: "UserStore", code: 2) }
+        let db = try preparedDB()
         var result: [Int] = []
         for row in try db.prepare(favorites.order(createdAt.desc).limit(limit)) {
             result.append(row[taxonId])
@@ -164,10 +169,11 @@ actor UserStore {
     
     /// 建立一次辨識 session；可選擇存一張代表縮圖（長邊 <= 1024）
     /// - Returns: session id
+    @discardableResult
     func createSession(sourceValue: String = "camera",
                        thumbnailJPEGData: Data? = nil,
                        now: Int64 = Int64(Date().timeIntervalSince1970)) throws -> Int64 {
-        guard let db else { throw NSError(domain: "UserStore", code: 3) }
+        let db = try preparedDB()
         
         let savedPath: String?
         if let data = thumbnailJPEGData {
@@ -189,11 +195,147 @@ actor UserStore {
                       entryValue: String = "identify",
                       sessionID: Int64? = nil,
                       now: Int64 = Int64(Date().timeIntervalSince1970)) throws {
-        guard let db else { throw NSError(domain: "UserStore", code: 3) }
+        let db = try preparedDB()
         
         let sql = "INSERT INTO taxon_view_history (created_at, taxon_id, session_id, entry) VALUES (?, ?, ?, ?)"
         let stmt = try db.prepare(sql)
         try stmt.run(now, taxonID, sessionID, entryValue)
+    }
+    
+    /// 由 session id 取得縮圖路徑（若有）
+    func fetchSessionImagePath(sessionID: Int64) throws -> String? {
+        let db = try preparedDB()
+        let sql = "SELECT image_path FROM recognition_session WHERE id = ? LIMIT 1"
+        let stmt = try db.prepare(sql)
+        for row in try stmt.run(sessionID) {
+            return row[0] as? String
+        }
+        return nil
+    }
+
+    /// 由 session id 直接取得 UIImage（若有）
+    /// - Parameter sessionID: recognition_session.id
+    /// - Returns: 對應的 UIImage，若路徑不存在或讀取失敗則回傳 nil
+    func fetchSessionImage(sessionID: Int64) throws -> UIImage? {
+        guard let storedName = try fetchSessionImagePath(sessionID: sessionID) else {
+            print("圖片獲取失敗：找不到相應的路徑")
+            return nil
+        }
+
+        let path = try resolveThumbnailPath(from: storedName)
+        let fm = FileManager.default
+        let exists = fm.fileExists(atPath: path)
+        print("stored image name: \(storedName)")
+        print("resolved path: \(path)")
+        print("file exists: \(exists)")
+
+        guard exists else {
+            print("圖片檔案不存在")
+            return nil
+        }
+
+        do {
+            let data = try Data(contentsOf: URL(fileURLWithPath: path))
+            print("image data size: \(data.count)")
+
+            let image = UIImage(data: data)
+            print("UIImage(data:) success: \(image != nil)")
+            return image
+        } catch {
+            print("讀取圖片 data 失敗: \(error)")
+            return nil
+        }
+    }
+
+    /// 由 taxon id 取得物種照片（若有）
+    /// - Parameter taxonID: species.taxon_id
+    /// - Returns: 對應的 UIImage，若無 photos 資料或下載失敗則回傳 nil
+    func fetchTaxonViewImage(taxonID: Int) async throws -> UIImage? {
+        guard let fishDB = await EmbeddingStore.shared.fishDB else {
+            print("FishDB 尚未初始化")
+            return nil
+        }
+
+        let items = try fishDB.loadTaxonItems(taxonIds: [taxonID])
+        guard let urlString = items.first?.photos.first?.url,
+              let url = URL(string: urlString) else {
+            print("找不到 taxon \(taxonID) 對應的 photos 資料")
+            return nil
+        }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            return UIImage(data: data)
+        } catch {
+            print("下載 taxon \(taxonID) 圖片失敗: \(error)")
+            return nil
+        }
+    }
+    
+    // MARK: - Recognition Sessions Query
+    
+    /// 取得最近的辨識 Session，並包含其對應的候選結果（依 rank 排序）。
+    /// - Parameters:
+    ///   - limit: 最多回傳幾筆 session（依 created_at 由新到舊排序），預設 50。
+    /// - Returns: 包含 session 基本資訊與候選結果的完整資料結構陣列。
+    /// - Note:
+    ///   - 目前採用 N+1 Query（每個 session 各查一次結果），實作簡單且可讀性高。
+    ///   - 若未來資料量增加，可優化為 JOIN + grouping 以減少查詢次數。
+    func fetchRecognitionSessions(limit: Int = 50) throws -> [RecognitionSessionDetail] {
+        print("進入資料庫查詢（前）")
+        let db = try preparedDB()
+        print("進入資料庫查詢（後）")
+        var sessionsResult: [RecognitionSessionDetail] = []
+        
+        // 1️⃣ 先撈 session
+        let sessionSQL = """
+        SELECT id, created_at, image_path, source
+        FROM recognition_session
+        ORDER BY created_at DESC
+        LIMIT ?
+        """
+        
+        let sessionStmt = try db.prepare(sessionSQL)
+        
+        for row in try sessionStmt.run(limit) {
+            let sessionID = row[0] as! Int64
+            let createdAt = row[1] as! Int64
+            let imagePath = row[2] as? String
+            let source = row[3] as! String
+            
+            // 2️⃣ 撈對應 candidates
+            let resultSQL = """
+            SELECT taxon_id, score, rank
+            FROM recognition_result
+            WHERE session_id = ?
+            ORDER BY rank ASC
+            """
+            
+            let resultStmt = try db.prepare(resultSQL)
+            
+            var candidates: [RecognitionCandidate] = []
+            for r in try resultStmt.run(sessionID) {
+                candidates.append(
+                    RecognitionCandidate(
+                        taxonID: Int(r[0] as! Int64),
+                        score: r[1] as! Double,
+                        rank: r[2] as! Int64
+                    )
+                )
+            }
+            
+            sessionsResult.append(
+                RecognitionSessionDetail(
+                    sessionID: sessionID,
+                    createdAt: createdAt,
+                    imagePath: imagePath,
+                    source: source,
+                    results: candidates
+                )
+            )
+        }
+        
+        return sessionsResult
     }
     
     // MARK: - Recognition results logging
@@ -205,11 +347,11 @@ actor UserStore {
     ///   - replaceExisting: 若該 session 先前已有紀錄，是否先清空再寫入（預設 true）
     func logRecognitionResults(
         sessionID: Int64,
-        ranked: [(taxonId: Int, score: Float)],
+        ranked: [(taxon: TaxonItem, score: Float)],
         now: Int64 = Int64(Date().timeIntervalSince1970),
         replaceExisting: Bool = true
     ) throws {
-        guard let db else { throw NSError(domain: "UserStore", code: 3) }
+        let db = try preparedDB()
         
         try db.transaction {
             if replaceExisting {
@@ -222,43 +364,41 @@ actor UserStore {
             let insertSQL = "INSERT INTO recognition_result (session_id, taxon_id, score, rank, created_at) VALUES (?, ?, ?, ?, ?)"
             let stmt = try db.prepare(insertSQL)
             for (idx, item) in ranked.enumerated() {
-                try stmt.run(sessionID, item.taxonId, Double(item.score), idx + 1, now)
+                try stmt.run(sessionID, item.taxon.taxonId, Double(item.score), idx + 1, now)
             }
+            print("RecognitionResults save successfully.")
         }
-    }
-    
-    struct TaxonViewRow: Sendable {
-        let taxonID: Int
-        let createdAt: Int64
-        let sessionID: Int64?
     }
     
     /// 取得最近瀏覽紀錄（新到舊）
-    func fetchRecentViews(limit: Int = 200) throws -> [TaxonViewRow] {
-        guard let db else { throw NSError(domain: "UserStore", code: 3) }
-        var result: [TaxonViewRow] = []
+    func fetchTaxonViewHistory(limit: Int = 200) throws -> [TaxonViewHistoryDetail] {
+        let db = try preparedDB()
+        var result: [TaxonViewHistoryDetail] = []
         
-        // 用 raw SQL 直接撈，避免 optional column 在不同 SQLite.swift 版本的差異
-        let sql = "SELECT taxon_id, created_at, session_id FROM taxon_view_history ORDER BY created_at DESC LIMIT ?"
+        let sql = """
+        SELECT id, taxon_id, created_at, session_id, entry
+        FROM taxon_view_history
+        ORDER BY created_at DESC
+        LIMIT ?
+        """
         let stmt = try db.prepare(sql)
         for row in try stmt.run(limit) {
-            let taxon = row[0] as! Int64
-            let created = row[1] as! Int64
-            let session = row[2] as? Int64
-            result.append(.init(taxonID: Int(taxon), createdAt: created, sessionID: session))
+            let id = row[0] as! Int64
+            let taxon = row[1] as! Int64
+            let created = row[2] as! Int64
+            let session = row[3] as? Int64
+            let entry = row[4] as? String ?? ""
+            result.append(
+                TaxonViewHistoryDetail(
+                    id: id,
+                    createdAt: created,
+                    taxonID: Int(taxon),
+                    sessionID: session,
+                    entry: entry
+                )
+            )
         }
         return result
-    }
-    
-    /// 由 session id 取得縮圖路徑（若有）
-    func fetchSessionImagePath(sessionID: Int64) throws -> String? {
-        guard let db else { throw NSError(domain: "UserStore", code: 3) }
-        let sql = "SELECT image_path FROM recognition_session WHERE id = ? LIMIT 1"
-        let stmt = try db.prepare(sql)
-        for row in try stmt.run(sessionID) {
-            return row[0] as? String
-        }
-        return nil
     }
     
     // MARK: - Maintenance & Cleanup
@@ -268,7 +408,7 @@ actor UserStore {
     /// - 會刪除 recognition_session 的資料列（recognition_result 會因外鍵 CASCADE 一併刪除）。
     /// - 會嘗試刪除該 session 的縮圖檔（若存在）。
     func deleteSession(sessionID: Int64) throws {
-        guard let db else { throw NSError(domain: "UserStore", code: 3) }
+        let db = try preparedDB()
         
         var pathToDelete: String?
         try db.transaction {
@@ -296,7 +436,7 @@ actor UserStore {
     /// - 回傳刪除的 session 數量。
     @discardableResult
     func purgeSessions(olderThan cutoff: Int64) throws -> Int {
-        guard let db else { throw NSError(domain: "UserStore", code: 3) }
+        let db = try preparedDB()
         
         var ids: [Int64] = []
         var paths: [String] = []
@@ -339,7 +479,7 @@ actor UserStore {
     /// - Returns: 刪除的檔案數量
     @discardableResult
     func cleanupOrphanThumbnails() throws -> Int {
-        guard let db else { throw NSError(domain: "UserStore", code: 3) }
+        let db = try preparedDB()
         
         // 讀取目前 DB 中仍被引用的縮圖路徑
         var referenced: Set<String> = []
@@ -367,6 +507,11 @@ actor UserStore {
         return removed
     }
     
+    private func resolveThumbnailPath(from storedName: String) throws -> String {
+        let dir = try thumbnailsDirURL()
+        return dir.appendingPathComponent(storedName).path
+    }
+
     // MARK: - Thumbnail storage
     
     private func thumbnailsDirURL() throws -> URL {
@@ -379,13 +524,13 @@ actor UserStore {
         return dir
     }
     
-    /// Save thumbnail JPEG into Application Support/FishBuddy/images/ with a UUID filename.
+    /// Save thumbnail JPEG into Application Support/FishBuddy/images/ with a UUID filename and return the stored filename.
     /// NOTE: We assume the input data is already JPEG-encoded and already resized to max side <= 1024.
     private func saveThumbnailJPEG(_ jpegData: Data) throws -> String {
         let dir = try thumbnailsDirURL()
         let name = UUID().uuidString + ".jpg"
         let url = dir.appendingPathComponent(name)
         try jpegData.write(to: url, options: [.atomic])
-        return url.path
+        return name
     }
 }

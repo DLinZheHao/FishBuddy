@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct UserHomeView: View {
+    /// viewModel
+    @StateObject private var vm = UserHomeViewModel()
+    
     var body: some View {
             NavigationStack {
                 ScrollView {
@@ -16,24 +19,20 @@ struct UserHomeView: View {
                         UserHomeHeroSection()
                         UserHomeSearchBar()
                         FeatureSection()
-                        FishSectionView(
-                            title: "Test Section" ,
-                            actionTitle: "See All",
-                            items: [
-                            FishCardItem(title: "Clownfish", subtitle: "Amphiprioninae", imageName: "fish1"),
-                            FishCardItem(title: "Blue Tang", subtitle: "Paracanthurus hepatus", imageName: "fish2"),
-                            FishCardItem(title: "Lionfish", subtitle: "Pterois", imageName: "fish3"),
-                            FishCardItem(title: "Goldfish", subtitle: "Carassius auratus", imageName: "fish4")
-                        ])
-                        FishSectionView(
-                            title: "Test Section" ,
-                            actionTitle: "See All",
-                            items: [
-                            FishCardItem(title: "Clownfish", subtitle: "Amphiprioninae", imageName: "fish1"),
-                            FishCardItem(title: "Blue Tang", subtitle: "Paracanthurus hepatus", imageName: "fish2"),
-                            FishCardItem(title: "Lionfish", subtitle: "Pterois", imageName: "fish3"),
-                            FishCardItem(title: "Goldfish", subtitle: "Carassius auratus", imageName: "fish4")
-                        ])
+                        
+                        if !vm.taxonViewHistory.isEmpty {
+                            FishSectionView(
+                                title: "Recently Viewd" ,
+                                actionTitle: "See All",
+                                items: vm.taxonViewHistory.map(UserHomeSectionItem.taxonView))
+                        }
+                        
+                        if !vm.response.isEmpty {
+                            FishSectionView(
+                                title: "Recent recognitions" ,
+                                actionTitle: "See All",
+                                items: vm.response.map(UserHomeSectionItem.recognition))
+                        }
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 16)
@@ -41,11 +40,14 @@ struct UserHomeView: View {
                 }
                 .navigationBarHidden(true)
             }
+            .task {
+                await vm.fetchTaxonViewHistory()
+                await vm.fetchRecognitionSessions()
+            }
         }
+        
 }
 
 #Preview {
     UserHomeView()
 }
-
-

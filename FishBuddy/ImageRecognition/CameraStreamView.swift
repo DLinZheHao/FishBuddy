@@ -142,7 +142,7 @@ struct CameraStreamView: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .bottom)
                         
-                        if let results = vm.imageSearchResult, !results.isEmpty {
+                        if let results = vm.imageSearchResult, !results.0.isEmpty {
                             VStack(alignment: .leading, spacing: 8) {
                                 HStack {
                                     Text("搜尋結果")
@@ -165,9 +165,9 @@ struct CameraStreamView: View {
                                 
                                 ScrollView {
                                     LazyVStack(alignment: .leading, spacing: 8) {
-                                        ForEach(results, id: \.taxon.taxonId) { (item, score) in
+                                        ForEach(results.0, id: \.taxon.taxonId) { (item, score) in
                                             NavigationLink {
-                                                TaxonDetailView(taxon: item)
+                                                TaxonDetailView(taxon: item, sessionID: results.1)
                                                     .navigationBarTitleDisplayMode(.inline)
                                             } label: {
                                                 SearchResultRow(
@@ -249,10 +249,20 @@ struct CameraStreamView: View {
                         self.vm.captureSession = session
                     }
                 }
-                camera.onPhotoReady = { data in
-                    self.lastPhoto = data.1
+                camera.onPhotoReady = { payload in
+                    self.lastPhoto = payload.image
                     Task {
-                        await self.vm.search(query: data.0)
+                        let results = await self.vm.search(query: payload.embedding,
+                                                           sessionID: payload.sessionID)
+                        
+                        do {
+                            try await UserStore.shared.logRecognitionResults(
+                                sessionID: payload.sessionID,
+                                ranked: results
+                            )
+                        } catch {
+                            print("❌ logRecognitionResults failed:", error)
+                        }
                     }
                 }
                 
