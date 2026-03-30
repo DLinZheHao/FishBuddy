@@ -144,7 +144,7 @@ final class CameraController: NSObject, ObservableObject {
     var onSessionReady: ((AVCaptureSession) -> Void)?
     
     /// 當拍完照後的回傳 -> 回傳處理過的 embeeding
-    var onPhotoReady: ((([Float], UIImage)) -> Void)?
+    var onPhotoReady: ((PhotoCapturePayload) -> Void)?
     
     /// 測試拍照完後，背景的切割結果
     var backgroundRemove: ((UIImage) -> Void)?
@@ -835,18 +835,18 @@ extension CameraController: AVCaptureVideoDataOutputSampleBufferDelegate {
 
 extension CameraController: AVCapturePhotoCaptureDelegate {
     func capturePhoto(flashMode: AVCaptureDevice.FlashMode = .auto,
-                             highResolution: Bool = true) {
+                      highResolution: Bool = true) {
         sessionQueue.async { [weak self] in
             guard let self, let photoOutput = self.photoOutput else { return }
-
+            
             let settings = AVCapturePhotoSettings()
-
+            
             // 以裝置支援上限為準，避免「高於 maxPhotoQualityPrioritization」造成崩潰
             let desired = self.photoQualityPrioritization
             let maxSupported = photoOutput.maxPhotoQualityPrioritization
             let clamped = AVCapturePhotoOutput.QualityPrioritization(rawValue: min(desired.rawValue, maxSupported.rawValue)) ?? maxSupported
             settings.photoQualityPrioritization = clamped
-
+            
             // iOS 16+ 不再使用 isHighResolutionPhotoEnabled / isHighResolutionCaptureEnabled。
             // 以 maxPhotoDimensions 控制解析度。
             if highResolution {
@@ -854,12 +854,12 @@ extension CameraController: AVCapturePhotoCaptureDelegate {
                 let maxDimensions = photoOutput.maxPhotoDimensions
                 settings.maxPhotoDimensions = maxDimensions
             }
-
+            
             // 閃光燈（若支援）
             if photoOutput.supportedFlashModes.contains(flashMode) {
                 settings.flashMode = flashMode
             }
-
+            
             photoOutput.capturePhoto(with: settings, delegate: self)
         }
     }
@@ -913,7 +913,17 @@ extension CameraController: AVCapturePhotoCaptureDelegate {
         }
         if let embedding = clip.embedding(for: finalImage) {
             Task { @MainActor in
-                self.onPhotoReady?((embedding, finalImage))
+                guard let jpegData = finalImage.jpegData(compressionQuality: 0.7)
+                else {
+                    return
+                }
+                let sessionID = try await UserStore.shared.createSession(thumbnailJPEGData: jpegData)
+                print("recognition-session save success! \(sessionID)")
+                
+                let photoCapturePayload = PhotoCapturePayload(embedding: embedding,
+                                                              image: finalImage,
+                                                              sessionID: sessionID)
+                self.onPhotoReady?(photoCapturePayload)
 //                saveToPhotoLibrary(finalImage, completion: {_ in })
             }
         }

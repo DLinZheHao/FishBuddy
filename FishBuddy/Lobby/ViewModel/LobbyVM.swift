@@ -15,7 +15,7 @@ class LobbyVM {
     var cancellables = Set<AnyCancellable>()
     
     // tabs 資料
-    var tabs: [Tab] = [.weather, .imageRecognition]
+    var tabs: [Tab] = [.userLobby, .weather, .imageRecognition]
     
 }
 
@@ -23,10 +23,12 @@ class LobbyVM {
 extension LobbyVM {
     /// 功能列
     enum Tab {
-        // 天氣狀態首頁
+        // 天氣狀態
         case weather
         // 圖片辨識
         case imageRecognition
+        // 使用者首頁
+        case userLobby
         
         /// 創建 tab 使用的 vc
         func initVC() -> UIViewController {
@@ -45,6 +47,12 @@ extension LobbyVM {
                 controller.tabBarItem = makeTabBarItem(title: "辨識",
                                                        imageSystemName: "camera",
                                                        selectedSystemName: "camera.fill")
+                
+            case .userLobby:
+                controller = UserLobbyVC()
+                controller.tabBarItem = makeTabBarItem(title: "首頁",
+                                                       imageSystemName: "house",
+                                                       selectedSystemName: "house.fill")
             }
             return controller
         }
@@ -66,6 +74,7 @@ extension LobbyVM {
 class CameraStreamVC: UIHostingController<CameraStreamView> {
     
     init() {
+        // init 之前不能使用 self 所以會初始化兩次
         let view = CameraStreamView()
         super.init(rootView: view)
         
@@ -88,6 +97,32 @@ class CameraStreamVC: UIHostingController<CameraStreamView> {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         tabBarController?.tabBar.isHidden = false
+    }
+    
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
+}
+
+class UserLobbyVC: UIHostingController<UserHomeView> {
+    
+    init() {
+        super.init(rootView: UserHomeView())
+    }
+    
+    @MainActor required dynamic init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder, rootView: UserHomeView())
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+//        tabBarController?.tabBar.isHidden = false
+        self.setNeedsUpdateOfSupportedInterfaceOrientations()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+//        tabBarController?.tabBar.isHidden = false
     }
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {

@@ -32,7 +32,7 @@ final class AppCoordinator {
 
                    await MainActor.run {
                        guard let taxon = item.first else { return }
-                       let view = TaxonDetailView(taxon: taxon)
+                       let view = TaxonDetailView(taxon: taxon, sessionID: nil)
                        let vc = UIHostingController(rootView: view)
                        self.nav.pushViewController(vc, animated: true)
                    }

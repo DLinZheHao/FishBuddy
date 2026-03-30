@@ -26,7 +26,7 @@ class CameraStreamVM: ObservableObject {
     @Published var streamID = UUID()
     
     /// 由 CameraController 提供的相片特徵向量串流
-    @Published var imageSearchResult: [(taxon: TaxonItem, score: Float)]?
+    @Published var imageSearchResult: ([(taxon: TaxonItem, score: Float)], Int64)?
     
     /// 相機捕捉模式
     @Published var targetMode: TargetMode = .manualAim
@@ -51,11 +51,12 @@ class CameraStreamVM: ObservableObject {
     }
     
     /// 搜尋結果：目前自己計算，並產出結果
-    func search(query: [Float], topK: Int = 20) async {
-        Task { @MainActor in
-            let results = await EmbeddingStore.shared.search(query: query, topK: topK)
-            self.imageSearchResult = results
+    func search(query: [Float], topK: Int = 20, sessionID: Int64) async -> [(TaxonItem, Float)] {
+        let results = await EmbeddingStore.shared.search(query: query, topK: topK)
+        await MainActor.run {
+            self.imageSearchResult = (results, sessionID)
         }
+        return results
     }
     
     /// 切換相機捕捉模式（循環）

@@ -16,6 +16,7 @@ struct TaxonDetailView: View {
     @State private var showSpeciesDigestDebug: Bool = false
     
     let taxon: TaxonItem
+    let sessionID: Int64?
 
     var body: some View {
         NavigationStack {
@@ -113,6 +114,15 @@ struct TaxonDetailView: View {
                         isFavorited = try await UserStore.shared.isFavorite(taxonID: taxon.taxonId)
                     } catch {
                         isFavorited = false
+                    }
+                    
+                    if let sessionID {
+                        do {
+                            try await UserStore.shared.logTaxonView(taxonID: taxon.taxonId, sessionID: sessionID)
+                            print("user store log taxon view success")
+                        } catch {
+                            print("user store log taxon view error: \(error)")
+                        }                        
                     }
                 }
             }
@@ -411,7 +421,7 @@ extension TaxonItem {
 
 #Preview {
     NavigationStack {
-        TaxonDetailView(taxon: .previewMock)
+        TaxonDetailView(taxon: .previewMock, sessionID: 1)
             .navigationTitle("FishBuddy")
     }
 }
