@@ -10,6 +10,7 @@ import SwiftUI
 struct FishCardView: View {
     let item: UserHomeSectionItem
     @State private var sessionImage: UIImage?
+    @State private var isLoadingImage = false
 
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -24,25 +25,45 @@ struct FishCardView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            if let sessionImage {
-                let _ = print("session image: \(sessionImage)")
-                Image(uiImage: sessionImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(maxHeight: 160)
-                    .clipShape(
-                        CustomRoundedRectangle(
-                            topLeft: 16,
-                            topRight: 16,
-                            bottomLeft: 0,
-                            bottomRight: 0
+            Group {
+                if let sessionImage {
+                    let _ = print("session image: \(sessionImage)")
+//                    KFImage(imageURL)
+                    Image(uiImage: sessionImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 160)
+                        .frame(height: 120)
+                        .clipShape(
+                            CustomRoundedRectangle(
+                                topLeft: 16,
+                                topRight: 16,
+                                bottomLeft: 0,
+                                bottomRight: 0
+                            )
                         )
-                    )
-            } else {
-                let _ = print("session image is nil")
-                Image(systemName: "photo")
-                    .font(.largeTitle)
-                    .foregroundStyle(.secondary)
+                } else if isLoadingImage {
+                    VStack {
+                        Spacer()
+                        ProgressView()
+                            .controlSize(.regular)
+                        Spacer()
+                    }
+                    .frame(width: 160)
+                    .frame(height: 120)
+                } else {
+                    VStack(spacing: 8) {
+                        Image(systemName: "photo")
+                            .font(.title2)
+                            .foregroundStyle(.secondary)
+
+                        Text("No Image")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(width: 160)
+                    .frame(height: 120)
+                }
             }
 
             VStack(alignment: .leading, spacing: 2) {
@@ -65,6 +86,11 @@ struct FishCardView: View {
                 .fill(Color(.secondarySystemBackground))
         )
         .task(id: item.id) {
+            await MainActor.run {
+                isLoadingImage = true
+                sessionImage = nil
+            }
+
             let image: UIImage?
             switch item {
             case .recognition(let session):
@@ -72,8 +98,10 @@ struct FishCardView: View {
             case .taxonView(let history):
                 image = try? await UserStore.shared.fetchTaxonViewImage(taxonID: history.taxonID)
             }
+
             await MainActor.run {
                 sessionImage = image
+                isLoadingImage = false
             }
         }
     }

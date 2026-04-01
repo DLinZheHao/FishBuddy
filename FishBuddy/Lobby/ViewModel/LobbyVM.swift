@@ -15,7 +15,7 @@ class LobbyVM {
     var cancellables = Set<AnyCancellable>()
     
     // tabs 資料
-    var tabs: [Tab] = [.userLobby, .weather, .imageRecognition]
+    var tabs: [Tab] = [.userLobby, .weather, .imageRecognition, .collection]
     
 }
 
@@ -29,6 +29,8 @@ extension LobbyVM {
         case imageRecognition
         // 使用者首頁
         case userLobby
+        // 收藏頁
+        case collection
         
         /// 創建 tab 使用的 vc
         func initVC() -> UIViewController {
@@ -53,6 +55,12 @@ extension LobbyVM {
                 controller.tabBarItem = makeTabBarItem(title: "首頁",
                                                        imageSystemName: "house",
                                                        selectedSystemName: "house.fill")
+
+            case .collection:
+                controller = CollectionVC()
+                controller.tabBarItem = makeTabBarItem(title: "收藏",
+                                                       imageSystemName: "square.grid.2x2",
+                                                       selectedSystemName: "square.grid.2x2.fill")
             }
             return controller
         }
@@ -125,6 +133,26 @@ class UserLobbyVC: UIHostingController<UserHomeView> {
 //        tabBarController?.tabBar.isHidden = false
     }
     
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
+}
+
+class CollectionVC: UIHostingController<CollectionView> {
+
+    init() {
+        super.init(rootView: CollectionView())
+    }
+
+    @MainActor required dynamic init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder, rootView: CollectionView())
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.setNeedsUpdateOfSupportedInterfaceOrientations()
+    }
+
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return .portrait
     }
