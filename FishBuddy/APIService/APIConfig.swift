@@ -76,8 +76,9 @@ public enum APIMediaType: Int {
 
 class APIBaseURLConfig {
     /// 本地 domain
-    static var domainAPI = "http://192.168.0.114:3000"
-//    "http://192.168.0.224:3000"
+    static var domainAPI = "http://127.0.0.1:3000"
+    // online backend website: https://fishbuddy-app-api.onrender.com
+    // "http://192.168.0.224:3000"
     // http://10.10.114.29:3000
     /// 氣象署天氣服務
     static var weatherBaseURL: URL {

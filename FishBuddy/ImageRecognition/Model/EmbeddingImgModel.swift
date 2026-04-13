@@ -336,7 +336,8 @@ struct Photo: Codable {
     }
 }
 
-struct Meta: Codable {
+struct MetaData: Codable, DefaultValue {
+    static var defaultValue = MetaData(wikipedia: nil)
     let wikipedia: WikipediaMeta?
 }
 
