@@ -31,10 +31,12 @@ class WeatherLobbyVM: ObservableObject {
     @Published var searchText: String = ""
 
     // MARK: Weather list
-    /// 今明 36 小時天氣預報資料
-    @Published var weatherResponse: WeatherResponse?
+    /// 今明 36 小時天氣預報資料（新格式，單城市 object）
+    @Published var forecastResponse: Forecast36HourResponse?
     /// 列表載入狀態
     @Published var listLoadingState: WeatherLoadingState = .idle
+    /// 舊版列表格式，保留供 WeatherView 參考，目前主流程不再填充
+    @Published var weatherResponse: WeatherResponse?
 
     // MARK: Detail page
     /// 點擊城市後取得的完整地點詳細資料，有值時觸發導航
@@ -85,7 +87,19 @@ class WeatherLobbyVM: ObservableObject {
         }
     }
 
+    // MARK: - Constants
+
+    /// 定位失敗且沒有上次選取的城市時使用的預設城市
+    /// （API 規定：不能打無參數 /forecast/36-hour，因為那會回 list 格式）
+    private let defaultCity = "臺北市"
+
     // MARK: - Launch entry point
+
+    /// 下拉刷新時呼叫：清空舊資料後重新載入，確保 UI 切回 skeleton
+    func refreshWeather() {
+        forecastResponse = nil
+        loadWeatherOnLaunch()
+    }
 
     /// 進入天氣頁時呼叫，依持久化設定選擇正確的 API 呼叫方式
     func loadWeatherOnLaunch() {
@@ -94,7 +108,8 @@ class WeatherLobbyVM: ObservableObject {
         } else if let city = selectedCity, !city.isEmpty {
             fetchWeatherForCityList(city)
         } else {
-            fetchWeatherAll()
+            // 沒有任何城市資訊時，用預設城市（不可打無參數端點）
+            fetchWeatherList(params: ["city": defaultCity])
         }
     }
 
@@ -103,7 +118,7 @@ class WeatherLobbyVM: ObservableObject {
     /// 取得裝置位置後呼叫 `/forecast/36-hour?lat=&lon=`
     func fetchWeatherForCurrentLocation() {
         listLoadingState = .loading
-        Task { @MainActor in
+        _Concurrency.Task { @MainActor in // conflict with Moya dependencies
             do {
                 let location = try await LocationService.shared.requestLocation()
                 let params: [String: Any] = [
@@ -112,12 +127,12 @@ class WeatherLobbyVM: ObservableObject {
                 ]
                 self.fetchWeatherList(params: params)
             } catch {
-                // 位置取得失敗：降級到上次選取的城市，或全城市列表
-                if let city = self.selectedCity, !city.isEmpty {
-                    self.fetchWeatherList(params: ["city": city])
-                } else {
-                    self.fetchWeatherList(params: [:])
-                }
+                // 位置取得失敗：降級到上次選取的城市，或預設城市
+                // 注意：不可打無參數 /forecast/36-hour（回傳 list 格式，與 Forecast36HourResponse 不相容）
+                let fallback = self.selectedCity?.isEmpty == false
+                    ? self.selectedCity!
+                    : self.defaultCity
+                self.fetchWeatherList(params: ["city": fallback])
             }
         }
     }
@@ -182,7 +197,7 @@ class WeatherLobbyVM: ObservableObject {
 
     private func fetchWeatherList(params: [String: Any]) {
         let target = WeatherAPIService.weatherAll36(params: params)
-        requestAndDecode(target: target, as: WeatherResponse.self)
+        requestAndDecode(target: target, as: Forecast36HourResponse.self)
             .sink(
                 receiveCompletion: { [weak self] completion in
                     if case .failure(let error) = completion {
@@ -190,7 +205,7 @@ class WeatherLobbyVM: ObservableObject {
                     }
                 },
                 receiveValue: { [weak self] response in
-                    self?.weatherResponse = response
+                    self?.forecastResponse = response
                     self?.listLoadingState = .loaded
                 }
             )

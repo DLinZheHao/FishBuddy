@@ -38,7 +38,7 @@ class WeatherLobbyViewController: UIViewController {
     }
 
     private func addSwiftUIView() {
-        let swiftUIView = WeatherView(vm: vm)
+        let swiftUIView = CityWeatherView(vm: vm)
         let hostingController = UIHostingController(rootView: swiftUIView)
 
         addChild(hostingController)
