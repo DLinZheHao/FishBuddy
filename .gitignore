@@ -36,6 +36,7 @@ build/
 .claude/settings.local.json
 .claude/local.json
 .claude/user.json
+.claude/worktrees/
 
 # ===== MCP (Model Context Protocol) =====
 .mcp.json
