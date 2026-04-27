@@ -35,10 +35,6 @@ class APIService {
     /// 暫存類別
     public var cacheType: URLRequest.CachePolicy = APIService.defaultCacheType
     
-    // MARK: 授權碼
-    /// 氣象局網站授權碼
-    var weatherKey = "CWA-BFB6A0E3-0705-4F0C-A8E5-5524B97BB466"
-    
     // MARK:- API Endpoint 網路請求設定
     /// endpointClosure (HTTP Header)
     private let endpointClosure = { (target: MultiTarget) -> Endpoint in

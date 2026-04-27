@@ -28,8 +28,7 @@ enum WeatherAPIService {
         var method: Moya.Method { return .get }
         var path: String { return "/36-hour" }
         var task: Task {
-            var params = params
-            params["Authorization"] = APIService.shareManager().weatherKey
+            let params = params
             return .requestParameters(parameters: params, encoding: URLEncoding.default)
         }
         
@@ -43,10 +42,9 @@ enum WeatherAPIService {
     // MARK: 潮汐預報 - 未來一個月潮汐預報 (目前後端自動取一個禮拜的資訊)
     struct tideForecast: WeatherAPITargetType {
         var method: Moya.Method { return .get }
-        var path: String { return "/tide_info" }
+        var path: String { return "/tidy_info" }
         var task: Task {
-            var params = params
-            params["Authorization"] = APIService.shareManager().weatherKey
+            let params = params
             return .requestParameters(parameters: params, encoding: URLEncoding.default)
         }
         

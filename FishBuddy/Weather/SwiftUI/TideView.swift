@@ -183,3 +183,6 @@ let sampleTideData = [
 #Preview {
     TideCityDetailView()
 }
+ 
+
+

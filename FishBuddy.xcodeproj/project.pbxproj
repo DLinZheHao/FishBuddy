@@ -51,6 +51,8 @@
 		05589EF62CE6F5C5003881AA /* Weather.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 05589EF52CE6F5C5003881AA /* Weather.storyboard */; };
 		05589EF92CE6F808003881AA /* FeatrueTitleBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05589EF82CE6F808003881AA /* FeatrueTitleBar.swift */; };
 		05589EFC2CE6F827003881AA /* FeatureTitleBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */; };
+		055F11E22F889FDA002EF383 /* MarineFishingDetailModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055F11E12F889FDA002EF383 /* MarineFishingDetailModel.swift */; };
+		055F11E42F889FE2002EF383 /* LocationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 055F11E32F889FE2002EF383 /* LocationDetailView.swift */; };
 		05623FD02E1234D300B33D2D /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05623FCF2E1234D300B33D2D /* SearchBar.swift */; };
 		0564128A2F737733003105C0 /* UserStoreModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056412892F737733003105C0 /* UserStoreModels.swift */; };
 		0564128D2F73CB11003105C0 /* UserHomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0564128C2F73CB11003105C0 /* UserHomeViewModel.swift */; };
@@ -80,6 +82,8 @@
 		058F58A72E7BA42C009913C5 /* BackgroundRemoverVK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058F58A62E7BA42A009913C5 /* BackgroundRemoverVK.swift */; };
 		0595566F2E14D5BA0050147C /* TideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0595566E2E14D5B90050147C /* TideView.swift */; };
 		059556712E150AF10050147C /* TideLobbyVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059556702E150AF10050147C /* TideLobbyVM.swift */; };
+		05BB6C622F8CD33B000B6E10 /* Forecast36HourModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BB6C612F8CD33B000B6E10 /* Forecast36HourModel.swift */; };
+		05BB6C642F8CD348000B6E10 /* CityWeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BB6C632F8CD348000B6E10 /* CityWeatherView.swift */; };
 		05C13B742E9896E400BE9FA0 /* TaxonDetailModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C13B732E9896E400BE9FA0 /* TaxonDetailModel.swift */; };
 		05C13B862E98E25F00BE9FA0 /* ImageInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C13B852E98E25F00BE9FA0 /* ImageInspectorView.swift */; };
 		05C13B892E98E2FA00BE9FA0 /* ImageInspectorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C13B882E98E2FA00BE9FA0 /* ImageInspectorModel.swift */; };
@@ -183,6 +187,8 @@
 		05589EF52CE6F5C5003881AA /* Weather.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Weather.storyboard; sourceTree = "<group>"; };
 		05589EF82CE6F808003881AA /* FeatrueTitleBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatrueTitleBar.swift; sourceTree = "<group>"; };
 		05589EFB2CE6F827003881AA /* FeatureTitleBar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FeatureTitleBar.xib; sourceTree = "<group>"; };
+		055F11E12F889FDA002EF383 /* MarineFishingDetailModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarineFishingDetailModel.swift; sourceTree = "<group>"; };
+		055F11E32F889FE2002EF383 /* LocationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationDetailView.swift; sourceTree = "<group>"; };
 		05623FCF2E1234D300B33D2D /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		056412892F737733003105C0 /* UserStoreModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStoreModels.swift; sourceTree = "<group>"; };
 		0564128C2F73CB11003105C0 /* UserHomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHomeViewModel.swift; sourceTree = "<group>"; };
@@ -213,6 +219,8 @@
 		0595566E2E14D5B90050147C /* TideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideView.swift; sourceTree = "<group>"; };
 		059556702E150AF10050147C /* TideLobbyVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideLobbyVM.swift; sourceTree = "<group>"; };
 		05B499472F1A1C6A00897C01 /* FishBuddyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FishBuddyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		05BB6C612F8CD33B000B6E10 /* Forecast36HourModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Forecast36HourModel.swift; sourceTree = "<group>"; };
+		05BB6C632F8CD348000B6E10 /* CityWeatherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityWeatherView.swift; sourceTree = "<group>"; };
 		05C13B732E9896E400BE9FA0 /* TaxonDetailModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaxonDetailModel.swift; sourceTree = "<group>"; };
 		05C13B852E98E25F00BE9FA0 /* ImageInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageInspectorView.swift; sourceTree = "<group>"; };
 		05C13B882E98E2FA00BE9FA0 /* ImageInspectorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageInspectorModel.swift; sourceTree = "<group>"; };
@@ -256,6 +264,7 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		05B499482F1A1C6A00897C01 /* FishBuddyTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FishBuddyTests; sourceTree = "<group>"; };
+		05BB6C5F2F8CC98E000B6E10 /* Service */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Service; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -448,6 +457,7 @@
 		054C84662CDB04D5005595EF /* Weather */ = {
 			isa = PBXGroup;
 			children = (
+				05BB6C5F2F8CC98E000B6E10 /* Service */,
 				05513A402DAE43FB0021573F /* UIKit */,
 				05513A412DAE44050021573F /* SwiftUI */,
 				054C84692CDB04F0005595EF /* Model */,
@@ -468,6 +478,8 @@
 		054C84692CDB04F0005595EF /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				05BB6C612F8CD33B000B6E10 /* Forecast36HourModel.swift */,
+				055F11E12F889FDA002EF383 /* MarineFishingDetailModel.swift */,
 				054C846D2CDB06AA005595EF /* WeatherAllModel.swift */,
 				05F3BED32D92824C00DDAC72 /* TideDataModel.swift */,
 			);
@@ -494,6 +506,8 @@
 		05513A412DAE44050021573F /* SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				05BB6C632F8CD348000B6E10 /* CityWeatherView.swift */,
+				055F11E32F889FE2002EF383 /* LocationDetailView.swift */,
 				058877022DC1BE4D00B1D13E /* WeatherView2.swift */,
 				05513A422DAE44540021573F /* WeatherView.swift */,
 				0595566E2E14D5B90050147C /* TideView.swift */,
@@ -987,6 +1001,9 @@
 			);
 			dependencies = (
 			);
+			fileSystemSynchronizedGroups = (
+				05BB6C5F2F8CC98E000B6E10 /* Service */,
+			);
 			name = FishBuddy;
 			productName = FishBuddy;
 			productReference = 054C843F2CD9B994005595EF /* FishBuddy.app */;
@@ -1150,12 +1167,14 @@
 				057F46572F6ABB1600718711 /* FontExtension.swift in Sources */,
 				05C94D932E6ABF7C0051B078 /* JsonUtils.swift in Sources */,
 				05823E092EB0678B00BDC553 /* EphemeralTileOverlay..swift in Sources */,
+				05BB6C622F8CD33B000B6E10 /* Forecast36HourModel.swift in Sources */,
 				057F465D2F6BE06600718711 /* FishSectionView.swift in Sources */,
 				05C94D942E6ABF7C0051B078 /* CameraController.swift in Sources */,
 				057F46712F701EC700718711 /* PhotoModels.swift in Sources */,
 				05C94D952E6ABF7C0051B078 /* CameraStreamVM.swift in Sources */,
 				05C94D962E6ABF7C0051B078 /* CLIPFeatureExtractor.swift in Sources */,
 				05C94D972E6ABF7C0051B078 /* mobileclip_s1_image.mlpackage in Sources */,
+				055F11E42F889FE2002EF383 /* LocationDetailView.swift in Sources */,
 				05C94D982E6ABF7C0051B078 /* ImageUtils.swift in Sources */,
 				057F465B2F6ACD6C00718711 /* FishCardView.swift in Sources */,
 				057F46732F7020CC00718711 /* RecognitionModels.swift in Sources */,
@@ -1164,6 +1183,7 @@
 				057F167A2EA1E54400EC7710 /* WrapLayout.swift in Sources */,
 				051208692F4D8ECA00873F6A /* UserStore.swift in Sources */,
 				05C94D992E6ABF7C0051B078 /* CameraStreamView.swift in Sources */,
+				05BB6C642F8CD348000B6E10 /* CityWeatherView.swift in Sources */,
 				05C94D9A2E6ABF7C0051B078 /* EmbeddingImgModel.swift in Sources */,
 				05E672E42CDB0CB3006CF3BF /* DebugLogger.swift in Sources */,
 				054C84582CD9BD76005595EF /* APIService.swift in Sources */,
@@ -1176,6 +1196,7 @@
 				053B67432F02711E009C4001 /* ColorExtension.swift in Sources */,
 				057F46512F6AB69100718711 /* UserHomeHeroSection.swift in Sources */,
 				05FAEF232DF2D45700E9BD08 /* GestureAnimationViewModel.swift in Sources */,
+				055F11E22F889FDA002EF383 /* MarineFishingDetailModel.swift in Sources */,
 				05FAEF2E2E00F41800E9BD08 /* CardDM.swift in Sources */,
 				0533D8F72F14EA4E0028A395 /* AppRoute.swift in Sources */,
 				057F46552F6AB99800718711 /* FeatureCard.swift in Sources */,

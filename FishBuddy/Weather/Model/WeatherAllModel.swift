@@ -45,8 +45,8 @@ struct WeatherInfo: Codable, Identifiable, DefaultValue {
         startTime: "",
         endTime: "",
         description: "",
-        minTemp: "",
-        maxTemp: "",
+        minTempC: "",
+        maxTempC: "",
         comfort: ""
     )
     
@@ -60,9 +60,9 @@ struct WeatherInfo: Codable, Identifiable, DefaultValue {
     /// 天氣狀態
     @Default var description: String
     /// 最低氣溫
-    @Default var minTemp: String
+    @Default var minTempC: String
     /// 最高氣溫
-    @Default var maxTemp: String
+    @Default var maxTempC: String
     /// 舒適度
     @Default var comfort: String
     
@@ -70,8 +70,8 @@ struct WeatherInfo: Codable, Identifiable, DefaultValue {
         case startTime = "startTime"
         case endTime = "endTime"
         case description = "description"
-        case minTemp = "minTemp"
-        case maxTemp = "maxTemp"
+        case minTempC = "minTempC"
+        case maxTempC = "maxTempC"
         case comfort = "comfort"
     }
 }

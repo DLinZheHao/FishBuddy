@@ -15,6 +15,8 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>取得您的位置以顯示當地天氣預報</string>
 	<key>Privacy – Photo Library Additions Usage Description</key>
 	<string>需要將拍攝結果儲存到您的相簿以供確認</string>
 	<key>UIAccessibilityTextSizesEnabled</key>

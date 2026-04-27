@@ -28,3 +28,22 @@ build/
 *.mlpackage
 **/*.mlpackage/
 **/weights/weight.bin
+
+# ===== Codex =====
+.codex/config.toml
+
+# ===== Claude Code =====
+.claude/settings.local.json
+.claude/local.json
+.claude/user.json
+.claude/worktrees/
+
+# ===== MCP (Model Context Protocol) =====
+.mcp.json
+
+# ===== OS =====
+.DS_Store
+
+# ===== Logs (optional,你有用 hook log) =====
+/tmp/codex-hooks.log
+

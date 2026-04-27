@@ -8,6 +8,9 @@
 import Foundation
 import SwiftUI
 
+/*
+ WeatherView is deprecated.
+ */
 struct WeatherView: View {
     /// ViewModel
     @ObservedObject var vm: WeatherLobbyVM
@@ -38,28 +41,47 @@ struct WeatherView: View {
                                })
                        }) { cityWeather in
                             VStack(alignment: .leading, spacing: 8) {
-                                if let dateStr = cityWeather.weather.first?.startTime,
-                                   let startDate = formatDateOnly(dateStr),
-                                   let date2Str = cityWeather.weather.last?.endTime,
-                                   let endDate = formatDateOnly(date2Str) {
+                                // 城市標題列 — 點擊後呼叫 tidy_info 並導航至 LocationDetailView
+                                Button {
+                                    vm.fetchLocationDetail(city: cityWeather.city)
+                                } label: {
                                     HStack(alignment: .bottom) {
-                                        Text("\(cityWeather.city)")
-                                            .font(.title2)
-                                        Text("\(startDate) -> \(endDate)")
-                                            .font(.system(size: 16))
+                                        if let dateStr = cityWeather.weather.first?.startTime,
+                                           let startDate = formatDateOnly(dateStr),
+                                           let date2Str = cityWeather.weather.last?.endTime,
+                                           let endDate = formatDateOnly(date2Str) {
+                                            Text(cityWeather.city)
+                                                .font(.title2)
+                                            Text("\(startDate) -> \(endDate)")
+                                                .font(.system(size: 16))
+                                        } else {
+                                            Text(cityWeather.city)
+                                                .font(.title2)
+                                        }
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .font(.system(size: 14, weight: .semibold))
+                                            .foregroundColor(.secondary)
                                     }
                                     .padding(.bottom, 4)
-                                } else {
-                                    Text(cityWeather.city)
-                                        .font(.title2)
-                                        .padding(.bottom, 4)
                                 }
+                                .foregroundColor(.primary)
 
                                 ForEach(cityWeather.weather) { info in
                                     WeatherInfoView(info: info)
                                 }
                             }
                             .padding()
+                        }
+                    }
+                    .overlay {
+                        if vm.isFetchingDetail {
+                            ZStack {
+                                Color(.systemBackground).opacity(0.55)
+                                ProgressView("載入中...")
+                                    .padding(20)
+                                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                            }
                         }
                     }
                 } else {
@@ -153,7 +175,7 @@ struct WeatherInfoView: View {
                 .font(.subheadline)
             
             HStack {
-                Text("溫度：\(info.minTemp)°C - \(info.maxTemp)°C")
+                Text("溫度：\(info.minTempC)°C - \(info.maxTempC)°C")
                 Spacer()
                 Text("\(info.comfort)")
             }
