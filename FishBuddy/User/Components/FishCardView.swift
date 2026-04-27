@@ -29,7 +29,7 @@ struct FishCardView: View {
                 Image(uiImage: sessionImage)
                     .resizable()
                     .scaledToFill()
-                    .frame(maxHeight: 160)
+                    .frame(maxWidth: 160, maxHeight: 160)
                     .clipShape(
                         CustomRoundedRectangle(
                             topLeft: 16,

@@ -51,26 +51,11 @@ extension TideEventDisplay: DefaultValue {
 
 struct MarineFishingDetailResponse: Codable, DefaultValue {
     static var defaultValue = MarineFishingDetailResponse(
-        requestedLocation: "",
-        resolvedLocation: "",
-        fallbackUsed: false,
-        fallbackReason: nil,
-        nearestStation: nil,
         meta: .defaultValue,
         location: .defaultValue,
         ui: .defaultValue,
         raw: .defaultValue
     )
-    /// 前端請求的城市名稱
-    @Default var requestedLocation: String
-    /// 後端實際使用的城市名稱（fallback 時可能不同）
-    @Default var resolvedLocation: String
-    /// 是否啟用了 fallback 資料
-    var fallbackUsed: Bool
-    /// fallback 原因（fallbackUsed 為 true 時才有值）
-    var fallbackReason: String?
-    /// 最近的氣象站名稱（fallbackUsed 為 true 時才有值）
-    var nearestStation: String?
     @Default var meta: Meta
     @Default var location: LocationInfo
     @Default var ui: UIData
@@ -81,14 +66,28 @@ struct MarineFishingDetailResponse: Codable, DefaultValue {
 
 struct Meta: Codable, DefaultValue {
     static var defaultValue = Meta(
-        updatedAt: "", timezone: "", sourceDatasets: [],
-        query: .defaultValue, units: .defaultValue
+        updatedAt: "", timezone: "",
+        requestedLocation: "", resolvedLocation: "",
+        fallbackUsed: false, fallbackReason: nil,
+        nearestStation: nil,
+        sourceDatasets: [], query: .defaultValue, units: .defaultValue
     )
     @Default var updatedAt: String
     @Default var timezone: String
+    @Default var requestedLocation: String
+    @Default var resolvedLocation: String
+    @Default var fallbackUsed: Bool
+    var fallbackReason: String?
+    var nearestStation: NearestStationRef?
     @Default var sourceDatasets: [String]
     @Default var query: Query
     @Default var units: Units
+}
+
+struct NearestStationRef: Codable {
+    var id: String?
+    var name: String?
+    var distanceKm: Double?
 }
 
 struct Query: Codable, DefaultValue {

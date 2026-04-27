@@ -538,7 +538,7 @@ private struct WeatherCard: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
                         ForEach(Array(weather.hourly.enumerated()), id: \.offset) { index, hourly in
-                            HourlyWeatherItem(hourly: hourly, isActive: index == 0)
+                            HourlyWeatherItem(hourly: hourly, isActive: true)
                         }
                     }
                     .padding(.horizontal, 2)
@@ -586,10 +586,8 @@ private struct HourlyWeatherItem: View {
         .padding(.horizontal, 10)
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(isActive ? AnyShapeStyle(Color.teal) : AnyShapeStyle(Color(.secondarySystemGroupedBackground)))
-                .shadow(color: isActive ? Color.teal.opacity(0.3) : .clear, radius: 6, x: 0, y: 3)
+                .fill(AnyShapeStyle(Color.teal))
         )
-        .scaleEffect(isActive ? 1.05 : 1.0)
     }
 
     /// SF Symbol 白名單，防止無效名稱導致 icon 消失

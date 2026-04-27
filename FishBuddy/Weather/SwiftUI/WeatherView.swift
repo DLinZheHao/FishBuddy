@@ -8,6 +8,9 @@
 import Foundation
 import SwiftUI
 
+/*
+ WeatherView is deprecated.
+ */
 struct WeatherView: View {
     /// ViewModel
     @ObservedObject var vm: WeatherLobbyVM

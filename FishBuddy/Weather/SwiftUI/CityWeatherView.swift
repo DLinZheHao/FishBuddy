@@ -50,9 +50,15 @@ struct CityWeatherView: View {
                 CityWeatherSkeletonView()
             case .loaded:
                 if let response = vm.forecastResponse {
-                    CityWeatherContentView(data: response.data, meta: response.meta) {
-                        vm.useDeviceLocation()
-                    }
+                    CityWeatherContentView(
+                        data: response.data,
+                        meta: response.meta,
+                        isFetchingDetail: vm.isFetchingDetail,
+                        isUsingDeviceLocation: vm.isUsingDeviceLocation,
+                        onUseDeviceLocation: { vm.useDeviceLocation() },
+                        onSelectCity: { vm.fetchWeatherForCityList($0) },
+                        onShowLocationDetail: { vm.fetchLocationDetail(city: response.data.city) }
+                    )
                 } else {
                     CityWeatherSkeletonView()
                 }
@@ -164,13 +170,20 @@ private struct CityWeatherErrorView: View {
 private struct CityWeatherContentView: View {
     let data: Forecast36HourData
     let meta: F36Meta
+    let isFetchingDetail: Bool
+    let isUsingDeviceLocation: Bool
     let onUseDeviceLocation: () -> Void
+    let onSelectCity: (String) -> Void
+    let onShowLocationDetail: () -> Void
+
+    @State private var showCityPicker: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             cityHeaderSection
             heroCard
             if let bw = data.summary?.bestWindow { bestWindowCard(bw) }
+            marineDetailEntryCard
             if let obs = data.currentObservation { currentObsCard(obs) }
             if !data.timeline.isEmpty { timelineSection }
             if data.sun != nil || data.moon != nil { sunMoonSection }
@@ -178,6 +191,14 @@ private struct CityWeatherContentView: View {
         .padding(.horizontal, 16)
         .padding(.top, 20)
         .padding(.bottom, 88) // tab bar clearance
+        .sheet(isPresented: $showCityPicker) {
+            CityPickerSheet(
+                currentCity: data.city,
+                isUsingDeviceLocation: isUsingDeviceLocation,
+                onSelectCity: onSelectCity,
+                onUseDeviceLocation: onUseDeviceLocation
+            )
+        }
     }
 
     // MARK: City Header
@@ -190,16 +211,27 @@ private struct CityWeatherContentView: View {
                     .foregroundColor(Color.cwOnSurfaceVar)
                     .tracking(0.3)
             }
-            HStack(spacing: 8) {
-                Text(data.city)
-                    .font(.system(size: 24, weight: .bold, design: .default))
-                    .foregroundColor(Color.cwPrimary)
-                if meta.selectionMode == "nearest" {
-                    Image(systemName: "location.fill")
-                        .font(.system(size: 13))
-                        .foregroundColor(Color.cwPrimary.opacity(0.7))
+            Button {
+                showCityPicker = true
+            } label: {
+                HStack(spacing: 8) {
+                    Text(data.city)
+                        .font(.system(size: 24, weight: .bold, design: .default))
+                        .foregroundColor(Color.cwPrimary)
+                    if meta.selectionMode == "nearest" {
+                        Image(systemName: "location.fill")
+                            .font(.system(size: 13))
+                            .foregroundColor(Color.cwPrimary.opacity(0.7))
+                    }
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(Color.cwPrimary.opacity(0.6))
                 }
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel("選擇城市")
+            .accessibilityHint("點擊以切換顯示的城市")
             Text("戶外與釣魚天氣概覽")
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(Color.cwOnSurface)
@@ -357,6 +389,60 @@ private struct CityWeatherContentView: View {
         .background(Color.cwSurfaceLow)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
+    }
+
+    // MARK: Marine Detail Entry Card
+
+    private var marineDetailEntryCard: some View {
+        Button(action: onShowLocationDetail) {
+            HStack(spacing: 0) {
+                // Left accent bar
+                Color.cwPrimary
+                    .frame(width: 4)
+
+                HStack(spacing: 14) {
+                    // Icon badge
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.cwSecContainer)
+                        Image(systemName: "water.waves")
+                            .font(.system(size: 18))
+                            .foregroundColor(Color.cwPrimary)
+                    }
+                    .frame(width: 44, height: 44)
+
+                    // Text
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("海釣現況速覽")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(Color.cwOnSurface)
+                        Text("波浪・海流・潮汐・建議")
+                            .font(.system(size: 12))
+                            .foregroundColor(Color.cwOnSurfaceVar)
+                    }
+
+                    Spacer()
+
+                    // Right side: loading indicator or chevron
+                    if isFetchingDetail {
+                        ProgressView()
+                            .tint(Color.cwPrimary)
+                            .padding(.trailing, 4)
+                    } else {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(Color.cwPrimary.opacity(0.7))
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+            }
+            .background(Color.cwSurfaceLow)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 2)
+        }
+        .disabled(isFetchingDetail)
+        .buttonStyle(.plain)
     }
 
     // MARK: Current Observation Card
@@ -755,6 +841,117 @@ private struct CityWeatherContentView: View {
         case "moderate": return Color.cwTertiary
         case "high":     return Color.cwError
         default:         return Color.cwOutlineVar
+        }
+    }
+}
+
+// MARK: - City Picker Sheet
+
+private struct CityPickerSheet: View {
+    let currentCity: String
+    let isUsingDeviceLocation: Bool
+    let onSelectCity: (String) -> Void
+    let onUseDeviceLocation: () -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var searchText: String = ""
+
+    /// 台灣 22 縣市，依地理區分組（使用 CWA 官方「臺」字寫法）
+    private static let regions: [(name: String, cities: [String])] = [
+        ("北部", ["基隆市", "臺北市", "新北市", "桃園市", "新竹市", "新竹縣", "宜蘭縣"]),
+        ("中部", ["苗栗縣", "臺中市", "彰化縣", "南投縣", "雲林縣"]),
+        ("南部", ["嘉義市", "嘉義縣", "臺南市", "高雄市", "屏東縣"]),
+        ("東部", ["花蓮縣", "臺東縣"]),
+        ("離島", ["澎湖縣", "金門縣", "連江縣"])
+    ]
+
+    private var filteredRegions: [(name: String, cities: [String])] {
+        let q = searchText.trimmingCharacters(in: .whitespaces)
+        guard !q.isEmpty else { return Self.regions }
+        let normalized = q.replacingOccurrences(of: "台", with: "臺")
+        return Self.regions.compactMap { region in
+            let matched = region.cities.filter {
+                $0.contains(q) || $0.contains(normalized)
+            }
+            return matched.isEmpty ? nil : (region.name, matched)
+        }
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    Button {
+                        onUseDeviceLocation()
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: "location.fill")
+                                .font(.system(size: 15))
+                                .foregroundColor(Color.cwPrimary)
+                                .frame(width: 22)
+                            Text("使用目前位置")
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundColor(Color.cwOnSurface)
+                            Spacer()
+                            if isUsingDeviceLocation {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundColor(Color.cwPrimary)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                ForEach(filteredRegions, id: \.name) { region in
+                    Section(region.name) {
+                        ForEach(region.cities, id: \.self) { city in
+                            Button {
+                                onSelectCity(city)
+                                dismiss()
+                            } label: {
+                                HStack {
+                                    Text(city)
+                                        .font(.system(size: 15))
+                                        .foregroundColor(Color.cwOnSurface)
+                                    Spacer()
+                                    if !isUsingDeviceLocation && city == currentCity {
+                                        Image(systemName: "checkmark")
+                                            .font(.system(size: 13, weight: .semibold))
+                                            .foregroundColor(Color.cwPrimary)
+                                    }
+                                }
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+
+                if filteredRegions.isEmpty {
+                    Section {
+                        Text("找不到符合「\(searchText)」的城市")
+                            .font(.system(size: 13))
+                            .foregroundColor(Color.cwOnSurfaceVar)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.vertical, 12)
+                    }
+                }
+            }
+            .searchable(
+                text: $searchText,
+                placement: .navigationBarDrawer(displayMode: .always),
+                prompt: "搜尋城市"
+            )
+            .navigationTitle("選擇城市")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("取消") { dismiss() }
+                        .foregroundColor(Color.cwPrimary)
+                }
+            }
         }
     }
 }
