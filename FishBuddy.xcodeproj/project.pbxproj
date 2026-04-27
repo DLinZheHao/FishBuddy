@@ -265,6 +265,7 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		05B499482F1A1C6A00897C01 /* FishBuddyTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = FishBuddyTests; sourceTree = "<group>"; };
 		05BB6C5F2F8CC98E000B6E10 /* Service */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Service; sourceTree = "<group>"; };
+		05BB6D822F9F9C84000B6E10 /* AI */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AI; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -388,6 +389,7 @@
 		054C84412CD9B994005595EF /* FishBuddy */ = {
 			isa = PBXGroup;
 			children = (
+				05BB6D822F9F9C84000B6E10 /* AI */,
 				0512FBB82F41C63200873F6A /* BioCLIP_iNat_Embed.mlpackage */,
 				05C94D922E6ABF7C0051B078 /* mobileclip_s1_image.mlpackage */,
 				051208642F4C56C900873F6A /* catalog_Bio.sqlite */,
@@ -1003,6 +1005,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				05BB6C5F2F8CC98E000B6E10 /* Service */,
+				05BB6D822F9F9C84000B6E10 /* AI */,
 			);
 			name = FishBuddy;
 			productName = FishBuddy;

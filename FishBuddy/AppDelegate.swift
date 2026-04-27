@@ -6,13 +6,12 @@
 //
 
 import UIKit
-import FoundationModels
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        Task {
+        Task { @MainActor in
             await EmbeddingStore.shared.prepare()
             do {
                 try await UserStore.shared.prepare()
@@ -20,27 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             catch {
                 print("資料庫讀取發生錯誤！ \(error)")
             }
-            if #available(iOS 26.0, *) {
-                let model = SystemLanguageModel.default
-                
-                // The availability property provides detailed information on the model's state.
-                switch model.availability {
-                case .available:
-                    print("Foundation Models is available and ready to go!")
-                    
-                case .unavailable(.deviceNotEligible):
-                    print("The model is not available on this device.")
-                    
-                case .unavailable(.appleIntelligenceNotEnabled):
-                    print("Apple Intelligence is not enabled in Settings.")
-                    
-                case .unavailable(.modelNotReady):
-                    print("The model is not ready yet. Please try again later.")
-                    
-                case .unavailable(_):
-                    print("The model is unavailable for an unknown reason.")
-                }
-            }
+            FoundationModelAvailabilityStore.shared.refresh()
         }
         return true
     }
