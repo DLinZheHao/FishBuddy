@@ -7,37 +7,37 @@
 
 import SwiftUI
 
+/// commit A 的暫時 view：messages timeline 已就緒、但聊天室 UI 等 commit B 才會接上。
+/// 這版只是把 vm.messages 用最樸素的方式列出，確保 timeline 流程能跑。
 @available(iOS 26.0, *)
 struct SpeciesDigestDebugView: View {
 
-    @State var vm: SpeciesDigestViewModel
+    @State var vm: SpeciesChatViewModel
 
     @State private var freeText: String = ""
     @State private var pendingTopic: QuestionTopic?
     @State private var askTick: Int = 0
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-
-                Text("🧪 Species Digest Test")
-                    .font(.title2)
-                    .bold()
-
-                Divider()
-
-                content
-
-                Divider()
-
-                qaSection
+        VStack(spacing: 0) {
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 12) {
+                    ForEach(vm.messages) { msg in
+                        rawRow(msg)
+                    }
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Divider()
+
+            chipBar
+            inputBar
         }
         .task {
             vm.prewarm()
-            await vm.load()
+            await vm.bootstrap()
         }
         .task(id: askTick) {
             guard askTick > 0, let topic = pendingTopic else { return }
@@ -46,76 +46,75 @@ struct SpeciesDigestDebugView: View {
     }
 
     @ViewBuilder
-    private var content: some View {
-        switch vm.state {
-        case .idle, .planning:
-            VStack(alignment: .leading, spacing: 8) {
-                ProgressView()
-                Text("Planning…")
-                    .foregroundStyle(.secondary)
-            }
+    private func rawRow(_ msg: SpeciesChatViewModel.ChatMessage) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("\(roleLabel(msg.role))\(msg.isStreaming ? "  ▍" : "")")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(describe(msg.content))
+                .font(.body)
+                .textSelection(.enabled)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
 
-        case .generating(let partial):
-            if let partial {
-                DigestResultView(partial: partial)
-            } else {
-                VStack(alignment: .leading, spacing: 8) {
-                    ProgressView()
-                    Text("Generating species digest…")
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-        case .loaded(let partial):
-            DigestResultView(partial: partial)
-
-        case .failed(let error):
-            VStack(alignment: .leading, spacing: 8) {
-                Text("❌ Error")
-                    .font(.headline)
-                Text(error.errorDescription ?? "Unknown error")
-                    .foregroundStyle(.red)
-            }
-
-        case .unavailable(let status):
-            VStack(alignment: .leading, spacing: 8) {
-                Text("⚠️ AI 功能無法使用")
-                    .font(.headline)
-                Text("狀態：\(String(describing: status))")
-                    .foregroundStyle(.secondary)
-            }
+    private func roleLabel(_ role: SpeciesChatViewModel.MessageRole) -> String {
+        switch role {
+        case .assistant: return "[AI]"
+        case .user:      return "[You]"
         }
     }
 
-    private var qaSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+    private func describe(_ content: SpeciesChatViewModel.MessageContent) -> String {
+        switch content {
+        case .userText(let s):
+            return s
+        case .digest(let d):
+            return [d.titleZh, d.keyTraits?.joined(separator: " / "), d.habitatSummary]
+                .compactMap { $0 }
+                .joined(separator: "\n")
+        case .answer(let a):
+            return a.text ?? ""
+        case .thinking:
+            return "（生成中…）"
+        case .info(let s):
+            return s
+        case .error(let s):
+            return "❌ \(s)"
+        case .cancelled(let partial):
+            return "（已取消）" + (partial?.text.map { "\n\($0)" } ?? "")
+        }
+    }
 
-            Text("提問")
-                .font(.headline)
+    // MARK: - Chips & Input (placeholder, will be redesigned in commit B)
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(Array(QuestionTopic.chipTopics.enumerated()), id: \.offset) { _, topic in
-                        Button(topic.displayName) {
-                            fire(topic: topic)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.small)
+    private var chipBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(Array(QuestionTopic.chipTopics.enumerated()), id: \.offset) { _, topic in
+                    Button(topic.displayName) {
+                        fire(topic: topic)
                     }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
                 }
             }
-
-            HStack(spacing: 8) {
-                TextField("自由提問…", text: $freeText)
-                    .textFieldStyle(.roundedBorder)
-                    .submitLabel(.send)
-                    .onSubmit { fireFree() }
-                Button("送出") { fireFree() }
-                    .disabled(trimmedFree.isEmpty)
-            }
-
-            answerView
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
         }
+    }
+
+    private var inputBar: some View {
+        HStack(spacing: 8) {
+            TextField("問這隻魚的特徵或習性…", text: $freeText)
+                .textFieldStyle(.roundedBorder)
+                .submitLabel(.send)
+                .onSubmit { fireFree() }
+            Button("送出") { fireFree() }
+                .disabled(trimmedFree.isEmpty)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
     }
 
     private var trimmedFree: String {
@@ -131,86 +130,6 @@ struct SpeciesDigestDebugView: View {
         let q = trimmedFree
         guard !q.isEmpty else { return }
         fire(topic: .free(q))
-    }
-
-    @ViewBuilder
-    private var answerView: some View {
-        if let topic = vm.lastTopic {
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Q：\(topic.displayName)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                answerBody(for: vm.answerState)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-
-    @ViewBuilder
-    private func answerBody(for state: SpeciesDigestViewModel.AnswerState) -> some View {
-        switch state {
-        case .idle:
-            EmptyView()
-
-        case .asking(let partial):
-            if let partial, let text = partial.text, !text.isEmpty {
-                Text(text)
-                    .foregroundStyle(.secondary)
-                    .textSelection(.enabled)
-            } else {
-                HStack(spacing: 8) {
-                    ProgressView()
-                    Text("生成中…")
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-        case .answered(let final):
-            VStack(alignment: .leading, spacing: 4) {
-                if final.noData == true {
-                    Text("（資料未涵蓋）")
-                        .font(.caption)
-                        .foregroundStyle(.orange)
-                }
-                Text(final.text ?? "—")
-                    .textSelection(.enabled)
-            }
-
-        case .failed(let error):
-            Text(error.errorDescription ?? "Unknown error")
-                .foregroundStyle(.red)
-        }
-    }
-}
-
-@available(iOS 26.0, *)
-struct DigestResultView: View {
-
-    let partial: SpeciesDigest.PartiallyGenerated
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            field("Title", partial.titleZh)
-            field("Key Traits", partial.keyTraits?.joined(separator: " / "))
-            field("Habitat", partial.habitatSummary)
-            field("Confusion Tip", partial.confusionTip)
-            field("Safety Note", partial.safetyNote)
-            field("Coverage", partial.coverage)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    @ViewBuilder
-    private func field(_ name: String, _ value: String?) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(name)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            Text(value ?? "—")
-                .font(.body)
-                .textSelection(.enabled)
-        }
+        freeText = ""
     }
 }
