@@ -94,7 +94,7 @@ struct TaxonDetailView: View {
 #if DEBUG
                 .sheet(isPresented: $showSpeciesDigestDebug) {
                     if #available(iOS 26.0, *) {
-                        SpeciesDigestDebugView(
+                        SpeciesChatView(
                             vm: SpeciesChatViewModel(taxon: taxon)
                         )
                         .presentationDetents([.medium, .large])
