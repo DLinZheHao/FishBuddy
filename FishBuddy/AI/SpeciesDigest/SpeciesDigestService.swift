@@ -32,6 +32,13 @@ final class SpeciesDigestService {
         case digestComplete(SpeciesDigest.PartiallyGenerated)
     }
 
+    enum AnswerEvent {
+        /// streaming 中的部分答案
+        case answerPartial(SpeciesAnswer.PartiallyGenerated)
+        /// streaming 結束的最後一個 snapshot
+        case answerComplete(SpeciesAnswer.PartiallyGenerated)
+    }
+
     enum DigestError: Error, LocalizedError {
         case unavailable(FoundationModelAvailabilityStore.Status)
         case planFailed(underlying: Error)
@@ -137,6 +144,43 @@ final class SpeciesDigestService {
     func prewarm() {
         LanguageModelSession(instructions: SpeciesDigestInstructions.plan).prewarm()
         LanguageModelSession(instructions: SpeciesDigestInstructions.digest).prewarm()
+        LanguageModelSession(instructions: SpeciesQAInstructions.answer).prewarm()
+    }
+
+    /// 為指定 taxon + topic 開啟一條單輪 Q&A stream。Q&A 不走 cache。
+    func answerStream(
+        for taxon: TaxonItem,
+        topic: QuestionTopic,
+        timeout: Duration = .seconds(60)
+    ) -> AsyncThrowingStream<AnswerEvent, Error> {
+        AsyncThrowingStream { continuation in
+            let work = Task {
+                do {
+                    let status = await FoundationModelAvailabilityStore.shared.status
+                    guard status == .available else {
+                        throw DigestError.unavailable(status)
+                    }
+                    try await self.runAnswer(taxon: taxon, topic: topic, continuation: continuation)
+                    continuation.finish()
+                } catch is CancellationError {
+                    continuation.finish(throwing: DigestError.cancelled)
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+
+            let timer = Task {
+                try? await Task.sleep(for: timeout)
+                guard !work.isCancelled else { return }
+                work.cancel()
+                continuation.finish(throwing: DigestError.timeout)
+            }
+
+            continuation.onTermination = { _ in
+                work.cancel()
+                timer.cancel()
+            }
+        }
     }
 
     // MARK: Private
@@ -208,5 +252,46 @@ final class SpeciesDigestService {
             CachedEntry(plan: plan, digest: final),
             forKey: taxon.taxonId as NSNumber
         )
+    }
+
+    private func runAnswer(
+        taxon: TaxonItem,
+        topic: QuestionTopic,
+        continuation: AsyncThrowingStream<AnswerEvent, Error>.Continuation
+    ) async throws {
+        var lastSnapshot: SpeciesAnswer.PartiallyGenerated?
+        do {
+            let session = LanguageModelSession(instructions: SpeciesQAInstructions.answer)
+            let prompt = Prompt {
+                "User question (Traditional Chinese): \(topic.question)"
+                SelectedFieldsForQAPrompt(taxon: taxon, fields: topic.fields)
+            }
+            let stream = session.streamResponse(
+                to: prompt,
+                generating: SpeciesAnswer.self,
+                includeSchemaInPrompt: false
+            )
+            for try await snapshot in stream {
+                try Task.checkCancellation()
+                let content = snapshot.content
+                lastSnapshot = content
+                continuation.yield(.answerPartial(content))
+            }
+        } catch is CancellationError {
+            throw DigestError.cancelled
+        } catch {
+            throw DigestError.digestFailed(underlying: error)
+        }
+
+        guard let final = lastSnapshot else {
+            throw DigestError.digestFailed(
+                underlying: NSError(
+                    domain: "SpeciesDigestService",
+                    code: -2,
+                    userInfo: [NSLocalizedDescriptionKey: "Answer stream produced no snapshot"]
+                )
+            )
+        }
+        continuation.yield(.answerComplete(final))
     }
 }

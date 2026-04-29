@@ -27,8 +27,18 @@ final class SpeciesDigestViewModel {
         case unavailable(FoundationModelAvailabilityStore.Status)
     }
 
+    enum AnswerState {
+        case idle
+        case asking(SpeciesAnswer.PartiallyGenerated?)
+        case answered(SpeciesAnswer.PartiallyGenerated)
+        case failed(SpeciesDigestService.DigestError)
+    }
+
     private(set) var state: State = .idle
     private(set) var plan: DigestPlan?
+
+    private(set) var answerState: AnswerState = .idle
+    private(set) var lastTopic: QuestionTopic?
 
     private let taxon: TaxonItem
 
@@ -51,6 +61,34 @@ final class SpeciesDigestViewModel {
 
     func prewarm() {
         SpeciesDigestService.shared.prewarm()
+    }
+
+    /// 從 SwiftUI Task 內呼叫。每次重新提問都會覆蓋前一次 answerState。
+    /// View 消失或同畫面再呼一次會自動讓上一條 stream 隨 await cancellation 收尾。
+    func ask(_ topic: QuestionTopic) async {
+        lastTopic = topic
+        answerState = .asking(nil)
+
+        do {
+            let stream = SpeciesDigestService.shared.answerStream(for: taxon, topic: topic)
+            for try await event in stream {
+                switch event {
+                case .answerPartial(let partial):
+                    answerState = .asking(partial)
+                case .answerComplete(let final):
+                    answerState = .answered(final)
+                }
+            }
+        } catch let error as SpeciesDigestService.DigestError {
+            switch error {
+            case .cancelled:
+                break
+            default:
+                answerState = .failed(error)
+            }
+        } catch {
+            answerState = .failed(.digestFailed(underlying: error))
+        }
     }
 
     private func run() async {
