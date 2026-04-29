@@ -50,6 +50,14 @@ final class SpeciesChatViewModel {
     private(set) var messages: [ChatMessage] = []
     private(set) var unavailable: FoundationModelAvailabilityStore.Status?
 
+    /// 顯示在 chat top bar 的標題；中文俗名優先，沒有則退到學名。
+    var title: String {
+        if let zh = taxon.commonNameZh, !zh.isEmpty {
+            return zh
+        }
+        return taxon.scientificName
+    }
+
     // MARK: - Private
 
     private let taxon: TaxonItem

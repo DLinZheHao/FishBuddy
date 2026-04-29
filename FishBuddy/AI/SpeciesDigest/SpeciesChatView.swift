@@ -16,11 +16,16 @@ struct SpeciesChatView: View {
     @State private var pendingTopic: QuestionTopic?
     @State private var askTick: Int = 0
 
+    @Environment(\.dismiss) private var dismiss
+
     var body: some View {
         ZStack {
             Color.cwSurface.ignoresSafeArea()
 
             messagesScroll
+        }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            ChatTopBar(title: vm.title) { dismiss() }
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             VStack(spacing: 0) {
@@ -92,6 +97,52 @@ struct SpeciesChatView: View {
         guard !q.isEmpty else { return }
         fire(topic: .free(q))
         freeText = ""
+    }
+}
+
+// MARK: - Top bar
+
+@available(iOS 26.0, *)
+private struct ChatTopBar: View {
+
+    let title: String
+    let onClose: () -> Void
+
+    var body: some View {
+        HStack(spacing: 0) {
+            Color.clear
+                .frame(width: 44, height: 36)
+
+            Spacer()
+
+            VStack(spacing: 0) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(Color.cwOnSurface)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                Text("AI 助手")
+                    .font(.caption2)
+                    .foregroundStyle(Color.cwOnSurfaceVar)
+            }
+
+            Spacer()
+
+            Button(action: onClose) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.cwOnSurface)
+                    .frame(width: 30, height: 30)
+                    .background(Circle().fill(Color.cwSurfaceHigh))
+            }
+            .padding(.trailing, 12)
+            .accessibilityLabel("關閉")
+        }
+        .padding(.vertical, 10)
+        .background(Color.cwSurfaceLow)
+        .overlay(alignment: .bottom) {
+            Divider().opacity(0.4)
+        }
     }
 }
 
