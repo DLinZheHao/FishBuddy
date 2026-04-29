@@ -10,7 +10,7 @@ import SwiftUI
 @available(iOS 26.0, *)
 struct SpeciesDigestDebugView: View {
 
-    @State var generator: SpeciesDigestGenerator
+    @State var vm: SpeciesDigestViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -27,31 +27,48 @@ struct SpeciesDigestDebugView: View {
         }
         .padding()
         .task {
-            generator.prewarmModel()
-            await generator.generateAll()
+            vm.prewarm()
+            await vm.load()
         }
     }
 
     @ViewBuilder
     private var content: some View {
-        // ❶ Error
-        if let error = generator.error {
+        switch vm.state {
+        case .idle, .planning:
+            VStack(alignment: .leading, spacing: 8) {
+                ProgressView()
+                Text("Planning…")
+                    .foregroundStyle(.secondary)
+            }
+
+        case .generating(let partial):
+            if let partial {
+                DigestResultView(partial: partial)
+            } else {
+                VStack(alignment: .leading, spacing: 8) {
+                    ProgressView()
+                    Text("Generating species digest…")
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+        case .loaded(let partial):
+            DigestResultView(partial: partial)
+
+        case .failed(let error):
             VStack(alignment: .leading, spacing: 8) {
                 Text("❌ Error")
                     .font(.headline)
-                Text(error.localizedDescription)
+                Text(error.errorDescription ?? "Unknown error")
                     .foregroundStyle(.red)
             }
-        }
-        // ❷ Success（已有任何 partial output）
-        else if let partial = generator.speciesDigest {
-            DigestResultView(partial: partial)
-        }
-        // ❸ Loading
-        else {
+
+        case .unavailable(let status):
             VStack(alignment: .leading, spacing: 8) {
-                ProgressView()
-                Text("Generating species digest…")
+                Text("⚠️ AI 功能無法使用")
+                    .font(.headline)
+                Text("狀態：\(String(describing: status))")
                     .foregroundStyle(.secondary)
             }
         }

@@ -86,4 +86,4 @@ Moya-based singleton (`APIService.shareManager()`). All endpoints defined as enu
 
 **JSON column decoding**: Species data is stored as JSON blobs in SQLite. `FishDB` decodes these via `JSONDecoder` into nested `TaxonItem` structs. When adding new species fields, update both the SQLite query and the corresponding `Codable` struct.
 
-**FoundationModels (AI summary)**: `SpeciesDigestGenerator` requires iOS 26.0+ and Apple Intelligence enabled. Always guard with availability checks; the rest of the app must function without it.
+**FoundationModels (AI summary)**: `SpeciesDigestService` (singleton) + `SpeciesDigestViewModel` (per-screen) require iOS 26.0+ and Apple Intelligence enabled. App-level availability is exposed via `FoundationModelAvailabilityStore.shared`. Always guard with availability checks; the rest of the app must function without it.

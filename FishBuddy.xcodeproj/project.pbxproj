@@ -38,7 +38,6 @@
 		054D35602EB9F9830051C5C4 /* AnimalTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054D355F2EB9F9720051C5C4 /* AnimalTracker.swift */; };
 		05513A432DAE44540021573F /* WeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05513A422DAE44540021573F /* WeatherView.swift */; };
 		05515DE52F0F9BAC009AAD00 /* Playground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05515DE42F0F9BAC009AAD00 /* Playground.swift */; };
-		05515DE72F13774B009AAD00 /* SpeciesDigestGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05515DE62F137736009AAD00 /* SpeciesDigestGenerator.swift */; };
 		05515DE92F13792C009AAD00 /* SpeciesDigest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05515DE82F137923009AAD00 /* SpeciesDigest.swift */; };
 		05515DEB2F1393F6009AAD00 /* SpeciesDigestTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05515DEA2F1393F4009AAD00 /* SpeciesDigestTestView.swift */; };
 		055446FB2E8241D000BF51AC /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 055446FA2E8241D000BF51AC /* Kingfisher */; };
@@ -175,7 +174,6 @@
 		054D355F2EB9F9720051C5C4 /* AnimalTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimalTracker.swift; sourceTree = "<group>"; };
 		05513A422DAE44540021573F /* WeatherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherView.swift; sourceTree = "<group>"; };
 		05515DE42F0F9BAC009AAD00 /* Playground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Playground.swift; sourceTree = "<group>"; };
-		05515DE62F137736009AAD00 /* SpeciesDigestGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeciesDigestGenerator.swift; sourceTree = "<group>"; };
 		05515DE82F137923009AAD00 /* SpeciesDigest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeciesDigest.swift; sourceTree = "<group>"; };
 		05515DEA2F1393F4009AAD00 /* SpeciesDigestTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeciesDigestTestView.swift; sourceTree = "<group>"; };
 		05589EE42CE6ECD8003881AA /* Display.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Display.swift; sourceTree = "<group>"; };
@@ -765,7 +763,6 @@
 		05C94D8E2E6ABF7C0051B078 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				05515DE62F137736009AAD00 /* SpeciesDigestGenerator.swift */,
 				05C94D8D2E6ABF7C0051B078 /* CameraStreamVM.swift */,
 			);
 			path = ViewModel;
@@ -1116,7 +1113,6 @@
 				054C846E2CDB06AA005595EF /* WeatherAllModel.swift in Sources */,
 				05E672E02CDB0C78006CF3BF /* APILoggerPlugin.swift in Sources */,
 				05823E0D2EB0683D00BDC553 /* ObservationDotsRenderer..swift in Sources */,
-				05515DE72F13774B009AAD00 /* SpeciesDigestGenerator.swift in Sources */,
 				05FAEF342E00F53D00E9BD08 /* CardSliderSubViews.swift in Sources */,
 				0512FBB42F41C60D00873F6A /* BioCLIPEmbeddingExtractor.swift in Sources */,
 				05FAEF392E013B7300E9BD08 /* CardSliderVM.swift in Sources */,
