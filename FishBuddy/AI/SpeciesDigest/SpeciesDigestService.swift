@@ -33,9 +33,13 @@ final class SpeciesDigestService {
     }
 
     enum AnswerEvent {
-        /// streaming 中的部分答案
+        /// Phase 1 完成；只供 debug／可被忽略
+        case planReady(QAPlan)
+        /// Phase 1 判定無資料可答；UI 直接顯示 noData，不會再有 partial/complete
+        case answerNoData
+        /// Phase 2 streaming 中的部分答案
         case answerPartial(SpeciesAnswer.PartiallyGenerated)
-        /// streaming 結束的最後一個 snapshot
+        /// Phase 2 streaming 結束的最後一個 snapshot
         case answerComplete(SpeciesAnswer.PartiallyGenerated)
     }
 
@@ -144,6 +148,7 @@ final class SpeciesDigestService {
     func prewarm() {
         LanguageModelSession(instructions: SpeciesDigestInstructions.plan).prewarm()
         LanguageModelSession(instructions: SpeciesDigestInstructions.digest).prewarm()
+        LanguageModelSession(instructions: SpeciesQAInstructions.plan).prewarm()
         LanguageModelSession(instructions: SpeciesQAInstructions.answer).prewarm()
     }
 
@@ -259,12 +264,35 @@ final class SpeciesDigestService {
         topic: QuestionTopic,
         continuation: AsyncThrowingStream<AnswerEvent, Error>.Continuation
     ) async throws {
+        // ──────────────── 決定使用哪些欄位 ────────────────
+        // chip：直接用 curated routing；free：走 Phase 1 LLM plan
+        let fields: [FocusArea]
+        switch topic {
+        case .free:
+            let plan = try await runQAPlan(taxon: taxon, topic: topic)
+            continuation.yield(.planReady(plan))
+            if plan.focus.isEmpty {
+                continuation.yield(.answerNoData)
+                return
+            }
+            fields = plan.focus
+        default:
+            // chip：用 QuestionTopic 自身的 curated routing
+            fields = topic.routing.fields
+        }
+
+        // ──────────────── Phase 2: 生成答案 ────────────────
         var lastSnapshot: SpeciesAnswer.PartiallyGenerated?
         do {
             let session = LanguageModelSession(instructions: SpeciesQAInstructions.answer)
             let prompt = Prompt {
                 "User question (Traditional Chinese): \(topic.question)"
-                SelectedFieldsForQAPrompt(taxon: taxon, fields: topic.fields)
+                if topic.isCurated {
+                    // chip 是 app 預先 curate 的題目，欄位也是親手挑的；告訴模型可以放心答。
+                    // 否則 on-device 模型偏向過嚴判 noData，導致明明有資料卻拒答。
+                    "Note: this question is one of the app's curated topics; the fields below have been pre-selected for this specific topic by the app. Trust the routing: if the fields contain ANY content addressing this topic (even partially or with caveats), provide an answer using the directly relevant parts. Set noData=true ONLY if the fields are genuinely empty or contain nothing related to the topic at all. Still avoid padding with unrelated facts."
+                }
+                SelectedFieldsForQAPrompt(taxon: taxon, fields: fields)
             }
             let stream = session.streamResponse(
                 to: prompt,
@@ -293,5 +321,39 @@ final class SpeciesDigestService {
             )
         }
         continuation.yield(.answerComplete(final))
+    }
+
+    /// Phase 1：呼叫 LLM 做 semantic field routing。
+    /// Plan call 失敗時 fallback 到 keyword router 的結果。
+    private func runQAPlan(
+        taxon: TaxonItem,
+        topic: QuestionTopic
+    ) async throws -> QAPlan {
+        do {
+            let session = LanguageModelSession(instructions: SpeciesQAInstructions.plan)
+            let prompt = Prompt {
+                "User question (Traditional Chinese): \(topic.question)"
+                QATaxonFieldDirectoryPrompt(taxon: taxon)
+            }
+            let stream = session.streamResponse(
+                to: prompt,
+                generating: QAPlan.self,
+                includeSchemaInPrompt: false
+            )
+            let plan = try await stream.collect().content
+            #if DEBUG
+            print("🧭 [QAPlan] Q=\"\(topic.question)\" → focus=\(plan.focus.map { String(describing: $0) }), reason=\"\(plan.reason)\"")
+            #endif
+            return plan
+        } catch is CancellationError {
+            throw DigestError.cancelled
+        } catch {
+            // Plan 失敗：退回 keyword router，避免整個 Q&A 一起爆掉
+            let routing = topic.routing
+            #if DEBUG
+            print("⚠️ [QAPlan] failed: \(error.localizedDescription) — fallback to keyword router fields=\(routing.fields)")
+            #endif
+            return QAPlan(focus: routing.fields, reason: "(plan-failed fallback)")
+        }
     }
 }

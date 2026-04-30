@@ -29,6 +29,8 @@ final class SpeciesChatViewModel {
         case userText(String)
         case digest(SpeciesDigest.PartiallyGenerated)
         case answer(SpeciesAnswer.PartiallyGenerated)
+        /// Phase 1 plan 判定無資料；不進 Phase 2，view 直接渲染 noDataView。
+        case noDataAnswer
         case thinking
         case info(String)
         case error(String)
@@ -129,6 +131,10 @@ final class SpeciesChatViewModel {
             let stream = SpeciesDigestService.shared.answerStream(for: taxon, topic: topic)
             for try await event in stream {
                 switch event {
+                case .planReady:
+                    break  // 對使用者不可見
+                case .answerNoData:
+                    update(id: assistantId, content: .noDataAnswer, streaming: false)
                 case .answerPartial(let partial):
                     lastPartial = partial
                     update(id: assistantId, content: .answer(partial), streaming: true)

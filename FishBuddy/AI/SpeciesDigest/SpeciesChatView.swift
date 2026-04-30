@@ -18,6 +18,10 @@ struct SpeciesChatView: View {
 
     @Environment(\.dismiss) private var dismiss
 
+    /// 自由輸入暫時關閉——`.free` 走 LLM plan 階段在 on-device 3B 模型上不夠穩定。
+    /// 待模型升級或改 architecture 後可重新打開（將此值設回 true）。
+    private let freeFormEnabled: Bool = false
+
     var body: some View {
         ZStack {
             Color.cwSurface.ignoresSafeArea()
@@ -31,11 +35,13 @@ struct SpeciesChatView: View {
             VStack(spacing: 0) {
                 Divider().opacity(0.4)
                 QuickReplyBar { topic in fire(topic: topic) }
-                InputBar(
-                    text: $freeText,
-                    placeholder: "問這隻魚的特徵或習性…",
-                    onSend: fireFree
-                )
+                if freeFormEnabled {
+                    InputBar(
+                        text: $freeText,
+                        placeholder: "問這隻魚的特徵或習性…",
+                        onSend: fireFree
+                    )
+                }
             }
             .background(Color.cwSurfaceLow)
         }
@@ -204,6 +210,8 @@ private struct MessageBubble: View {
                 topic: message.topic,
                 isStreaming: message.isStreaming
             )
+        case .noDataAnswer:
+            NoDataAnswerBubbleContent(topic: message.topic)
         case .thinking:
             ThinkingIndicator()
         case .error(let text):
@@ -295,12 +303,24 @@ private struct DigestBubbleContent: View {
 
             if let traits = partial.keyTraits, !traits.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {
-                    ForEach(Array(traits.enumerated()), id: \.offset) { _, trait in
-                        HStack(alignment: .firstTextBaseline, spacing: 6) {
-                            Text("•").foregroundStyle(Color.cwPrimary)
-                            Text(trait).foregroundStyle(Color.cwOnSurface)
+                    ForEach(Array(traits.enumerated()), id: \.offset) { index, trait in
+                        HStack(alignment: .top, spacing: 6) {
+                            Text("•")
+                                .foregroundStyle(Color.cwPrimary)
+
+                            Text(trait)
+                                .foregroundStyle(Color.cwOnSurface)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                         .font(.subheadline)
+
+                        if index != traits.count - 1 {
+                            Divider()
+                                .frame(height: 1)
+                                .overlay(Color.cwOnSurface.opacity(0.3))
+                                .padding(.leading, 14)
+                                .padding(.vertical, 2)
+                        }
                     }
                 }
             }
@@ -340,29 +360,97 @@ private struct AnswerBubbleContent: View {
     let isStreaming: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             if let topic {
                 Text("Q：\(topic.displayName)")
                     .font(.caption)
                     .foregroundStyle(Color.cwOnSurfaceVar)
             }
 
-            if partial.noData == true {
-                Label("此問題的資料未涵蓋", systemImage: "exclamationmark.triangle.fill")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.cwTertiary)
+            if isEffectiveNoData {
+                noDataView
+            } else {
+                paragraphsView
             }
+        }
+    }
 
-            HStack(alignment: .firstTextBaseline, spacing: 0) {
-                Text(partial.text ?? "")
-                    .font(.body)
-                    .foregroundStyle(Color.cwOnSurface)
-                    .textSelection(.enabled)
+    /// 模型有時 noData=false 但 paragraphs 仍寫 fallback 字串；這裡同樣視為無資料。
+    private var isEffectiveNoData: Bool {
+        if partial.noData == true { return true }
+        let items = (partial.paragraphs ?? []).compactMap { $0 }.filter { !$0.isEmpty }
+        // 串流中可能只有半截，所以等到完成（或唯一一段）才判定
+        guard !isStreaming || items.count >= 1 else { return false }
+        if items.count == 1, items[0].contains("資料中未涵蓋") { return true }
+        return false
+    }
 
-                if isStreaming {
-                    StreamingCursor()
-                        .padding(.leading, 2)
+    private var noDataView: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.subheadline)
+                .foregroundStyle(Color.cwTertiary)
+            Text("資料庫中沒有這個問題的相關資訊")
+                .font(.body)
+                .foregroundStyle(Color.cwOnSurfaceVar)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    @ViewBuilder
+    private var paragraphsView: some View {
+        let items = (partial.paragraphs ?? []).compactMap { $0 }
+        let lastIndex = items.count - 1
+
+        if items.isEmpty {
+            // 還沒收到第一段；只顯示游標佔位避免高度跳動
+            if isStreaming {
+                StreamingCursor()
+            }
+        } else {
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(Array(items.enumerated()), id: \.offset) { idx, paragraph in
+                    HStack(alignment: .firstTextBaseline, spacing: 0) {
+                        Text(paragraph)
+                            .font(.body)
+                            .foregroundStyle(Color.cwOnSurface)
+                            .lineSpacing(3)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .textSelection(.enabled)
+
+                        if isStreaming, idx == lastIndex {
+                            StreamingCursor()
+                                .padding(.leading, 2)
+                        }
+                    }
                 }
+            }
+        }
+    }
+}
+
+// MARK: - NoData bubble (Phase 1 plan 判定無資料)
+
+@available(iOS 26.0, *)
+private struct NoDataAnswerBubbleContent: View {
+
+    let topic: QuestionTopic?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if let topic {
+                Text("Q：\(topic.displayName)")
+                    .font(.caption)
+                    .foregroundStyle(Color.cwOnSurfaceVar)
+            }
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.cwTertiary)
+                Text("資料庫中沒有這個問題的相關資訊")
+                    .font(.body)
+                    .foregroundStyle(Color.cwOnSurfaceVar)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
@@ -376,16 +464,26 @@ private struct CancelledBubbleContent: View {
     let partial: SpeciesAnswer.PartiallyGenerated?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             Label("已取消", systemImage: "xmark.circle.fill")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.cwOnSurfaceVar)
 
-            if let text = partial?.text, !text.isEmpty {
-                Text(text)
-                    .font(.body)
-                    .foregroundStyle(Color.cwOnSurfaceVar)
-                    .textSelection(.enabled)
+            // 若取消當下已知 noData=true，不再印 fallback 段落（避免兩段重複訊息）
+            if partial?.noData != true {
+                let items = (partial?.paragraphs ?? []).compactMap { $0 }.filter { !$0.isEmpty }
+                if !items.isEmpty {
+                    VStack(alignment: .leading, spacing: 6) {
+                        ForEach(Array(items.enumerated()), id: \.offset) { _, paragraph in
+                            Text(paragraph)
+                                .font(.body)
+                                .foregroundStyle(Color.cwOnSurfaceVar)
+                                .lineSpacing(3)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .textSelection(.enabled)
+                        }
+                    }
+                }
             }
         }
     }
